@@ -10,12 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as CoursesRouteImport } from './routes/courses'
 import { Route as DualCoursesRouteImport } from './routes/dual-courses'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CoursesRoute = CoursesRouteImport.update({
@@ -31,30 +37,34 @@ const DualCoursesRoute = DualCoursesRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/courses': typeof CoursesRoute
   '/dual-courses': typeof DualCoursesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/courses': typeof CoursesRoute
   '/dual-courses': typeof DualCoursesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/courses': typeof CoursesRoute
   '/dual-courses': typeof DualCoursesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/courses' | '/dual-courses'
+  fullPaths: '/' | '/about' | '/courses' | '/dual-courses'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/courses' | '/dual-courses'
-  id: '__root__' | '/' | '/courses' | '/dual-courses'
+  to: '/' | '/about' | '/courses' | '/dual-courses'
+  id: '__root__' | '/' | '/about' | '/courses' | '/dual-courses'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
   CoursesRoute: typeof CoursesRoute
   DualCoursesRoute: typeof DualCoursesRoute
 }
@@ -66,6 +76,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/courses': {
@@ -87,6 +104,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
   CoursesRoute: CoursesRoute,
   DualCoursesRoute: DualCoursesRoute,
 }
