@@ -26,33 +26,15 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     setBusy(true);
     setError(null);
-    setNotice(null);
-
-    if (mode === "signup") {
-      const { data, error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: { emailRedirectTo: window.location.origin + "/auth" },
-      });
-      setBusy(false);
-      if (signUpError) return setError(signUpError.message);
-      if (!data.session) {
-        return setNotice("Account created. Check your email to confirm it, then sign in.");
-      }
-      navigate({ to: "/admin" });
-      return;
-    }
 
     const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
     setBusy(false);
@@ -66,12 +48,8 @@ function AuthPage() {
         <Link to="/" className="text-xs font-bold tracking-[0.3em] text-secondary uppercase">
           Creative Arts College
         </Link>
-        <h1 className="mt-4 font-display text-3xl font-black">
-          {mode === "signin" ? "Staff sign in" : "Create staff account"}
-        </h1>
-        <p className="mt-2 text-sm opacity-80">
-          Manage course fees and student enquiries.
-        </p>
+        <h1 className="mt-4 font-display text-3xl font-black">Staff sign in</h1>
+        <p className="mt-2 text-sm opacity-80">Manage course fees and student enquiries.</p>
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-4">
           <div>
@@ -100,7 +78,7 @@ function AuthPage() {
               type="password"
               required
               minLength={8}
-              autoComplete={mode === "signin" ? "current-password" : "new-password"}
+              autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="mt-2 w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-sm outline-none focus:border-secondary"
@@ -108,30 +86,19 @@ function AuthPage() {
           </div>
 
           {error && <p className="text-sm font-semibold text-destructive">{error}</p>}
-          {notice && <p className="text-sm font-semibold text-secondary">{notice}</p>}
 
           <button
             type="submit"
             disabled={busy}
             className="w-full rounded-full bg-secondary px-6 py-3 text-sm font-bold text-secondary-foreground disabled:opacity-60"
           >
-            {busy ? "Please wait…" : mode === "signin" ? "Sign in" : "Create account"}
+            {busy ? "Please wait…" : "Sign in"}
           </button>
         </form>
 
-        <button
-          type="button"
-          onClick={() => {
-            setMode(mode === "signin" ? "signup" : "signin");
-            setError(null);
-            setNotice(null);
-          }}
-          className="mt-6 text-sm underline opacity-80 hover:opacity-100"
-        >
-          {mode === "signin"
-            ? "First time here? Create your account"
-            : "Already have an account? Sign in"}
-        </button>
+        <p className="mt-6 text-xs opacity-60">
+          Accounts are created by the college. Contact the administrator if you need access.
+        </p>
       </div>
     </div>
   );
