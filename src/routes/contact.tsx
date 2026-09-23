@@ -1,5 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { contact, courses, dualCourses } from "@/data/courses";
+import { useState } from "react";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { CatalogueError, CatalogueNotFound } from "@/components/route-fallbacks";
+import { catalogueQueryOptions } from "@/lib/catalogue-queries";
+import { submitEnquiry } from "@/lib/catalogue.functions";
+import { contact } from "@/data/courses";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -17,12 +23,46 @@ export const Route = createFileRoute("/contact")({
       },
     ],
   }),
+  loader: ({ context }) => context.queryClient.ensureQueryData(catalogueQueryOptions),
+  errorComponent: ({ error }) => <CatalogueError error={error} />,
+  notFoundComponent: () => <CatalogueNotFound />,
   component: ContactPage,
 });
 
 function ContactPage() {
-  const mailto = (subject: string) =>
-    `mailto:info@creativearts.co.za?subject=${encodeURIComponent(subject)}`;
+  const { data: catalogue } = useSuspenseQuery(catalogueQueryOptions);
+  const submitFn = useServerFn(submitEnquiry);
+  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const data = new FormData(form);
+    const interest = String(data.get("interest") ?? "");
+    const [kind, id] = interest.includes(":") ? interest.split(":") : ["", ""];
+
+    setStatus("sending");
+    const result = await submitFn({
+      data: {
+        fullName: String(data.get("name") ?? ""),
+        phone: String(data.get("phone") ?? ""),
+        email: String(data.get("email") ?? ""),
+        courseId: kind === "course" ? id : null,
+        dualCourseId: kind === "dual" ? id : null,
+        campus: String(data.get("campus") ?? ""),
+        message: String(data.get("message") ?? "") || null,
+      },
+    });
+
+    if (result.ok) {
+      setStatus("sent");
+      form.reset();
+    } else {
+      setStatus("error");
+      setErrorMessage(result.error);
+    }
+  };
 
   return (
     <div>
@@ -42,80 +82,104 @@ function ContactPage() {
       </section>
 
       <section className="mx-auto grid max-w-6xl gap-6 px-5 py-14 lg:grid-cols-[1.1fr_0.9fr]">
-        <form
-          className="rounded-2xl border border-border bg-card p-6"
-          onSubmit={(e) => {
-            e.preventDefault();
-            const data = new FormData(e.currentTarget);
-            const body = [...data.entries()]
-              .map(([k, v]) => `${k}: ${v}`)
-              .join("\n");
-            window.location.href = `${mailto("2027 course enquiry")}&body=${encodeURIComponent(body)}`;
-          }}
-        >
-          <h2 className="font-display text-xl font-black">Enquiry</h2>
-          <div className="mt-5 grid gap-4 sm:grid-cols-2">
-            <Field label="Full name" name="name" required />
-            <Field label="Mobile number" name="phone" type="tel" required />
-            <Field label="Email address" name="email" type="email" required className="sm:col-span-2" />
-            <div className="sm:col-span-2">
-              <label htmlFor="interest" className="text-sm font-bold">
-                Course of interest
-              </label>
-              <select
-                id="interest"
-                name="interest"
-                className="mt-2 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm"
-              >
-                <optgroup label="Dual courses">
-                  {dualCourses.map((d) => (
-                    <option key={d.id}>{d.title} (dual)</option>
-                  ))}
-                </optgroup>
-                <optgroup label="Individual courses">
-                  {courses.map((c) => (
-                    <option key={c.id}>{c.name}</option>
-                  ))}
-                </optgroup>
-              </select>
-            </div>
-            <div className="sm:col-span-2">
-              <label htmlFor="campus" className="text-sm font-bold">
-                Preferred campus
-              </label>
-              <select
-                id="campus"
-                name="campus"
-                className="mt-2 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm"
-              >
-                {contact.campuses.map((c) => (
-                  <option key={c.city}>{c.city}</option>
-                ))}
-                <option>Blended / online</option>
-              </select>
-            </div>
-            <div className="sm:col-span-2">
-              <label htmlFor="message" className="text-sm font-bold">
-                Message (optional)
-              </label>
-              <textarea
-                id="message"
-                name="message"
-                rows={4}
-                className="mt-2 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm"
-              />
-            </div>
+        {status === "sent" ? (
+          <div className="flex flex-col items-start justify-center rounded-2xl border-2 border-secondary bg-card p-8">
+            <h2 className="font-display text-2xl font-black text-primary">
+              Enquiry received
+            </h2>
+            <p className="mt-3 text-sm text-muted-foreground">
+              Thank you — an advisor will contact you with the fee sheet, intake dates and
+              registration deposit. If you'd like to speak to someone sooner, call us on{" "}
+              <a href={`tel:${contact.phone.replace(/\s/g, "")}`} className="font-bold text-secondary">
+                {contact.phone}
+              </a>
+              .
+            </p>
+            <button
+              type="button"
+              onClick={() => setStatus("idle")}
+              className="mt-6 rounded-full border border-border px-5 py-2.5 text-sm font-bold text-muted-foreground hover:bg-muted"
+            >
+              Send another enquiry
+            </button>
           </div>
-          <button
-            type="submit"
-            className="mt-6 w-full rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-foreground transition-opacity hover:opacity-90"
-          >
-            Send enquiry
-          </button>
-          <p className="mt-3 text-xs text-muted-foreground">
-            Registration deposits will be payable online once payments go live.
-          </p>
-        </form>
+        ) : (
+          <form className="rounded-2xl border border-border bg-card p-6" onSubmit={onSubmit}>
+            <h2 className="font-display text-xl font-black">Enquiry</h2>
+            <div className="mt-5 grid gap-4 sm:grid-cols-2">
+              <Field label="Full name" name="name" required />
+              <Field label="Mobile number" name="phone" type="tel" required />
+              <Field label="Email address" name="email" type="email" required className="sm:col-span-2" />
+              <div className="sm:col-span-2">
+                <label htmlFor="interest" className="text-sm font-bold">
+                  Course of interest
+                </label>
+                <select
+                  id="interest"
+                  name="interest"
+                  className="mt-2 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm"
+                >
+                  <option value="">Not sure yet</option>
+                  <optgroup label="Dual courses">
+                    {catalogue.duals.map((d) => (
+                      <option key={d.id} value={`dual:${d.id}`}>
+                        {d.title} (dual)
+                      </option>
+                    ))}
+                  </optgroup>
+                  <optgroup label="Individual courses">
+                    {catalogue.courses.map((c) => (
+                      <option key={c.id} value={`course:${c.id}`}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </optgroup>
+                </select>
+              </div>
+              <div className="sm:col-span-2">
+                <label htmlFor="campus" className="text-sm font-bold">
+                  Preferred campus
+                </label>
+                <select
+                  id="campus"
+                  name="campus"
+                  className="mt-2 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm"
+                >
+                  {contact.campuses.map((c) => (
+                    <option key={c.city}>{c.city}</option>
+                  ))}
+                  <option>Blended / online</option>
+                </select>
+              </div>
+              <div className="sm:col-span-2">
+                <label htmlFor="message" className="text-sm font-bold">
+                  Message (optional)
+                </label>
+                <textarea
+                  id="message"
+                  name="message"
+                  rows={4}
+                  className="mt-2 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm"
+                />
+              </div>
+            </div>
+            {status === "error" && (
+              <p className="mt-4 rounded-xl bg-gold/20 px-4 py-3 text-sm font-semibold text-gold-foreground">
+                {errorMessage}
+              </p>
+            )}
+            <button
+              type="submit"
+              disabled={status === "sending"}
+              className="mt-6 w-full rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
+            >
+              {status === "sending" ? "Sending…" : "Send enquiry"}
+            </button>
+            <p className="mt-3 text-xs text-muted-foreground">
+              Registration deposits will be payable online once payments go live.
+            </p>
+          </form>
+        )}
 
         <div className="space-y-5">
           <div className="rounded-2xl bg-primary p-6 text-primary-foreground">

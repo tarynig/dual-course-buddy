@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { DualCard } from "@/components/course-cards";
-import { courses, dualCourses, faculties } from "@/data/courses";
+import { CatalogueError, CatalogueNotFound } from "@/components/route-fallbacks";
+import { catalogueQueryOptions } from "@/lib/catalogue-queries";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -19,11 +21,16 @@ export const Route = createFileRoute("/")({
       },
     ],
   }),
+  loader: ({ context }) => context.queryClient.ensureQueryData(catalogueQueryOptions),
+  errorComponent: ({ error }) => <CatalogueError error={error} />,
+  notFoundComponent: () => <CatalogueNotFound />,
   component: Home,
 });
 
 function Home() {
-  const featuredDuals = dualCourses.filter((d) =>
+  const { data: catalogue } = useSuspenseQuery(catalogueQueryOptions);
+
+  const featuredDuals = catalogue.duals.filter((d) =>
     ["d-advanced-graphic", "d-film-content", "d-music-dj", "d-fashion-dd"].includes(d.id),
   );
 
@@ -62,7 +69,7 @@ function Home() {
           <dl className="grid gap-4 sm:grid-cols-2">
             <HeroStat value="30+" label="SAQA qualifications" />
             <HeroStat value="12–24" label="Months to qualify" />
-            <HeroStat value={`${dualCourses.length}`} label="Dual pairings" />
+            <HeroStat value={`${catalogue.duals.length}`} label="Dual pairings" />
             <HeroStat value="99%" label="Pass rate" />
           </dl>
         </div>
@@ -71,11 +78,11 @@ function Home() {
       <section className="mx-auto max-w-6xl px-5 py-16">
         <h2 className="font-display text-3xl font-black">Seven faculties</h2>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          {courses.length} individual courses across the creative, media, communication and
-          technology sectors.
+          {catalogue.courses.length} individual courses across the creative, media, communication
+          and technology sectors.
         </p>
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {faculties.map((f) => (
+          {catalogue.faculties.map((f) => (
             <Link
               key={f.id}
               to="/courses"
@@ -84,7 +91,7 @@ function Home() {
               <h3 className="font-display text-lg font-black text-primary">{f.name}</h3>
               <p className="mt-2 text-sm text-muted-foreground">{f.tagline}</p>
               <p className="mt-4 text-xs font-black tracking-widest text-secondary uppercase">
-                {courses.filter((c) => c.faculty === f.id).length} courses →
+                {catalogue.courses.filter((c) => c.faculty === f.id).length} courses →
               </p>
             </Link>
           ))}
@@ -105,12 +112,12 @@ function Home() {
               to="/dual-courses"
               className="rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-foreground"
             >
-              See all {dualCourses.length} pairings
+              See all {catalogue.duals.length} pairings
             </Link>
           </div>
           <div className="mt-8 grid gap-5 md:grid-cols-2">
             {featuredDuals.map((d) => (
-              <DualCard key={d.id} dual={d} />
+              <DualCard key={d.id} dual={d} courses={catalogue.courses} />
             ))}
           </div>
         </div>
