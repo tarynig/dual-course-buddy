@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { signIn } from "@/lib/auth.functions";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -26,6 +27,7 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
+  const submitSignIn = useServerFn(signIn);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
@@ -36,10 +38,17 @@ function AuthPage() {
     setBusy(true);
     setError(null);
 
-    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+    try {
+      const result = await submitSignIn({ data: { email, password } });
+      if (!result.ok) {
+        setBusy(false);
+        return setError(result.error);
+      }
+      navigate({ to: "/admin" });
+    } catch {
+      setError("We couldn't sign you in right now. Please try again.");
+    }
     setBusy(false);
-    if (signInError) return setError(signInError.message);
-    navigate({ to: "/admin" });
   }
 
   return (
