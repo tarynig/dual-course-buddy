@@ -33,7 +33,8 @@ export async function createSession(userId: string): Promise<void> {
 
   setCookie(SESSION_COOKIE, token, {
     httpOnly: true,
-    secure: true,
+    // Local development runs over plain http; everything else is https.
+    secure: process.env["NODE_ENV"] !== "development",
     sameSite: "lax",
     path: "/",
     maxAge: SESSION_DAYS * 24 * 60 * 60,

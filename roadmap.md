@@ -6,6 +6,6 @@
 - [x] Wire catalogue pages to read courses/fees from the database
 - [x] Store Apply-form submissions as enquiries in the database
 - [ ] Fees data entry once the college supplies numbers
-- [ ] Staff view for reading enquiries (needs a login decision)
-
-- [x] Admin login (staff sign in at /auth) and admin dashboard at /admin: enquiry inbox with status tracking + fee editing for courses and dual courses. Founding admin: taryn.wdb@gmail.com (auto-granted on first sign-in).
+- [x] Staff view for reading enquiries (admin dashboard)
+- [x] Admin login (staff sign in at /auth) and admin dashboard at /admin: enquiry inbox with status tracking + fee editing for courses and dual courses.
+- [x] Ported to plain PostgreSQL: all data access is standard SQL (postgres.js) via DATABASE_URL; own accounts/sessions tables (app_users, app_sessions) with bcrypt via pgcrypto and cookie sessions; no third-party SDKs. Admin: taryn.wdb@gmail.com (temporary password set — change it in the Account tab).

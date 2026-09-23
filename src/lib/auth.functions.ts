@@ -27,7 +27,7 @@ export const signIn = createServerFn({ method: "POST" })
       SELECT id FROM public.app_users
       WHERE lower(email) = lower(${data.email})
         AND is_active
-        AND password_hash = crypt(${data.password}, password_hash)
+        AND public.verify_password(${data.password}, password_hash)
       LIMIT 1
     `;
     const user = rows[0];
@@ -61,9 +61,9 @@ export const changePassword = createServerFn({ method: "POST" })
 
     const rows = await db()<Array<{ id: string }>>`
       UPDATE public.app_users
-      SET password_hash = crypt(${data.newPassword}, gen_salt('bf', 10))
+      SET password_hash = public.hash_password(${data.newPassword})
       WHERE id = ${user.id}
-        AND password_hash = crypt(${data.currentPassword}, password_hash)
+        AND public.verify_password(${data.currentPassword}, password_hash)
       RETURNING id
     `;
     if (!rows[0]) return { ok: false as const, error: "Your current password isn't correct." };
