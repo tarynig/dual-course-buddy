@@ -2,7 +2,7 @@ import { useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { supabase } from "@/integrations/supabase/client";
+import { changePassword, signOut } from "@/lib/auth.functions";
 import {
   getAdminEnquiries,
   getAdminSession,
@@ -37,19 +37,21 @@ export const Route = createFileRoute("/_authenticated/admin")({
 });
 
 const STATUSES = ["new", "contacted", "enrolled", "closed"] as const;
+const TABS = ["enquiries", "fees", "account"] as const;
 
 function AdminPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [tab, setTab] = useState<"enquiries" | "fees">("enquiries");
+  const [tab, setTab] = useState<(typeof TABS)[number]>("enquiries");
 
   const fetchSession = useServerFn(getAdminSession);
+  const endSession = useServerFn(signOut);
   const session = useQuery({ queryKey: ["admin-session"], queryFn: () => fetchSession() });
 
   async function handleSignOut() {
     await queryClient.cancelQueries();
     queryClient.clear();
-    await supabase.auth.signOut();
+    await endSession({});
     navigate({ to: "/auth", replace: true });
   }
 
