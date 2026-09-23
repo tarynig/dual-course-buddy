@@ -64,12 +64,6 @@ export const formatZar = (value: number) =>
   new Intl.NumberFormat("en-ZA", { style: "currency", currency: "ZAR", maximumFractionDigits: 0 }).format(value);
 
 /** Individual fees added together, if both are known. */
-export const separateFeeTotal = (dual: DualCourse): number | null => {
-  if (dual.fee === null) return null;
-  return null; // computed with the catalogue in DualCard — see separateFeeTotalOf
-};
-
-/** Individual fees added together, if both are known. */
 export const separateFeeTotalOf = (courses: Course[], dual: DualCourse): number | null => {
   const parts = dual.courseIds.map((id) => courses.find((c) => c.id === id)?.fee ?? null);
   if (parts.some((p) => p === null)) return null;

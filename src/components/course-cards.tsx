@@ -1,9 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import {
-  courseById,
   dualSaving,
   formatZar,
-  separateFeeTotal,
+  separateFeeTotalOf,
   separateMonths,
   type Course,
   type DualCourse,
@@ -61,12 +60,14 @@ export function CourseCard({ course }: { course: Course }) {
   );
 }
 
-export function DualCard({ dual }: { dual: DualCourse }) {
-  const parts = dual.courseIds.map((id) => courseById(id)).filter(Boolean) as Course[];
-  const apart = separateMonths(dual);
+export function DualCard({ dual, courses }: { dual: DualCourse; courses: Course[] }) {
+  const parts = dual.courseIds
+    .map((id) => courses.find((c) => c.id === id))
+    .filter(Boolean) as Course[];
+  const apart = separateMonths(courses, dual);
   const monthsSaved = Math.max(apart - dual.months, 0);
-  const saving = dualSaving(dual);
-  const separate = separateFeeTotal(dual);
+  const saving = dualSaving(courses, dual);
+  const separate = separateFeeTotalOf(courses, dual);
 
   return (
     <article className="flex h-full flex-col rounded-2xl border-2 border-secondary/40 bg-card p-6 shadow-sm">
