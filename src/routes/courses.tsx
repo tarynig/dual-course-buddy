@@ -1,7 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { CourseCard } from "@/components/course-cards";
-import { courses, faculties, type FacultyId } from "@/data/courses";
+import { CatalogueError, CatalogueNotFound } from "@/components/route-fallbacks";
+import { catalogueQueryOptions } from "@/lib/catalogue-queries";
+import type { FacultyId } from "@/data/courses";
 
 export const Route = createFileRoute("/courses")({
   head: () => ({
@@ -20,14 +23,18 @@ export const Route = createFileRoute("/courses")({
       },
     ],
   }),
+  loader: ({ context }) => context.queryClient.ensureQueryData(catalogueQueryOptions),
+  errorComponent: ({ error }) => <CatalogueError error={error} />,
+  notFoundComponent: () => <CatalogueNotFound />,
   component: CoursesPage,
 });
 
 function CoursesPage() {
+  const { data: catalogue } = useSuspenseQuery(catalogueQueryOptions);
   const [faculty, setFaculty] = useState<FacultyId | "all">("all");
   const [maxMonths, setMaxMonths] = useState(24);
 
-  const filtered = courses.filter(
+  const filtered = catalogue.courses.filter(
     (c) => (faculty === "all" || c.faculty === faculty) && c.months <= maxMonths,
   );
 
@@ -61,7 +68,7 @@ function CoursesPage() {
           >
             All faculties
           </button>
-          {faculties.map((f) => (
+          {catalogue.faculties.map((f) => (
             <button
               key={f.id}
               type="button"
@@ -99,7 +106,7 @@ function CoursesPage() {
           </span>
         </div>
 
-        {faculties
+        {catalogue.faculties
           .filter((f) => faculty === "all" || f.id === faculty)
           .map((f) => {
             const list = filtered.filter((c) => c.faculty === f.id);

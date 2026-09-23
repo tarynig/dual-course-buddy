@@ -1,13 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { DualCard } from "@/components/course-cards";
-import {
-  courses,
-  dualCourses,
-  dualsForCourse,
-  faculties,
-  separateMonths,
-} from "@/data/courses";
+import { CatalogueError, CatalogueNotFound } from "@/components/route-fallbacks";
+import { catalogueQueryOptions } from "@/lib/catalogue-queries";
+import { dualsForCourse, separateMonths } from "@/data/courses";
 
 export const Route = createFileRoute("/dual-courses")({
   head: () => ({
@@ -26,18 +23,24 @@ export const Route = createFileRoute("/dual-courses")({
       },
     ],
   }),
+  loader: ({ context }) => context.queryClient.ensureQueryData(catalogueQueryOptions),
+  errorComponent: ({ error }) => <CatalogueError error={error} />,
+  notFoundComponent: () => <CatalogueNotFound />,
   component: DualPage,
 });
 
 function DualPage() {
+  const { data: catalogue } = useSuspenseQuery(catalogueQueryOptions);
   const [selected, setSelected] = useState<string>("");
 
   const results = useMemo(
-    () => (selected ? dualsForCourse(selected) : dualCourses),
-    [selected],
+    () => (selected ? dualsForCourse(catalogue, selected) : catalogue.duals),
+    [catalogue, selected],
   );
 
-  const pairableCourses = courses.filter((c) => dualsForCourse(c.id).length > 0);
+  const pairableCourses = catalogue.courses.filter(
+    (c) => dualsForCourse(catalogue, c.id).length > 0,
+  );
 
   return (
     <div>
@@ -72,7 +75,7 @@ function DualPage() {
               className="min-w-64 rounded-xl border border-input bg-background px-4 py-3 text-sm font-semibold"
             >
               <option value="">Show all dual courses</option>
-              {faculties.map((f) => (
+              {catalogue.faculties.map((f) => (
                 <optgroup key={f.id} label={f.name}>
                   {pairableCourses
                     .filter((c) => c.faculty === f.id)
@@ -109,7 +112,7 @@ function DualPage() {
               <Stat
                 label="Most time saved"
                 value={`${Math.max(
-                  ...results.map((d) => separateMonths(d) - d.months),
+                  ...results.map((d) => separateMonths(catalogue.courses, d) - d.months),
                 )} months`}
               />
               <Stat label="Qualifications earned" value="2 per pairing" />
@@ -124,7 +127,7 @@ function DualPage() {
         ) : (
           <div className="mt-10 grid gap-5 md:grid-cols-2">
             {results.map((d) => (
-              <DualCard key={d.id} dual={d} />
+              <DualCard key={d.id} dual={d} courses={catalogue.courses} />
             ))}
           </div>
         )}
