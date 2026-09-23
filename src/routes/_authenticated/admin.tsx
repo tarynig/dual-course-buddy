@@ -317,3 +317,68 @@ function FeeRow({
     </div>
   );
 }
+
+function AccountPanel() {
+  const update = useServerFn(changePassword);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleSubmit(event: React.FormEvent) {
+    event.preventDefault();
+    setMessage(null);
+    setError(null);
+    try {
+      const result = await update({ data: { currentPassword, newPassword } });
+      if (!result.ok) return setError(result.error);
+      setCurrentPassword("");
+      setNewPassword("");
+      setMessage("Password updated.");
+    } catch {
+      setError("Couldn't update your password. Please try again.");
+    }
+  }
+
+  return (
+    <section className="max-w-md">
+      <h2 className="font-display text-xl font-black">Change your password</h2>
+      <p className="mt-2 text-sm text-muted-foreground">
+        Use at least 10 characters. You'll stay signed in on this device.
+      </p>
+      <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+        <label className="block text-xs font-bold tracking-widest uppercase text-muted-foreground">
+          Current password
+          <input
+            type="password"
+            required
+            autoComplete="current-password"
+            value={currentPassword}
+            onChange={(e) => setCurrentPassword(e.target.value)}
+            className="mt-2 block w-full rounded-lg border border-border bg-background px-3 py-2 text-sm font-normal"
+          />
+        </label>
+        <label className="block text-xs font-bold tracking-widest uppercase text-muted-foreground">
+          New password
+          <input
+            type="password"
+            required
+            minLength={10}
+            autoComplete="new-password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            className="mt-2 block w-full rounded-lg border border-border bg-background px-3 py-2 text-sm font-normal"
+          />
+        </label>
+        {error && <p className="text-sm font-semibold text-destructive">{error}</p>}
+        {message && <p className="text-sm font-semibold text-primary">{message}</p>}
+        <button
+          type="submit"
+          className="rounded-full bg-primary px-6 py-2 text-sm font-bold text-primary-foreground"
+        >
+          Update password
+        </button>
+      </form>
+    </section>
+  );
+}
