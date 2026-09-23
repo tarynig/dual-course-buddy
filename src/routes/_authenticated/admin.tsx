@@ -94,7 +94,7 @@ function AdminPage() {
       {session.data?.isAdmin && (
         <div className="mx-auto max-w-6xl px-5 py-10">
           <div className="flex gap-2">
-            {(["enquiries", "fees"] as const).map((t) => (
+            {TABS.map((t) => (
               <button
                 key={t}
                 type="button"
@@ -110,7 +110,11 @@ function AdminPage() {
             ))}
           </div>
 
-          <div className="mt-8">{tab === "enquiries" ? <EnquiriesPanel /> : <FeesPanel />}</div>
+          <div className="mt-8">
+            {tab === "enquiries" && <EnquiriesPanel />}
+            {tab === "fees" && <FeesPanel />}
+            {tab === "account" && <AccountPanel />}
+          </div>
         </div>
       )}
     </div>
