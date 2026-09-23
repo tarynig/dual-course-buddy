@@ -45,7 +45,8 @@ function AuthPage() {
         return setError(result.error);
       }
       navigate({ to: "/admin" });
-    } catch {
+    } catch (err) {
+      console.error("signIn failed", err);
       setError("We couldn't sign you in right now. Please try again.");
     }
     setBusy(false);
