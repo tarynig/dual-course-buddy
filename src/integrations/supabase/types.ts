@@ -14,7 +14,205 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      courses: {
+        Row: {
+          award: string
+          deposit: number | null
+          description: string
+          faculty_id: string
+          fee: number | null
+          id: string
+          months: number
+          name: string
+          saqa: string | null
+          signature: boolean
+          sort_order: number
+          type: string
+        }
+        Insert: {
+          award: string
+          deposit?: number | null
+          description: string
+          faculty_id: string
+          fee?: number | null
+          id: string
+          months: number
+          name: string
+          saqa?: string | null
+          signature?: boolean
+          sort_order?: number
+          type: string
+        }
+        Update: {
+          award?: string
+          deposit?: number | null
+          description?: string
+          faculty_id?: string
+          fee?: number | null
+          id?: string
+          months?: number
+          name?: string
+          saqa?: string | null
+          signature?: boolean
+          sort_order?: number
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "courses_faculty_id_fkey"
+            columns: ["faculty_id"]
+            isOneToOne: false
+            referencedRelation: "faculties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dual_course_courses: {
+        Row: {
+          course_id: string
+          dual_id: string
+          position: number
+        }
+        Insert: {
+          course_id: string
+          dual_id: string
+          position?: number
+        }
+        Update: {
+          course_id?: string
+          dual_id?: string
+          position?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dual_course_courses_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dual_course_courses_dual_id_fkey"
+            columns: ["dual_id"]
+            isOneToOne: false
+            referencedRelation: "dual_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dual_courses: {
+        Row: {
+          deposit: number | null
+          faculty_id: string
+          fee: number | null
+          id: string
+          months: number
+          sort_order: number
+          title: string
+        }
+        Insert: {
+          deposit?: number | null
+          faculty_id: string
+          fee?: number | null
+          id: string
+          months: number
+          sort_order?: number
+          title: string
+        }
+        Update: {
+          deposit?: number | null
+          faculty_id?: string
+          fee?: number | null
+          id?: string
+          months?: number
+          sort_order?: number
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dual_courses_faculty_id_fkey"
+            columns: ["faculty_id"]
+            isOneToOne: false
+            referencedRelation: "faculties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      enquiries: {
+        Row: {
+          campus: string
+          course_id: string | null
+          created_at: string
+          dual_course_id: string | null
+          email: string
+          full_name: string
+          id: string
+          message: string | null
+          phone: string
+          status: string
+        }
+        Insert: {
+          campus: string
+          course_id?: string | null
+          created_at?: string
+          dual_course_id?: string | null
+          email: string
+          full_name: string
+          id?: string
+          message?: string | null
+          phone: string
+          status?: string
+        }
+        Update: {
+          campus?: string
+          course_id?: string | null
+          created_at?: string
+          dual_course_id?: string | null
+          email?: string
+          full_name?: string
+          id?: string
+          message?: string | null
+          phone?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "enquiries_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "enquiries_dual_course_id_fkey"
+            columns: ["dual_course_id"]
+            isOneToOne: false
+            referencedRelation: "dual_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      faculties: {
+        Row: {
+          id: string
+          name: string
+          sort_order: number
+          tagline: string
+        }
+        Insert: {
+          id: string
+          name: string
+          sort_order?: number
+          tagline: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          sort_order?: number
+          tagline?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
