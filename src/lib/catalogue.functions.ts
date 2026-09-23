@@ -1,5 +1,4 @@
 import { createServerFn } from "@tanstack/react-start";
-import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import type {
   Catalogue,
@@ -10,31 +9,7 @@ import type {
   FacultyId,
 } from "@/data/courses";
 
-/**
- * Publishable-key client for public catalogue reads and public enquiry writes.
- * Created per-call: process.env is only available server-side at call time,
- * and opaque sb_ keys must be sent via the apikey header, not a bearer token.
- */
-function createPublicClient() {
-  const url = process.env["SUPABASE_URL"];
-  const key = process.env["SUPABASE_PUBLISHABLE_KEY"];
-  if (!url || !key) return null;
-  return createClient(url, key, {
-    auth: { persistSession: false, autoRefreshToken: false, storage: undefined },
-    global: {
-      fetch: (input, init) => {
-        const headers = new Headers(init?.headers);
-        if (key.startsWith("sb_") && headers.get("Authorization") === `Bearer ${key}`) {
-          headers.delete("Authorization");
-        }
-        headers.set("apikey", key);
-        return fetch(input, { ...init, headers });
-      },
-    },
-  });
-}
-
-type FacultyRow = { id: string; name: string; tagline: string; sort_order: number };
+type FacultyRow = { id: string; name: string; tagline: string };
 type CourseRow = {
   id: string;
   faculty_id: string;
@@ -44,59 +19,59 @@ type CourseRow = {
   award: string;
   saqa: string | null;
   description: string;
-  fee: number | string | null;
-  deposit: number | string | null;
+  fee: string | number | null;
+  deposit: string | number | null;
   signature: boolean;
-  sort_order: number;
 };
 type DualRow = {
   id: string;
   title: string;
   faculty_id: string;
   months: number;
-  fee: number | string | null;
-  deposit: number | string | null;
-  sort_order: number;
+  fee: string | number | null;
+  deposit: string | number | null;
+  course_ids: Array<string>;
 };
-type DualItemRow = { dual_id: string; course_id: string; position: number };
 
-const toNumber = (value: number | string | null): number | null =>
+const toNumber = (value: string | number | null): number | null =>
   value === null || value === undefined ? null : Number(value);
 
 export const getCatalogue = createServerFn({ method: "GET" }).handler(
   async (): Promise<Catalogue> => {
-    const client = createPublicClient();
-    if (!client) return { faculties: [], courses: [], duals: [] };
+    const { db } = await import("./db.server");
+    const sql = db();
 
-    const [facultiesRes, coursesRes, dualsRes, itemsRes] = await Promise.all([
-      client.from("faculties").select("id, name, tagline, sort_order"),
-      client
-        .from("courses")
-        .select(
-          "id, faculty_id, name, months, type, award, saqa, description, fee, deposit, signature, sort_order",
-        ),
-      client.from("dual_courses").select("id, title, faculty_id, months, fee, deposit, sort_order"),
-      client.from("dual_course_courses").select("dual_id, course_id, position"),
-    ]);
+    try {
+      const [facultyRows, courseRows, dualRows] = await Promise.all([
+        sql<Array<FacultyRow>>`
+          SELECT id, name, tagline FROM public.faculties ORDER BY sort_order
+        `,
+        sql<Array<CourseRow>>`
+          SELECT id, faculty_id, name, months, type, award, saqa, description,
+                 fee, deposit, signature
+          FROM public.courses
+          ORDER BY sort_order
+        `,
+        sql<Array<DualRow>>`
+          SELECT d.id, d.title, d.faculty_id, d.months, d.fee, d.deposit,
+                 COALESCE(
+                   (SELECT array_agg(i.course_id ORDER BY i.position)
+                    FROM public.dual_course_courses i
+                    WHERE i.dual_id = d.id),
+                   '{}'::text[]
+                 ) AS course_ids
+          FROM public.dual_courses d
+          ORDER BY d.sort_order
+        `,
+      ]);
 
-    if (facultiesRes.error || coursesRes.error || dualsRes.error || itemsRes.error) {
-      console.error(
-        "Catalogue read failed:",
-        facultiesRes.error?.message ??
-          coursesRes.error?.message ??
-          dualsRes.error?.message ??
-          itemsRes.error?.message,
-      );
-      return { faculties: [], courses: [], duals: [] };
-    }
+      const faculties: Array<Faculty> = facultyRows.map((f) => ({
+        id: f.id as FacultyId,
+        name: f.name,
+        tagline: f.tagline,
+      }));
 
-    const faculties: Faculty[] = (facultiesRes.data as FacultyRow[])
-      .sort((a, b) => a.sort_order - b.sort_order)
-      .map((f) => ({ id: f.id as FacultyId, name: f.name, tagline: f.tagline }));
-
-    const courses: Course[] = (coursesRes.data as CourseRow[])
-      .sort((a, b) => a.sort_order - b.sort_order)
-      .map((c) => ({
+      const courses: Array<Course> = courseRows.map((c) => ({
         id: c.id,
         name: c.name,
         faculty: c.faculty_id as FacultyId,
@@ -110,31 +85,21 @@ export const getCatalogue = createServerFn({ method: "GET" }).handler(
         signature: c.signature,
       }));
 
-    const itemsByDual = new Map<string, string[]>();
-    for (const item of (itemsRes.data as DualItemRow[]).sort(
-      (a, b) => a.position - b.position,
-    )) {
-      const list = itemsByDual.get(item.dual_id) ?? [];
-      list.push(item.course_id);
-      itemsByDual.set(item.dual_id, list);
+      const duals: Array<DualCourse> = dualRows.map((d) => ({
+        id: d.id,
+        title: d.title,
+        faculty: d.faculty_id as FacultyId,
+        courseIds: [d.course_ids[0] ?? "", d.course_ids[1] ?? ""] as [string, string],
+        months: d.months,
+        fee: toNumber(d.fee),
+        deposit: toNumber(d.deposit),
+      }));
+
+      return { faculties, courses, duals };
+    } catch (error) {
+      console.error("Catalogue read failed:", error);
+      return { faculties: [], courses: [], duals: [] };
     }
-
-    const duals: DualCourse[] = (dualsRes.data as DualRow[])
-      .sort((a, b) => a.sort_order - b.sort_order)
-      .map((d) => {
-        const ids = itemsByDual.get(d.id) ?? [];
-        return {
-          id: d.id,
-          title: d.title,
-          faculty: d.faculty_id as FacultyId,
-          courseIds: [ids[0] ?? "", ids[1] ?? ""] as [string, string],
-          months: d.months,
-          fee: toNumber(d.fee),
-          deposit: toNumber(d.deposit),
-        };
-      });
-
-    return { faculties, courses, duals };
   },
 );
 
@@ -151,30 +116,28 @@ const enquirySchema = z.object({
 export const submitEnquiry = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => enquirySchema.parse(data))
   .handler(async ({ data }) => {
-    const client = createPublicClient();
-    if (!client) {
-      return {
-        ok: false as const,
-        error: "We couldn't send your enquiry right now — please call us instead.",
-      };
-    }
+    const { db } = await import("./db.server");
 
-    const { error } = await client.from("enquiries").insert({
-      full_name: data.fullName,
-      phone: data.phone,
-      email: data.email,
-      course_id: data.courseId ?? null,
-      dual_course_id: data.dualCourseId ?? null,
-      campus: data.campus,
-      message: data.message ?? null,
-    });
-
-    if (error) {
-      console.error("Enquiry insert failed:", error.message);
+    try {
+      await db()`
+        INSERT INTO public.enquiries
+          (full_name, phone, email, course_id, dual_course_id, campus, message)
+        VALUES (
+          ${data.fullName},
+          ${data.phone},
+          ${data.email},
+          ${data.courseId ?? null},
+          ${data.dualCourseId ?? null},
+          ${data.campus},
+          ${data.message ?? null}
+        )
+      `;
+      return { ok: true as const };
+    } catch (error) {
+      console.error("Enquiry insert failed:", error);
       return {
         ok: false as const,
         error: "We couldn't send your enquiry — please try again or call us.",
       };
     }
-    return { ok: true as const };
   });
