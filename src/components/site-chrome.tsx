@@ -133,6 +133,11 @@ export function SiteFooter() {
               </li>
             ))}
           </ul>
+          <p className="mt-4 text-sm">
+            <Link to="/auth" className="opacity-60 hover:opacity-100">
+              Staff login
+            </Link>
+          </p>
           <p className="mt-6 text-xs opacity-60">
             Accredited by QCTO, MICT-SETA, CATHSSETA and ICITP. PR20250064GP
           </p>
