@@ -7,3 +7,5 @@
 - [x] Store Apply-form submissions as enquiries in the database
 - [ ] Fees data entry once the college supplies numbers
 - [ ] Staff view for reading enquiries (needs a login decision)
+
+- [x] Admin login (staff sign in at /auth) and admin dashboard at /admin: enquiry inbox with status tracking + fee editing for courses and dual courses. Founding admin: taryn.wdb@gmail.com (auto-granted on first sign-in).
