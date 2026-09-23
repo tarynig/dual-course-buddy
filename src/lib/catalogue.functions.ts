@@ -47,6 +47,7 @@ type CourseRow = {
   fee: number | string | null;
   deposit: number | string | null;
   signature: boolean;
+  sort_order: number;
 };
 type DualRow = {
   id: string;
@@ -55,6 +56,7 @@ type DualRow = {
   months: number;
   fee: number | string | null;
   deposit: number | string | null;
+  sort_order: number;
 };
 type DualItemRow = { dual_id: string; course_id: string; position: number };
 
@@ -71,9 +73,9 @@ export const getCatalogue = createServerFn({ method: "GET" }).handler(
       client
         .from("courses")
         .select(
-          "id, faculty_id, name, months, type, award, saqa, description, fee, deposit, signature",
+          "id, faculty_id, name, months, type, award, saqa, description, fee, deposit, signature, sort_order",
         ),
-      client.from("dual_courses").select("id, title, faculty_id, months, fee, deposit"),
+      client.from("dual_courses").select("id, title, faculty_id, months, fee, deposit, sort_order"),
       client.from("dual_course_courses").select("dual_id, course_id, position"),
     ]);
 
@@ -93,7 +95,7 @@ export const getCatalogue = createServerFn({ method: "GET" }).handler(
       .map((f) => ({ id: f.id as FacultyId, name: f.name, tagline: f.tagline }));
 
     const courses: Course[] = (coursesRes.data as CourseRow[])
-      .sort((a, b) => 0)
+      .sort((a, b) => a.sort_order - b.sort_order)
       .map((c) => ({
         id: c.id,
         name: c.name,
@@ -101,7 +103,7 @@ export const getCatalogue = createServerFn({ method: "GET" }).handler(
         months: c.months,
         type: c.type as CourseType,
         award: c.award,
-        saqa: c.saqa ?? undefined,
+        ...(c.saqa ? { saqa: c.saqa } : {}),
         description: c.description,
         fee: toNumber(c.fee),
         deposit: toNumber(c.deposit),
@@ -118,7 +120,7 @@ export const getCatalogue = createServerFn({ method: "GET" }).handler(
     }
 
     const duals: DualCourse[] = (dualsRes.data as DualRow[])
-      .sort((a, b) => 0)
+      .sort((a, b) => a.sort_order - b.sort_order)
       .map((d) => {
         const ids = itemsByDual.get(d.id) ?? [];
         return {
