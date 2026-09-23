@@ -5,23 +5,23 @@ import postgres from "postgres";
 
 type Sql = ReturnType<typeof postgres>;
 
-let _sql: Sql | undefined;
-
 function connectionString(): string {
   const url = process.env["DATABASE_URL"] ?? process.env["SUPABASE_DB_URL"];
   if (!url) throw new Error("DATABASE_URL is not configured");
   return url;
 }
 
+// A connection must not be shared between requests: the serverless runtime
+// tears sockets down at the end of the request that opened them, and reusing
+// one afterwards fails with "Network connection lost". So every call gets a
+// short-lived connection that closes itself once idle.
 export function db(): Sql {
-  if (!_sql) {
-    _sql = postgres(connectionString(), {
-      ssl: "require",
-      max: 4,
-      idle_timeout: 20,
-      connect_timeout: 15,
-      prepare: false,
-    });
-  }
-  return _sql;
+  return postgres(connectionString(), {
+    ssl: "require",
+    max: 1,
+    idle_timeout: 2,
+    connect_timeout: 15,
+    prepare: false,
+    fetch_types: false,
+  });
 }
