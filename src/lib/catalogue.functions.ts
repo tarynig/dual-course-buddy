@@ -117,9 +117,29 @@ export const submitEnquiry = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => enquirySchema.parse(data))
   .handler(async ({ data }) => {
     const { db } = await import("./db.server");
+    const { sendMail, teamRecipients } = await import("./mail.server");
+    const { applicantEnquiryEmail, teamEnquiryEmail } = await import(
+      "./emails/enquiry-emails"
+    );
+
+    const sql = db();
 
     try {
-      await db()`
+      // Name the course they picked so the notification is useful at a glance.
+      let interest = "Not sure yet";
+      if (data.courseId) {
+        const rows = await sql<Array<{ name: string }>>`
+          SELECT name FROM public.courses WHERE id = ${data.courseId} LIMIT 1
+        `;
+        interest = rows[0]?.name ?? interest;
+      } else if (data.dualCourseId) {
+        const rows = await sql<Array<{ title: string }>>`
+          SELECT title FROM public.dual_courses WHERE id = ${data.dualCourseId} LIMIT 1
+        `;
+        interest = rows[0]?.title ?? interest;
+      }
+
+      const inserted = await sql<Array<{ id: string }>>`
         INSERT INTO public.enquiries
           (full_name, phone, email, course_id, dual_course_id, campus, message)
         VALUES (
@@ -131,7 +151,34 @@ export const submitEnquiry = createServerFn({ method: "POST" })
           ${data.campus},
           ${data.message ?? null}
         )
+        RETURNING id
       `;
+
+      const enquiry = {
+        reference: (inserted[0]?.id ?? "").slice(0, 8).toUpperCase(),
+        fullName: data.fullName,
+        email: data.email,
+        phone: data.phone,
+        campus: data.campus,
+        interest,
+        message: data.message ?? null,
+        receivedAt: new Date(),
+      };
+
+      // The enquiry is already saved, so mail is a bonus on top of it: a failed
+      // or unconfigured send must never turn a good submission into an error.
+      const team = teamRecipients();
+      if (team.length === 0) {
+        console.warn("[mail] ADMISSIONS_EMAIL is not set — no admissions inbox to notify");
+      }
+
+      await Promise.all([
+        sendMail({ to: enquiry.email, ...applicantEnquiryEmail(enquiry) }),
+        ...team.map((address) =>
+          sendMail({ to: address, ...teamEnquiryEmail(enquiry) }),
+        ),
+      ]);
+
       return { ok: true as const };
     } catch (error) {
       console.error("Enquiry insert failed:", error);
