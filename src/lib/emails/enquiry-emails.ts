@@ -159,8 +159,8 @@ export function applicantEnquiryEmail(enquiry: EnquiryForEmail): EnquiryEmail {
     <p style="margin:26px 0 0;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:${MUTED};">Your enquiry</p>
     ${detailsTable(enquiry)}
     <p style="margin:0;background:${GOLD};color:${INK};padding:14px 16px;border-radius:12px;font-family:${FONT};font-size:14px;">
-      In a hurry? Call <strong>${escapeHtml(contact.phone)}</strong> and quote reference
-      <strong>${escapeHtml(enquiry.reference)}</strong>.
+      In a hurry? Call <strong>${escapeHtml(contact.phone)}</strong><br />
+      and quote reference <strong>${escapeHtml(enquiry.reference)}</strong>.
     </p>
     <p style="margin:22px 0 0;">We look forward to welcoming you.</p>
     <p style="margin:6px 0 0;font-weight:bold;">The Creative Arts College team</p>`;
