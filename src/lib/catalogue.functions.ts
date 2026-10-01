@@ -117,6 +117,10 @@ export const submitEnquiry = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => enquirySchema.parse(data))
   .handler(async ({ data }) => {
     const { db } = await import("./db.server");
+    const { sendMail, teamRecipients } = await import("./mail.server");
+    const { applicantEnquiryEmail, teamEnquiryEmail } = await import(
+      "./emails/enquiry-emails"
+    );
 
     const sql = db();
 

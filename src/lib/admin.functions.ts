@@ -114,3 +114,46 @@ export const setFees = createServerFn({ method: "POST" })
     }
     return { ok: true as const };
   });
+
+/** Sends the admissions notification template to the signed-in admin's own inbox. */
+export const sendTestEmail = createServerFn({ method: "POST" }).handler(
+  async () => {
+    const { requireAdmin } = await import("./session.server");
+    const user = await requireAdmin();
+    const { mailConfigured, sendMail } = await import("./mail.server");
+    const { teamEnquiryEmail } = await import("./emails/enquiry-emails");
+
+    if (!mailConfigured()) {
+      return {
+        ok: false as const,
+        error:
+          "Mail isn't set up on this server yet — the mail account settings are missing.",
+      };
+    }
+
+    const sample = {
+      reference: "SAMPLE01",
+      fullName: "Jane Learner",
+      email: "jane.learner@example.com",
+      phone: "082 555 0134",
+      campus: "Durban",
+      interest: "Dual: Graphic Design + Photography",
+      message: "This is a sample message so you can see how a real enquiry will look.",
+      receivedAt: new Date(),
+    };
+
+    const result = await sendMail({ to: user.email, ...teamEnquiryEmail(sample) });
+
+    if (!result.sent) {
+      return {
+        ok: false as const,
+        error:
+          result.reason === "not_configured"
+            ? "Mail isn't set up on this server yet — the mail account settings are missing."
+            : "The mail server refused the message — please check the mail account settings.",
+      };
+    }
+
+    return { ok: true as const };
+  },
+);
