@@ -33,9 +33,12 @@ export async function createSession(userId: string): Promise<void> {
 
   setCookie(SESSION_COOKIE, token, {
     httpOnly: true,
-    // Local development runs over plain http; everything else is https.
-    secure: process.env["NODE_ENV"] !== "development",
-    sameSite: "lax",
+    // The editor preview embeds the site in a frame on another domain, so the
+    // cookie must be cross-site capable (SameSite=None + Secure + Partitioned).
+    // Server functions are still protected by the CSRF middleware.
+    secure: true,
+    sameSite: "none",
+    partitioned: true,
     path: "/",
     maxAge: SESSION_DAYS * 24 * 60 * 60,
   });
