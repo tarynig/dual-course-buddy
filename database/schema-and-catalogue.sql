@@ -28,19 +28,9 @@ CREATE FUNCTION public.hash_password(plain text) RETURNS text
 $$;
 
 
---
--- Name: touch_updated_at(); Type: FUNCTION; Schema: public; Owner: -
---
+-- Note: app_users.updated_at is maintained by the app itself on each update,
+-- so no trigger is needed here (kept out for hosts that reject BEGIN/END blocks).
 
-CREATE FUNCTION public.touch_updated_at() RETURNS trigger
-    LANGUAGE plpgsql
-    SET search_path TO 'public'
-    AS $$
-BEGIN
-  NEW.updated_at = now();
-  RETURN NEW;
-END;
-$$;
 
 
 --
