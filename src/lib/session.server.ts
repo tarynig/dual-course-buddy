@@ -67,7 +67,7 @@ export async function destroySession(): Promise<void> {
     const tokenHash = await sha256(token);
     await db()`DELETE FROM public.app_sessions WHERE token_hash = ${tokenHash}`;
   }
-  deleteCookie(SESSION_COOKIE, { path: "/" });
+  deleteCookie(SESSION_COOKIE, { path: "/", secure: true, sameSite: "none", partitioned: true });
 }
 
 export async function requireUser(): Promise<SessionUser> {
