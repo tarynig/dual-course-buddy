@@ -1,21 +1,9 @@
--- Creative Arts College: plain PostgreSQL schema + course catalogue (no enquiries, no accounts).
-CREATE EXTENSION IF NOT EXISTS pgcrypto;
---
--- PostgreSQL database dump
---
-
-\restrict T0NfJ8ayeL8Mjr5S5ijkh0qrL21q1GGc8s3vBfmaY5W2uNXpeTJ7IsenAwvfZ91
-
--- Dumped from database version 17.6
--- Dumped by pg_dump version 17.9
+-- Compatible with PostgreSQL 12 and later.
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
-SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
 SET check_function_bodies = false;
 SET xmloption = content;
 SET client_min_messages = warning;
