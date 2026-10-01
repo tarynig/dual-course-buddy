@@ -1,3 +1,5 @@
+-- Creative Arts College: plain PostgreSQL schema + course catalogue (no enquiries, no accounts).
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
 --
 -- PostgreSQL database dump
 --
@@ -501,3 +503,6 @@ ALTER TABLE public.faculties ENABLE ROW LEVEL SECURITY;
 
 \unrestrict T0NfJ8ayeL8Mjr5S5ijkh0qrL21q1GGc8s3vBfmaY5W2uNXpeTJ7IsenAwvfZ91
 
+
+-- Create the first admin (replace email and password):
+-- INSERT INTO public.app_users (email, password_hash, role) VALUES ('you@example.com', public.hash_password('ChangeMe123!'), 'admin');
