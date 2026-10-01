@@ -28,19 +28,9 @@ CREATE FUNCTION public.hash_password(plain text) RETURNS text
 $$;
 
 
---
--- Name: touch_updated_at(); Type: FUNCTION; Schema: public; Owner: -
---
+-- Note: app_users.updated_at is maintained by the app itself on each update,
+-- so no trigger is needed here (kept out for hosts that reject BEGIN/END blocks).
 
-CREATE FUNCTION public.touch_updated_at() RETURNS trigger
-    LANGUAGE plpgsql
-    SET search_path TO 'public'
-    AS $$
-BEGIN
-  NEW.updated_at = now();
-  RETURN NEW;
-END;
-$$;
 
 
 --
@@ -380,11 +370,6 @@ CREATE INDEX app_sessions_user_id_idx ON public.app_sessions USING btree (user_i
 CREATE UNIQUE INDEX app_users_email_key ON public.app_users USING btree (lower(email));
 
 
---
--- Name: app_users app_users_touch_updated_at; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER app_users_touch_updated_at BEFORE UPDATE ON public.app_users FOR EACH ROW EXECUTE FUNCTION public.touch_updated_at();
 
 
 --
