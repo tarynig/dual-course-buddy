@@ -38,9 +38,10 @@ step is skipped with a note in the server log.
 3. Build for a Node server: `CAC_TARGET=node npm run build:node`
 4. In **Setup Node.js App**: point it at that folder, set the startup file to
    `dist/server/index.mjs`, add the environment variables above, then **Start App**.
-5. Create the database tables and load the data: restore the SQL export of the current database
-   with `psql "your connection string" < backup.sql`, or run the migrations in `supabase/migrations`
-   in order against the empty database.
+5. Create the database tables and load the data: run the plain PostgreSQL file
+   `database/schema-and-catalogue.sql` against the empty database
+   (`psql "your connection string" -f database/schema-and-catalogue.sql`), then create the first
+   admin with the INSERT shown at the end of that file.
 6. Check: the course pages render, the Apply form stores an enquiry, and the sign-in works.
 
 ## First deploy: one thing to confirm
@@ -52,8 +53,9 @@ config and `NITRO_PRESET=node-server npm run build` is the equivalent command.
 
 ## Notes
 
-- The `.env` in this project containing `SUPABASE_*` entries is generated for the editor and is not
-  read by the site; it is not needed on your hosting.
+- Editor-only leftovers, not used by the site and safe to delete on your server: the
+  `src/integrations` folder, the `supabase` folder, the editor's `.env`, and the `@supabase/supabase-js`
+  package entry. The editor regenerates these, so they are only removed from your copy.
 - Accounts, logins and password hashing are the site's own tables (`app_users`, `app_sessions`) and
   plain PostgreSQL functions — no external login service is involved.
 - Outbound mail goes through `src/lib/mail.server.ts` only. Swapping to a different mail provider
