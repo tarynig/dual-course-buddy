@@ -6,6 +6,7 @@ import { changePassword, signOut } from "@/lib/auth.functions";
 import {
   getAdminEnquiries,
   getAdminSession,
+  sendTestEmail,
   setEnquiryStatus,
   setFees,
 } from "@/lib/admin.functions";
@@ -113,7 +114,12 @@ function AdminPage() {
           <div className="mt-8">
             {tab === "enquiries" && <EnquiriesPanel />}
             {tab === "fees" && <FeesPanel />}
-            {tab === "account" && <AccountPanel />}
+            {tab === "account" && (
+              <div className="space-y-12">
+                <AccountPanel />
+                <EmailPanel />
+              </div>
+            )}
           </div>
         </div>
       )}
