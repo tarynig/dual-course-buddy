@@ -173,7 +173,7 @@ export const submitEnquiry = createServerFn({ method: "POST" })
       }
 
       await Promise.all([
-        sendMail(applicantEnquiryEmail(enquiry)),
+        sendMail({ to: enquiry.email, ...applicantEnquiryEmail(enquiry) }),
         ...team.map((address) =>
           sendMail({ to: address, ...teamEnquiryEmail(enquiry) }),
         ),
