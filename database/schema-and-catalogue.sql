@@ -370,11 +370,6 @@ CREATE INDEX app_sessions_user_id_idx ON public.app_sessions USING btree (user_i
 CREATE UNIQUE INDEX app_users_email_key ON public.app_users USING btree (lower(email));
 
 
---
--- Name: app_users app_users_touch_updated_at; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER app_users_touch_updated_at BEFORE UPDATE ON public.app_users FOR EACH ROW EXECUTE FUNCTION public.touch_updated_at();
 
 
 --

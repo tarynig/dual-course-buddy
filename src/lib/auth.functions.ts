@@ -61,7 +61,8 @@ export const changePassword = createServerFn({ method: "POST" })
 
     const rows = await db()<Array<{ id: string }>>`
       UPDATE public.app_users
-      SET password_hash = public.hash_password(${data.newPassword})
+      SET password_hash = public.hash_password(${data.newPassword}),
+          updated_at = now()
       WHERE id = ${user.id}
         AND public.verify_password(${data.currentPassword}, password_hash)
       RETURNING id
