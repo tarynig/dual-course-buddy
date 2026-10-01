@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 
-export function CatalogueError({ error }: { error: Error }) {
+export function CatalogueError({ error }: { error: unknown }) {
   return (
     <div className="mx-auto max-w-3xl px-5 py-24 text-center">
       <h1 className="font-display text-3xl font-black">Something went wrong</h1>
@@ -20,8 +20,8 @@ export function CatalogueError({ error }: { error: Error }) {
           Try again
         </button>
       </p>
-      {error?.message && (
-        <p className="mt-8 text-xs text-muted-foreground/60">{error.message}</p>
+      {(error instanceof Error && error.message) && (
+        <p className="mt-8 text-xs text-muted-foreground/60">{(error as Error).message}</p>
       )}
     </div>
   );
