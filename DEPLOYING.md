@@ -20,6 +20,8 @@ In the **server's environment**, never in the code. Two equivalent places:
 | Setting | What it is | Where to find it |
 | --- | --- | --- |
 | `DATABASE_URL` | PostgreSQL connection string | cPanel PostgreSQL / your host |
+| `HOST` | `0.0.0.0` — required by cPanel's app checker | — |
+| `PORT` | `3000` — required by cPanel's app checker | — |
 | `SMTP_HOST` | Outgoing mail server | Email Accounts -> Connect Devices |
 | `SMTP_PORT` | `465` for SSL, `587` for STARTTLS | same page |
 | `SMTP_SECURE` | leave empty for 465, `false` for 587 | — |
