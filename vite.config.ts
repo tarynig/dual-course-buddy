@@ -12,7 +12,9 @@ import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 const nodeTarget = process.env["CAC_TARGET"] === "node";
 
 export default defineConfig({
-  nitro: nodeTarget ? { preset: "node-server" } : undefined,
+  // Omitted entirely unless building for the college's own Node host, so the preview keeps its
+  // default target.
+  ...(nodeTarget ? { nitro: { preset: "node-server" } } : {}),
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
