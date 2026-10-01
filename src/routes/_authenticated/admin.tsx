@@ -388,3 +388,52 @@ function AccountPanel() {
     </section>
   );
 }
+
+function EmailPanel() {
+  const sendSample = useServerFn(sendTestEmail);
+  const [state, setState] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [error, setError] = useState("");
+
+  async function handleSend() {
+    setState("sending");
+    setError("");
+    try {
+      const result = await sendSample({});
+      if (result.ok) {
+        setState("sent");
+        return;
+      }
+      setError(result.error);
+      setState("error");
+    } catch {
+      setError("Couldn't reach the mail server. Please try again.");
+      setState("error");
+    }
+  }
+
+  return (
+    <section className="max-w-md">
+      <h2 className="font-display text-xl font-black">Enquiry emails</h2>
+      <p className="mt-2 text-sm text-muted-foreground">
+        Each enquiry is emailed to the admissions inbox and confirmed back to the applicant.
+        Send yourself a sample to check the settings and see exactly what arrives.
+      </p>
+      <button
+        type="button"
+        onClick={handleSend}
+        disabled={state === "sending"}
+        className="mt-6 rounded-full bg-primary px-6 py-2 text-sm font-bold text-primary-foreground disabled:opacity-60"
+      >
+        {state === "sending" ? "Sending…" : "Send me a sample enquiry email"}
+      </button>
+      {state === "sent" && (
+        <p className="mt-3 text-sm font-semibold text-primary">
+          Sample sent — check your inbox.
+        </p>
+      )}
+      {state === "error" && (
+        <p className="mt-3 text-sm font-semibold text-destructive">{error}</p>
+      )}
+    </section>
+  );
+}
