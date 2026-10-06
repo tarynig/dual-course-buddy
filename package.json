@@ -7,8 +7,8 @@
     "dev": "vite dev",
     "build": "vite build",
     "build:dev": "vite build --mode development",
-    "build:node": "node scripts/prepare-brochure-assets.mjs && CAC_TARGET=node vite build",
-    "start": "node dist/server/index.mjs",
+    "build:node": "node --input-type=module -e \"process.env.CAC_TARGET='node'; process.argv=[process.execPath,'./node_modules/vite/bin/vite.js','build']; await import('./node_modules/vite/bin/vite.js')\"",
+    "start": "node start.mjs",
     "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write ."
