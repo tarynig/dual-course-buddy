@@ -1,16 +1,17 @@
 import { Link } from "@tanstack/react-router";
 import { NumberedBar } from '@/components/brochure-visuals';
 import {
-  dualSaving,
   formatZar,
-  separateFeeTotalOf,
+  fromPrice,
   separateMonths,
+  type PaymentPlan,
   type Course,
   type DualCourse,
 } from "@/data/courses";
 
-export function FeeLine({ fee, deposit }: { fee: number | null; deposit: number | null }) {
-  if (fee === null) {
+export function FeeLine({ plans }: { plans: PaymentPlan[] }) {
+  const from = fromPrice(plans);
+  if (from === null) {
     return (
       <p className="text-sm font-semibold text-muted-foreground">
         Fees on request — <Link to="/contact" className="text-primary underline">get the fee sheet</Link>
@@ -19,11 +20,10 @@ export function FeeLine({ fee, deposit }: { fee: number | null; deposit: number 
   }
   return (
     <p className="text-sm font-semibold">
-      <span className="font-display text-xl font-black text-primary">{formatZar(fee)}</span>
-      {deposit !== null && (
-        <span className="ml-2 text-muted-foreground">
-          · {formatZar(deposit)} deposit to secure your seat
-        </span>
+      <span className="text-muted-foreground">From </span>
+      <span className="font-display text-xl font-black text-primary">{formatZar(from)}</span>
+      {plans.length > 1 && (
+        <span className="ml-2 text-muted-foreground">· {plans.length} payment plans</span>
       )}
     </p>
   );
@@ -55,7 +55,7 @@ export function CourseCard({ course, number = 1 }: { course: Course; number?: nu
       </p>
 
       <div className="mt-5 border-t border-border pt-4">
-        <FeeLine fee={course.fee} deposit={course.deposit} />
+        <FeeLine plans={course.plans} />
         <Link
           to="/courses/$courseId"
           params={{ courseId: course.id }}
@@ -74,8 +74,7 @@ export function DualCard({ dual, courses, number = 1 }: { dual: DualCourse; cour
     .filter(Boolean) as Course[];
   const apart = separateMonths(courses, dual);
   const monthsSaved = Math.max(apart - dual.months, 0);
-  const saving = dualSaving(courses, dual);
-  const separate = separateFeeTotalOf(courses, dual);
+  const saving = dual.saving;
 
   return (
     <article className="brochure-course flex h-full flex-col">
@@ -102,7 +101,7 @@ export function DualCard({ dual, courses, number = 1 }: { dual: DualCourse; cour
         <span className="rounded-full bg-accent px-3 py-1 text-accent-foreground">
           {monthsSaved > 0 ? `${monthsSaved} months faster than one after the other` : "Two qualifications, one timeline"}
         </span>
-        {saving !== null && (
+        {saving !== null && saving > 0 && (
           <span className="rounded-full bg-gold px-3 py-1 text-gold-foreground">
             Save {formatZar(saving)}
           </span>
@@ -110,25 +109,7 @@ export function DualCard({ dual, courses, number = 1 }: { dual: DualCourse; cour
       </div>
 
       <div className="mt-auto border-t border-border pt-4">
-        {dual.fee === null ? (
-          <FeeLine fee={null} deposit={null} />
-        ) : (
-          <p className="text-sm font-semibold">
-            <span className="font-display text-xl font-black text-primary">
-              {formatZar(dual.fee)}
-            </span>
-            {separate !== null && (
-              <span className="ml-2 text-muted-foreground line-through">
-                {formatZar(separate)}
-              </span>
-            )}
-            {dual.deposit !== null && (
-              <span className="block text-muted-foreground">
-                {formatZar(dual.deposit)} deposit to secure your seat
-              </span>
-            )}
-          </p>
-        )}
+        <FeeLine plans={dual.plans} />
       </div>
     </article>
   );

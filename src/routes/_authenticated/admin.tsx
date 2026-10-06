@@ -8,10 +8,9 @@ import {
   getAdminSession,
   sendTestEmail,
   setEnquiryStatus,
-  setFees,
 } from "@/lib/admin.functions";
 import { catalogueQueryOptions } from "@/lib/catalogue-queries";
-import { formatZar } from "@/data/courses";
+import { FeesPanel } from "@/components/admin-fees";
 import { CoursesContentPanel, DualsContentPanel } from "@/components/admin-content";
 import { CatalogueError, CatalogueNotFound } from "@/components/route-fallbacks";
 
@@ -196,133 +195,6 @@ function EnquiriesPanel() {
           </div>
         </div>
       ))}
-    </div>
-  );
-}
-
-function FeesPanel() {
-  const catalogue = useQuery(catalogueQueryOptions);
-  const save = useServerFn(setFees);
-  const queryClient = useQueryClient();
-  const [saved, setSaved] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  async function handleSave(
-    kind: "course" | "dual",
-    id: string,
-    fee: string,
-    deposit: string,
-  ) {
-    setError(null);
-    try {
-      await save({
-        data: {
-          kind,
-          id,
-          fee: fee.trim() === "" ? null : Number(fee),
-          deposit: deposit.trim() === "" ? null : Number(deposit),
-        },
-      });
-      setSaved(id);
-      queryClient.invalidateQueries({ queryKey: ["catalogue"] });
-      setTimeout(() => setSaved(null), 2000);
-    } catch {
-      setError("Couldn't save that fee. Please try again.");
-    }
-  }
-
-  if (catalogue.isLoading) return <p className="text-sm text-muted-foreground">Loading courses…</p>;
-
-  return (
-    <div className="space-y-10">
-      {error && <p className="text-sm text-destructive">{error}</p>}
-
-      <section>
-        <h2 className="font-display text-xl font-black">Dual course fees</h2>
-        <div className="mt-4 space-y-3">
-          {catalogue.data?.duals.map((d) => (
-            <FeeRow
-              key={d.id}
-              title={d.title}
-              fee={d.fee}
-              deposit={d.deposit}
-              saved={saved === d.id}
-              onSave={(fee, deposit) => handleSave("dual", d.id, fee, deposit)}
-            />
-          ))}
-        </div>
-      </section>
-
-      <section>
-        <h2 className="font-display text-xl font-black">Individual course fees</h2>
-        <div className="mt-4 space-y-3">
-          {catalogue.data?.courses.map((c) => (
-            <FeeRow
-              key={c.id}
-              title={c.name}
-              fee={c.fee}
-              deposit={c.deposit}
-              saved={saved === c.id}
-              onSave={(fee, deposit) => handleSave("course", c.id, fee, deposit)}
-            />
-          ))}
-        </div>
-      </section>
-    </div>
-  );
-}
-
-function FeeRow({
-  title,
-  fee,
-  deposit,
-  saved,
-  onSave,
-}: {
-  title: string;
-  fee: number | null;
-  deposit: number | null;
-  saved: boolean;
-  onSave: (fee: string, deposit: string) => void;
-}) {
-  const [feeValue, setFeeValue] = useState(fee === null ? "" : String(fee));
-  const [depositValue, setDepositValue] = useState(deposit === null ? "" : String(deposit));
-
-  return (
-    <div className="flex flex-wrap items-end justify-between gap-4 rounded-2xl border border-border bg-card p-4">
-      <div className="min-w-[14rem] flex-1">
-        <p className="font-semibold">{title}</p>
-        <p className="text-xs text-muted-foreground">
-          Currently {fee === null ? "fees on request" : formatZar(fee)}
-        </p>
-      </div>
-      <label className="text-xs font-bold tracking-widest uppercase text-muted-foreground">
-        Total fee
-        <input
-          type="number"
-          min={0}
-          value={feeValue}
-          onChange={(e) => setFeeValue(e.target.value)}
-          className="mt-1 block w-32 rounded-lg border border-border bg-background px-3 py-2 text-sm font-normal"
-        />
-      </label>
-      <label className="text-xs font-bold tracking-widest uppercase text-muted-foreground">
-        Deposit
-        <input
-          type="number"
-          min={0}
-          value={depositValue}
-          onChange={(e) => setDepositValue(e.target.value)}
-          className="mt-1 block w-32 rounded-lg border border-border bg-background px-3 py-2 text-sm font-normal"
-        />
-      </label>
-      <button
-        type="button"
-        onClick={() => onSave(feeValue, depositValue)}
-        className="rounded-full bg-primary px-5 py-2 text-xs font-bold text-primary-foreground"
-      >
-        {saved ? "Saved" : "Save"}
-      </button>
     </div>
   );
 }
