@@ -9,10 +9,8 @@ export interface Course {
   award: string;
   saqa?: string;
   description: string;
-  /** Full programme fee in ZAR. Null until the official fee is loaded. */
-  fee: number | null;
-  /** Deposit payable on registration, in ZAR. */
-  deposit: number | null;
+  /** Payment plans offered for this course (amounts live on the plan). */
+  plans: PaymentPlan[];
   signature?: boolean;
   /** Long-form course information shown on the course's own page. */
   details?: string;
@@ -26,10 +24,26 @@ export interface DualCourse {
   faculty: FacultyId;
   courseIds: [string, string];
   months: number;
-  /** Combined dual-course fee in ZAR (lower than the two individual fees). */
-  fee: number | null;
-  deposit: number | null;
+  /** Payment plans offered for this dual course. */
+  plans: PaymentPlan[];
+  /** Saving shown on the dual course, entered by the college. */
+  saving: number | null;
 }
+
+export interface PaymentPlan {
+  id: string;
+  name: string;
+  deposit: number;
+  instalments: number;
+  instalmentAmount: number;
+  notes: string | null;
+}
+
+export const planTotal = (p: PaymentPlan) => p.deposit + p.instalments * p.instalmentAmount;
+
+/** Lowest total across the given plans — the "from" price. */
+export const fromPrice = (plans: PaymentPlan[]): number | null =>
+  plans.length ? Math.min(...plans.map(planTotal)) : null;
 
 export type FacultyId =
   | "audio"
@@ -51,9 +65,10 @@ export interface Catalogue {
   faculties: Faculty[];
   courses: Course[];
   duals: DualCourse[];
+  plans: PaymentPlan[];
 }
 
-export const emptyCatalogue: Catalogue = { faculties: [], courses: [], duals: [] };
+export const emptyCatalogue: Catalogue = { faculties: [], courses: [], duals: [], plans: [] };
 
 export const courseById = (catalogue: Catalogue, id: string) =>
   catalogue.courses.find((c) => c.id === id);
@@ -66,19 +81,6 @@ export const dualsForCourse = (catalogue: Catalogue, id: string) =>
 
 export const formatZar = (value: number) =>
   `R\u00a0${Math.round(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")}`;
-
-/** Individual fees added together, if both are known. */
-export const separateFeeTotalOf = (courses: Course[], dual: DualCourse): number | null => {
-  const parts = dual.courseIds.map((id) => courses.find((c) => c.id === id)?.fee ?? null);
-  if (parts.some((p) => p === null)) return null;
-  return (parts as number[]).reduce((a, b) => a + b, 0);
-};
-
-export const dualSaving = (courses: Course[], dual: DualCourse): number | null => {
-  const total = separateFeeTotalOf(courses, dual);
-  if (total === null || dual.fee === null) return null;
-  return total - dual.fee;
-};
 
 /** Longest individual duration, i.e. what back-to-back study would take. */
 export const separateMonths = (courses: Course[], dual: DualCourse): number =>

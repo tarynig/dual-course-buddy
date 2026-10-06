@@ -6,6 +6,7 @@ import type {
   CourseType,
   DualCourse,
   Faculty,
+  PaymentPlan,
   FacultyId,
 } from "@/data/courses";
 
@@ -19,23 +20,39 @@ type CourseRow = {
   award: string;
   saqa: string | null;
   description: string;
-  fee: string | number | null;
-  deposit: string | number | null;
   signature: boolean;
   details: string | null;
+  plan_ids: string;
+};
+type PlanRow = {
+  id: string;
+  name: string;
+  deposit: string | number;
+  instalments: number;
+  instalment_amount: string | number;
+  notes: string | null;
 };
 type DualRow = {
   id: string;
   title: string;
   faculty_id: string;
   months: number;
-  fee: string | number | null;
-  deposit: string | number | null;
-  course_ids: Array<string>;
+  saving: string | number | null;
+  plan_ids: string;
+  course_ids: string;
 };
 
 const toNumber = (value: string | number | null): number | null =>
   value === null || value === undefined ? null : Number(value);
+
+// Run one query at a time over the single connection rather than pipelining them.
+async function sequential<T extends ReadonlyArray<unknown>>(
+  queries: { [K in keyof T]: PromiseLike<T[K]> },
+): Promise<T> {
+  const out: unknown[] = [];
+  for (const q of queries as ReadonlyArray<PromiseLike<unknown>>) out.push(await q);
+  return out as unknown as T;
+}
 
 export const getCatalogue = createServerFn({ method: "GET" }).handler(
   async (): Promise<Catalogue> => {
@@ -43,28 +60,48 @@ export const getCatalogue = createServerFn({ method: "GET" }).handler(
     const sql = db();
 
     try {
-      const [facultyRows, courseRows, dualRows] = await Promise.all([
+      const [facultyRows, courseRows, dualRows, planRows] = await sequential([
         sql<Array<FacultyRow>>`
           SELECT id, name, tagline FROM public.faculties ORDER BY sort_order
         `,
         sql<Array<CourseRow>>`
           SELECT id, faculty_id, name, months, type, award, saqa, description,
-                 fee, deposit, signature, details
+                 signature, details,
+                 COALESCE((SELECT string_agg(p.plan_id::text, ',') FROM public.course_payment_plans p
+                           WHERE p.course_id = courses.id), '') AS plan_ids
           FROM public.courses
           ORDER BY sort_order
         `,
         sql<Array<DualRow>>`
-          SELECT d.id, d.title, d.faculty_id, d.months, d.fee, d.deposit,
+          SELECT d.id, d.title, d.faculty_id, d.months, d.saving,
+                 COALESCE((SELECT string_agg(p.plan_id::text, ',') FROM public.dual_payment_plans p
+                           WHERE p.dual_id = d.id), '') AS plan_ids,
                  COALESCE(
-                   (SELECT array_agg(i.course_id ORDER BY i.position)
+                   (SELECT string_agg(i.course_id, ',' ORDER BY i.position)
                     FROM public.dual_course_courses i
                     WHERE i.dual_id = d.id),
-                   '{}'::text[]
+                   ''
                  ) AS course_ids
           FROM public.dual_courses d
           ORDER BY d.sort_order
         `,
+        sql<Array<PlanRow>>`
+          SELECT id::text AS id, name, deposit, instalments, instalment_amount, notes
+          FROM public.payment_plans ORDER BY sort_order, created_at
+        `,
       ]);
+
+      const plans: Array<PaymentPlan> = planRows.map((p) => ({
+        id: p.id,
+        name: p.name,
+        deposit: Number(p.deposit),
+        instalments: p.instalments,
+        instalmentAmount: Number(p.instalment_amount),
+        notes: p.notes,
+      }));
+      // Lists arrive as comma-joined text so they parse the same on every Postgres driver setup.
+      const list = (text: string) => (text ? text.split(",") : []);
+      const pick = (ids: string) => plans.filter((p) => list(ids).includes(p.id));
 
       const faculties: Array<Faculty> = facultyRows.map((f) => ({
         id: f.id as FacultyId,
@@ -81,8 +118,7 @@ export const getCatalogue = createServerFn({ method: "GET" }).handler(
         award: c.award,
         ...(c.saqa ? { saqa: c.saqa } : {}),
         description: c.description,
-        fee: toNumber(c.fee),
-        deposit: toNumber(c.deposit),
+        plans: pick(c.plan_ids),
         signature: c.signature,
         ...(c.details ? { details: c.details } : {}),
       }));
@@ -91,16 +127,16 @@ export const getCatalogue = createServerFn({ method: "GET" }).handler(
         id: d.id,
         title: d.title,
         faculty: d.faculty_id as FacultyId,
-        courseIds: [d.course_ids[0] ?? "", d.course_ids[1] ?? ""] as [string, string],
+        courseIds: [list(d.course_ids)[0] ?? "", list(d.course_ids)[1] ?? ""] as [string, string],
         months: d.months,
-        fee: toNumber(d.fee),
-        deposit: toNumber(d.deposit),
+        plans: pick(d.plan_ids),
+        saving: toNumber(d.saving),
       }));
 
-      return { faculties, courses, duals };
+      return { faculties, courses, duals, plans };
     } catch (error) {
       console.error("Catalogue read failed:", error);
-      return { faculties: [], courses: [], duals: [] };
+      return { faculties: [], courses: [], duals: [], plans: [] };
     }
   },
 );

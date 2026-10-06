@@ -76,6 +76,36 @@ export type Database = {
         }
         Relationships: []
       }
+      course_payment_plans: {
+        Row: {
+          course_id: string
+          plan_id: string
+        }
+        Insert: {
+          course_id: string
+          plan_id: string
+        }
+        Update: {
+          course_id?: string
+          plan_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_payment_plans_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_payment_plans_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "payment_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       courses: {
         Row: {
           award: string
@@ -172,6 +202,7 @@ export type Database = {
           fee: number | null
           id: string
           months: number
+          saving: number | null
           sort_order: number
           title: string
         }
@@ -181,6 +212,7 @@ export type Database = {
           fee?: number | null
           id: string
           months: number
+          saving?: number | null
           sort_order?: number
           title: string
         }
@@ -190,6 +222,7 @@ export type Database = {
           fee?: number | null
           id?: string
           months?: number
+          saving?: number | null
           sort_order?: number
           title?: string
         }
@@ -199,6 +232,36 @@ export type Database = {
             columns: ["faculty_id"]
             isOneToOne: false
             referencedRelation: "faculties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dual_payment_plans: {
+        Row: {
+          dual_id: string
+          plan_id: string
+        }
+        Insert: {
+          dual_id: string
+          plan_id: string
+        }
+        Update: {
+          dual_id?: string
+          plan_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dual_payment_plans_dual_id_fkey"
+            columns: ["dual_id"]
+            isOneToOne: false
+            referencedRelation: "dual_courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dual_payment_plans_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "payment_plans"
             referencedColumns: ["id"]
           },
         ]
@@ -275,6 +338,39 @@ export type Database = {
           name?: string
           sort_order?: number
           tagline?: string
+        }
+        Relationships: []
+      }
+      payment_plans: {
+        Row: {
+          created_at: string
+          deposit: number
+          id: string
+          instalment_amount: number
+          instalments: number
+          name: string
+          notes: string | null
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          deposit?: number
+          id?: string
+          instalment_amount?: number
+          instalments?: number
+          name: string
+          notes?: string | null
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          deposit?: number
+          id?: string
+          instalment_amount?: number
+          instalments?: number
+          name?: string
+          notes?: string | null
+          sort_order?: number
         }
         Relationships: []
       }

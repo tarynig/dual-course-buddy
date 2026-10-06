@@ -91,7 +91,7 @@ function CoursePage() {
             )}
           </div>
           <div className="mt-8 border-t border-border pt-5">
-            <FeeLine fee={course.fee} deposit={course.deposit} />
+            <FeeLine plans={course.plans} />
             <Link to="/contact" className="mt-5 inline-block rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-foreground">
               Enquire about this course
             </Link>
