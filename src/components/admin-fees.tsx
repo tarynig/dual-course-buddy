@@ -218,8 +218,12 @@ function PlanForm({ plan, onDone }: { plan: PaymentPlan | null; onDone: () => vo
       });
       await queryClient.invalidateQueries({ queryKey: ["catalogue"] });
       onDone();
-    } catch {
-      setError("Couldn't save. Check the name and amounts are filled in.");
+    } catch (e) {
+      setError(
+        e instanceof Error && e.message.includes("permission denied")
+          ? "This preview can't change saved records. Saving works on your own server."
+          : "Couldn't save. Check the name and amounts are filled in.",
+      );
     } finally {
       setBusy(false);
     }
