@@ -16,3 +16,6 @@
 - [x] Production handover pack: `.env.example` (every setting the site reads) and `DEPLOYING.md` (cPanel + standalone PostgreSQL steps). Settings live in the server's environment, never in code.
 - [ ] Confirm the Node build target on the first real deploy (`CAC_TARGET=node npm run build:node` -> `dist/nitro.json` should read `node-server`; the editor's build environment pins it to Cloudflare so this can only be checked on their server).
 - [ ] Publish so the live site matches the current version (still running the pre-PostgreSQL build).
+- [x] Admin content management: Courses tab (edit/add/delete course info incl. full course info) and Dual courses tab (pick two single courses, name, faculty, duration). Each course has its own page with full info.
+- [ ] Full course info text — college to supply, then enter per course in the admin Courses tab.
+- [ ] Dual course pricing rules (next step).
