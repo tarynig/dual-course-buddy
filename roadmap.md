@@ -18,4 +18,6 @@
 - [ ] Publish so the live site matches the current version (still running the pre-PostgreSQL build).
 - [x] Admin content management: Courses tab (edit/add/delete course info incl. full course info) and Dual courses tab (pick two single courses, name, faculty, duration). Each course has its own page with full info.
 - [ ] Full course info text — college to supply, then enter per course in the admin Courses tab.
-- [ ] Dual course pricing rules (next step).
+- [x] Payment plans: admin Fees tab manages plans (deposit, number of payments, amount each); each course/dual picks its plans; site shows "From R…" (cheapest plan total); dual "Save R…" entered per dual.
+- [ ] Payment plan display layout — college to send the exact layout.
+- [ ] Enter real payment plans and savings in the Fees tab.
