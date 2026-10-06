@@ -1,3 +1,4 @@
+import logo from '@/assets/cac-logo.png.asset.json';
 import student from '@/assets/brochure/student.jpg.asset.json';
 import audio from '@/assets/brochure/audio.jpg.asset.json';
 import dj from '@/assets/brochure/dj.jpg.asset.json';
@@ -14,6 +15,7 @@ const source = (asset: { url: string; original_filename: string }) =>
   import.meta.env['VITE_CAC_LOCAL_IMAGES'] === 'true' ? `/brochure/${asset.original_filename}` : asset.url;
 export const brochureStudent = source(student);
 export const brochureDj = source(dj);
+export const cacLogo = source(logo);
 export const facultyImages: Record<FacultyId, { src: string; alt: string }> = {
   audio: { src: source(audio), alt: 'Sound recording equipment from the college prospectus' },
   content: { src: source(content), alt: 'A film camera recording a production' },
