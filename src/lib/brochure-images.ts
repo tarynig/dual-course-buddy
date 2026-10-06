@@ -11,7 +11,7 @@ import type { FacultyId } from '@/data/courses';
 
 // Node builds serve downloaded photos from the college's own host.
 const source = (asset: { url: string; original_filename: string }) =>
-  import.meta.env.VITE_CAC_LOCAL_IMAGES === 'true' ? `/brochure/${asset.original_filename}` : asset.url;
+  import.meta.env['VITE_CAC_LOCAL_IMAGES'] === 'true' ? `/brochure/${asset.original_filename}` : asset.url;
 export const brochureStudent = source(student);
 export const brochureDj = source(dj);
 export const facultyImages: Record<FacultyId, { src: string; alt: string }> = {
