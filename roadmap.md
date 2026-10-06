@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Align catalogue with the brochure: original photos, circular frames and numbered circular-bar headers; retain all fees and filters. Own-host builds include local photo copies.
+
 - [x] Course catalogue site (courses, dual courses, about, contact) — shipped, fees pending
 - [x] Enable Lovable Cloud (PostgreSQL) backend
 - [x] Database schema: faculties, courses, dual_courses, enquiries (+ access rules, seeded with the 2027 prospectus)

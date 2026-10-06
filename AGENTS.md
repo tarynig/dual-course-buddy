@@ -22,4 +22,5 @@
   that triggered it.
 - New capabilities go behind one small module with a swappable transport so a later host move is a
   single-file change.
+- Brochure visuals use shared photo/bar components and one image map; Node builds materialize the asset pointers into own-host public files so production never depends on the editor's CDN.
 

@@ -61,7 +61,7 @@ export const dualsForCourse = (catalogue: Catalogue, id: string) =>
   catalogue.duals.filter((d) => d.courseIds.includes(id));
 
 export const formatZar = (value: number) =>
-  new Intl.NumberFormat("en-ZA", { style: "currency", currency: "ZAR", maximumFractionDigits: 0 }).format(value);
+  `R\u00a0${Math.round(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")}`;
 
 /** Individual fees added together, if both are known. */
 export const separateFeeTotalOf = (courses: Course[], dual: DualCourse): number | null => {

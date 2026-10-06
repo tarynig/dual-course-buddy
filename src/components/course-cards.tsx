@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { NumberedBar } from '@/components/brochure-visuals';
 import {
   dualSaving,
   formatZar,
@@ -28,11 +29,11 @@ export function FeeLine({ fee, deposit }: { fee: number | null; deposit: number 
   );
 }
 
-export function CourseCard({ course }: { course: Course }) {
+export function CourseCard({ course, number = 1 }: { course: Course; number?: number }) {
   return (
-    <article className="flex h-full flex-col rounded-2xl border border-border bg-card p-6 shadow-sm transition-shadow hover:shadow-md">
+    <article className="brochure-course flex h-full flex-col">
+      <NumberedBar number={number} title={course.name} />
       <div className="flex items-start justify-between gap-3">
-        <h3 className="font-display text-lg font-black">{course.name}</h3>
         <span className="shrink-0 rounded-full bg-accent px-3 py-1 text-xs font-bold text-accent-foreground">
           {course.months} months
         </span>
@@ -60,7 +61,7 @@ export function CourseCard({ course }: { course: Course }) {
   );
 }
 
-export function DualCard({ dual, courses }: { dual: DualCourse; courses: Course[] }) {
+export function DualCard({ dual, courses, number = 1 }: { dual: DualCourse; courses: Course[]; number?: number }) {
   const parts = dual.courseIds
     .map((id) => courses.find((c) => c.id === id))
     .filter(Boolean) as Course[];
@@ -70,9 +71,9 @@ export function DualCard({ dual, courses }: { dual: DualCourse; courses: Course[
   const separate = separateFeeTotalOf(courses, dual);
 
   return (
-    <article className="flex h-full flex-col rounded-2xl border-2 border-secondary/40 bg-card p-6 shadow-sm">
+    <article className="brochure-course flex h-full flex-col">
+      <NumberedBar number={number} title={dual.title} dual />
       <div className="flex items-start justify-between gap-3">
-        <h3 className="font-display text-lg font-black">{dual.title}</h3>
         <span className="shrink-0 rounded-full bg-primary px-3 py-1 text-xs font-bold text-primary-foreground">
           {dual.months} months
         </span>

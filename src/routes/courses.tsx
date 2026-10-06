@@ -2,6 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { CourseCard } from "@/components/course-cards";
+import { FacultyBar, FacultyPhoto } from '@/components/brochure-visuals';
+import { Button } from '@/components/ui/button';
 import { CatalogueError, CatalogueNotFound } from "@/components/route-fallbacks";
 import { catalogueQueryOptions } from "@/lib/catalogue-queries";
 import type { FacultyId } from "@/data/courses";
@@ -9,6 +11,8 @@ import type { FacultyId } from "@/data/courses";
 export const Route = createFileRoute("/courses")({
   head: () => ({
     meta: [
+      { property: 'og:type', content: 'website' },
+      { name: 'twitter:card', content: 'summary_large_image' },
       { title: "Courses 2027 | Creative Arts College" },
       {
         name: "description",
@@ -46,7 +50,7 @@ function CoursesPage() {
             2027 Prospectus
           </p>
           <h1 className="mt-3 max-w-2xl font-display text-4xl font-black md:text-5xl">
-            Every course, one place
+            Creative Arts College courses
           </h1>
           <p className="mt-4 max-w-2xl text-sm opacity-85 md:text-base">
             Accredited qualifications and CAC skills programmes across seven faculties. Each course
@@ -57,7 +61,7 @@ function CoursesPage() {
 
       <section className="mx-auto max-w-6xl px-5 py-10">
         <div className="flex flex-wrap items-center gap-2">
-          <button
+          <Button
             type="button"
             onClick={() => setFaculty("all")}
             className={`rounded-full border px-4 py-2 text-sm font-bold transition-colors ${
@@ -67,9 +71,9 @@ function CoursesPage() {
             }`}
           >
             All faculties
-          </button>
+          </Button>
           {catalogue.faculties.map((f) => (
-            <button
+            <Button
               key={f.id}
               type="button"
               onClick={() => setFaculty(f.id)}
@@ -80,11 +84,11 @@ function CoursesPage() {
               }`}
             >
               {f.name}
-            </button>
+            </Button>
           ))}
         </div>
 
-        <div className="mt-6 flex flex-wrap items-center gap-4 rounded-2xl border border-border bg-card p-5">
+        <div className="mt-6 flex flex-wrap items-center gap-4 border-y border-border py-5">
           <label htmlFor="duration" className="text-sm font-bold">
             Maximum duration
           </label>
@@ -112,15 +116,18 @@ function CoursesPage() {
             const list = filtered.filter((c) => c.faculty === f.id);
             if (list.length === 0) return null;
             return (
-              <div key={f.id} className="mt-12">
-                <h2 className="font-display text-2xl font-black">{f.name}</h2>
-                <p className="mt-1 text-sm text-muted-foreground">{f.tagline}</p>
-                <div className="mt-6 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-                  {list.map((c) => (
-                    <CourseCard key={c.id} course={c} />
-                  ))}
+              <section key={f.id} className="mt-12 border-b border-border pb-12">
+                <FacultyBar faculty={f.id} title={f.name} />
+                <p className="mt-4 text-sm text-muted-foreground">{f.tagline}</p>
+                <div className="brochure-faculty-layout mt-6">
+                  <div className="grid gap-6 md:grid-cols-2">
+                    {list.map((c, index) => (
+                      <CourseCard key={c.id} course={c} number={catalogue.courses.filter(course => course.faculty === f.id).findIndex(course => course.id === c.id) + 1} />
+                    ))}
+                  </div>
+                  <FacultyPhoto faculty={f.id} />
                 </div>
-              </div>
+              </section>
             );
           })}
       </section>

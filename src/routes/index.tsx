@@ -1,12 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { DualCard } from "@/components/course-cards";
+import { FacultyBar, FacultyPhoto } from '@/components/brochure-visuals';
+import { brochureStudent } from '@/lib/brochure-images';
 import { CatalogueError, CatalogueNotFound } from "@/components/route-fallbacks";
 import { catalogueQueryOptions } from "@/lib/catalogue-queries";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
+      { property: 'og:type', content: 'website' },
+      { name: 'twitter:card', content: 'summary_large_image' },
       { title: "Creative Arts College | Where Education & Industry Meet" },
       {
         name: "description",
@@ -36,14 +40,15 @@ function Home() {
 
   return (
     <div>
-      <section className="surface-deep dot-grid">
-        <div className="mx-auto grid max-w-6xl gap-10 px-5 py-20 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
+      <section className="surface-deep relative overflow-hidden">
+        <img src={brochureStudent} alt="" className="absolute inset-0 h-full w-full object-cover object-top opacity-25" fetchPriority="high" />
+        <div className="relative mx-auto grid max-w-6xl gap-10 px-5 py-16 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
           <div>
             <span className="inline-block rounded-full bg-secondary px-4 py-1.5 text-xs font-black tracking-[0.2em] text-secondary-foreground uppercase">
               2027 Prospectus
             </span>
             <h1 className="mt-5 font-display text-5xl leading-[0.95] font-black text-balance-tight md:text-7xl">
-              Where education &amp; industry meet
+              Creative Arts College
             </h1>
             <p className="mt-6 max-w-xl text-base opacity-85">
               Creative Arts College is a division of the South African Film Institute Group. Real
@@ -76,7 +81,7 @@ function Home() {
       </section>
 
       <section className="mx-auto max-w-6xl px-5 py-16">
-        <h2 className="font-display text-3xl font-black">Seven faculties</h2>
+        <FacultyBar title="Seven faculties" />
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
           {catalogue.courses.length} individual courses across the creative, media, communication
           and technology sectors.
@@ -86,13 +91,16 @@ function Home() {
             <Link
               key={f.id}
               to="/courses"
-              className="group rounded-2xl border border-border bg-card p-6 transition-colors hover:border-secondary"
+              className="brochure-faculty-link group"
             >
+              <FacultyPhoto faculty={f.id} />
+              <div>
               <h3 className="font-display text-lg font-black text-primary">{f.name}</h3>
               <p className="mt-2 text-sm text-muted-foreground">{f.tagline}</p>
               <p className="mt-4 text-xs font-black tracking-widest text-secondary uppercase">
                 {catalogue.courses.filter((c) => c.faculty === f.id).length} courses →
               </p>
+              </div>
             </Link>
           ))}
         </div>
@@ -102,7 +110,7 @@ function Home() {
         <div className="mx-auto max-w-6xl px-5">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <h2 className="font-display text-3xl font-black">Dual courses</h2>
+              <FacultyBar title="Dual courses" />
               <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
                 Pair two complementary courses, pay a lower combined rate, and finish far sooner
                 than studying them one after the other.
@@ -116,8 +124,8 @@ function Home() {
             </Link>
           </div>
           <div className="mt-8 grid gap-5 md:grid-cols-2">
-            {featuredDuals.map((d) => (
-              <DualCard key={d.id} dual={d} courses={catalogue.courses} />
+            {featuredDuals.map((d, index) => (
+              <DualCard key={d.id} dual={d} courses={catalogue.courses} number={index + 1} />
             ))}
           </div>
         </div>
