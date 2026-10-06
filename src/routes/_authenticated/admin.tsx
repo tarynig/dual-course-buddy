@@ -12,6 +12,7 @@ import {
 } from "@/lib/admin.functions";
 import { catalogueQueryOptions } from "@/lib/catalogue-queries";
 import { formatZar } from "@/data/courses";
+import { CoursesContentPanel, DualsContentPanel } from "@/components/admin-content";
 import { CatalogueError, CatalogueNotFound } from "@/components/route-fallbacks";
 
 export const Route = createFileRoute("/_authenticated/admin")({
@@ -38,7 +39,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
 });
 
 const STATUSES = ["new", "contacted", "enrolled", "closed"] as const;
-const TABS = ["enquiries", "fees", "account"] as const;
+const TABS = ["enquiries", "courses", "dual courses", "fees", "account"] as const;
 
 function AdminPage() {
   const navigate = useNavigate();
@@ -94,7 +95,7 @@ function AdminPage() {
 
       {session.data?.isAdmin && (
         <div className="mx-auto max-w-6xl px-5 py-10">
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             {TABS.map((t) => (
               <button
                 key={t}
@@ -113,6 +114,8 @@ function AdminPage() {
 
           <div className="mt-8">
             {tab === "enquiries" && <EnquiriesPanel />}
+            {tab === "courses" && <CoursesContentPanel />}
+            {tab === "dual courses" && <DualsContentPanel />}
             {tab === "fees" && <FeesPanel />}
             {tab === "account" && (
               <div className="space-y-12">

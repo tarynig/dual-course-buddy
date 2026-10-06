@@ -81,6 +81,7 @@ export type Database = {
           award: string
           deposit: number | null
           description: string
+          details: string | null
           faculty_id: string
           fee: number | null
           id: string
@@ -95,6 +96,7 @@ export type Database = {
           award: string
           deposit?: number | null
           description: string
+          details?: string | null
           faculty_id: string
           fee?: number | null
           id: string
@@ -109,6 +111,7 @@ export type Database = {
           award?: string
           deposit?: number | null
           description?: string
+          details?: string | null
           faculty_id?: string
           fee?: number | null
           id?: string

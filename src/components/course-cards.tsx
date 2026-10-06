@@ -56,6 +56,13 @@ export function CourseCard({ course, number = 1 }: { course: Course; number?: nu
 
       <div className="mt-5 border-t border-border pt-4">
         <FeeLine fee={course.fee} deposit={course.deposit} />
+        <Link
+          to="/courses/$courseId"
+          params={{ courseId: course.id }}
+          className="mt-3 inline-block text-sm font-bold text-primary underline"
+        >
+          View full course info →
+        </Link>
       </div>
     </article>
   );
@@ -84,7 +91,7 @@ export function DualCard({ dual, courses, number = 1 }: { dual: DualCourse; cour
           <li key={p.id} className="flex items-start gap-2 text-sm">
             <span className="mt-1 size-1.5 shrink-0 rounded-full bg-secondary" />
             <span>
-              <span className="font-semibold">{p.name}</span>
+              <Link to="/courses/$courseId" params={{ courseId: p.id }} className="font-semibold underline-offset-2 hover:underline">{p.name}</Link>
               <span className="text-muted-foreground"> · {p.award}</span>
             </span>
           </li>

@@ -22,6 +22,7 @@ type CourseRow = {
   fee: string | number | null;
   deposit: string | number | null;
   signature: boolean;
+  details: string | null;
 };
 type DualRow = {
   id: string;
@@ -48,7 +49,7 @@ export const getCatalogue = createServerFn({ method: "GET" }).handler(
         `,
         sql<Array<CourseRow>>`
           SELECT id, faculty_id, name, months, type, award, saqa, description,
-                 fee, deposit, signature
+                 fee, deposit, signature, details
           FROM public.courses
           ORDER BY sort_order
         `,
@@ -83,6 +84,7 @@ export const getCatalogue = createServerFn({ method: "GET" }).handler(
         fee: toNumber(c.fee),
         deposit: toNumber(c.deposit),
         signature: c.signature,
+        ...(c.details ? { details: c.details } : {}),
       }));
 
       const duals: Array<DualCourse> = dualRows.map((d) => ({
