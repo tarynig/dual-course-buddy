@@ -264,19 +264,12 @@ ALTER TABLE ONLY public.enquiries
 ALTER TABLE ONLY public.enquiries
     ADD CONSTRAINT enquiries_dual_course_id_fkey FOREIGN KEY (dual_course_id) REFERENCES public.dual_courses(id);
 
-ALTER TABLE public.app_sessions ENABLE ROW LEVEL SECURITY;
 
-ALTER TABLE public.app_users ENABLE ROW LEVEL SECURITY;
 
-ALTER TABLE public.courses ENABLE ROW LEVEL SECURITY;
 
-ALTER TABLE public.dual_course_courses ENABLE ROW LEVEL SECURITY;
 
-ALTER TABLE public.dual_courses ENABLE ROW LEVEL SECURITY;
 
-ALTER TABLE public.enquiries ENABLE ROW LEVEL SECURITY;
 
-ALTER TABLE public.faculties ENABLE ROW LEVEL SECURITY;
 
 CREATE TABLE public.payment_plans (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),

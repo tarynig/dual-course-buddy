@@ -1,0 +1,11 @@
+ALTER TABLE public.app_sessions DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.app_users DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.courses DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.dual_course_courses DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.dual_courses DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.enquiries DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.faculties DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.payment_plans DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.course_payment_plans DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.dual_payment_plans DISABLE ROW LEVEL SECURITY;
+SELECT (SELECT count(*) FROM public.faculties) AS faculties, (SELECT count(*) FROM public.courses) AS courses, (SELECT count(*) FROM public.dual_courses) AS duals, (SELECT count(*) FROM public.app_users) AS users;
