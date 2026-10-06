@@ -14,7 +14,11 @@ export interface Course {
   /** Deposit payable on registration, in ZAR. */
   deposit: number | null;
   signature?: boolean;
+  /** Long-form course information shown on the course's own page. */
+  details?: string;
 }
+
+export const COURSE_TYPES: CourseType[] = ["OC", "AOC", "HOC", "FETC", "SC"];
 
 export interface DualCourse {
   id: string;
