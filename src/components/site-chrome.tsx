@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { contact } from "@/data/courses";
+import { cacLogo } from "@/lib/brochure-images";
 
 const nav = [
   { to: "/", label: "Home" },
@@ -13,9 +14,7 @@ const nav = [
 export function Logo({ compact = false }: { compact?: boolean }) {
   return (
     <Link to="/" className="inline-flex items-center gap-2">
-      <span className="grid size-9 place-items-center rounded-full border-2 border-secondary text-lg font-black text-secondary">
-        C
-      </span>
+      <img src={cacLogo} alt="Creative Arts College logo" className="size-9 object-contain" />
       <span className="leading-none">
         <span className="block font-display text-lg font-black tracking-tight">
           <span className="text-secondary">creative</span>
