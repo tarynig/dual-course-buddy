@@ -96,7 +96,7 @@
   h4 {
     font-family: var(--font-display);
     font-weight: 800;
-    letter-spacing: -0.02em;
+    letter-spacing: 0;
   }
 }
 
@@ -118,3 +118,27 @@
 @utility text-balance-tight {
   text-wrap: balance;
 }
+
+:root {
+  --brochure-panel: oklch(0.94 0.004 295);
+  --brochure-ring: oklch(0.99 0.002 300);
+  --brochure-shadow: 0 7px 0 color-mix(in oklab, var(--primary) 12%, transparent);
+}
+.brochure-faculty-bar { display:flex; align-items:center; gap:1rem; background:var(--primary); color:var(--primary-foreground); border-radius:999px; padding:.55rem 1.5rem .55rem .6rem; max-width:36rem; }
+.brochure-faculty-bar h2 { font-size:1.45rem; line-height:1.2; text-transform:uppercase; }
+.brochure-icon { width:2.9rem; height:2.9rem; flex-shrink:0; display:grid; place-items:center; border-radius:50%; background:var(--secondary); color:var(--secondary-foreground); }
+.brochure-icon svg { width:1.65rem; height:1.65rem; }
+.brochure-photo { aspect-ratio:1; width:100%; border-radius:50%; padding:.65rem; background:var(--brochure-ring); border:2px solid var(--secondary); box-shadow:var(--brochure-shadow); overflow:hidden; }
+.brochure-photo img { width:100%; height:100%; border-radius:50%; object-fit:cover; }
+.brochure-course-bar { position:relative; display:flex; align-items:center; gap:.8rem; min-height:4.4rem; padding:.5rem 1.25rem .5rem .5rem; margin:-.75rem -.25rem 1rem; background:var(--primary); color:var(--primary-foreground); border-radius:999px 0 1.75rem 999px; border-bottom:5px solid var(--secondary); }
+.brochure-course-bar h3 { font-size:1rem; line-height:1.25; text-transform:uppercase; overflow-wrap:anywhere; }
+.brochure-number { display:grid; place-items:center; flex-shrink:0; width:2.8rem; height:2.8rem; background:var(--card); color:var(--foreground); border:6px solid var(--secondary); border-radius:50%; font-weight:900; font-size:.9rem; box-shadow:0 0 0 5px var(--primary); }
+.brochure-course-bar-dual { background:var(--secondary); border-color:var(--primary); }
+.brochure-course-bar-dual .brochure-number { border-color:var(--primary); box-shadow:0 0 0 5px var(--secondary); }
+.brochure-course { background:var(--brochure-panel); border-radius:8px; padding:1.25rem; }
+.brochure-faculty-layout { display:grid; grid-template-columns:minmax(0,1fr) 19rem; align-items:start; gap:2rem; }
+.brochure-faculty-layout > .brochure-photo { position:sticky; top:6rem; margin-top:1.5rem; }
+.brochure-faculty-link { display:flex; align-items:center; gap:1rem; padding:1rem 0; border-bottom:1px solid var(--border); }
+.brochure-faculty-link .brochure-photo { width:6rem; flex-shrink:0; padding:.25rem; }
+@media(max-width:900px) { .brochure-faculty-layout { grid-template-columns:minmax(0,1fr); } .brochure-faculty-layout > .brochure-photo { width:13rem; grid-row:1; justify-self:center; position:static; margin:0; } }
+@media(max-width:480px) { .brochure-faculty-bar h2 { font-size:1.1rem; } .brochure-faculty-bar { gap:.6rem; } .brochure-course-bar h3 { font-size:.9rem; } }

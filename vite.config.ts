@@ -12,6 +12,7 @@ import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 const nodeTarget = process.env["CAC_TARGET"] === "node";
 
 export default defineConfig({
+  vite: { define: { 'import.meta.env.VITE_CAC_LOCAL_IMAGES': JSON.stringify(nodeTarget ? 'true' : 'false') } },
   // Omitted entirely unless building for the college's own Node host, so the preview keeps its
   // default target.
   ...(nodeTarget ? { nitro: { preset: "node-server" } } : {}),
