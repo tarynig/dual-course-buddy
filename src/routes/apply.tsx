@@ -104,7 +104,8 @@ function ApplyPage() {
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (step < STEPS.length - 1) { next(); return; }
-    for (let i = 0; i < STEPS.length; i++) if (!stepValid(i)) { setStep(i); return; }
+    const bad = Array.from(formRef.current?.querySelectorAll<HTMLInputElement>("input,select,textarea") ?? []).find((el) => !el.checkValidity());
+    if (bad) { goToField(bad.name, bad.validationMessage); return; }
     const f = new FormData(e.currentTarget);
     const g = (k: string) => String(f.get(k) ?? "").trim();
     const opt = (k: string) => g(k) || null;
@@ -152,7 +153,7 @@ function ApplyPage() {
         if ("field" in result && result.field) goToField(result.field, result.error);
       }
     } catch {
-      setState({ status: "error", message: "Some details look incomplete or invalid — please check the form and try again." });
+      setState({ status: "error", message: "We couldn't submit your application just now — please try again, or call us on 081 589 1088." });
     }
   }
 
