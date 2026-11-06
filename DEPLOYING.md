@@ -74,7 +74,11 @@ the host runs `npm run build:node` rather than the default `npm run build`.
 - Outbound mail goes through `src/lib/mail.server.ts` only. Swapping to a different mail provider
   later means editing that one file.
 
-## PayFast deposits
+## PayFast booking fees
+
+The website processes only the global booking fee defined in `src/lib/booking-fee.ts`. It is credited toward the deposit if accepted and refundable without questions if the student does not proceed. Admins arrange every other payment and process refunds directly; the website does not automate refunds or deposit credits.
+
+For an existing installation, apply `database/update-booking-fee.sql` before deploying this version. Historical deposit payments stay labelled separately.
 
 Set these in the server's environment (cPanel → Setup Node.js App → Environment Variables):
 
@@ -83,4 +87,4 @@ Set these in the server's environment (cPanel → Setup Node.js App → Environm
 - `PAYFAST_PASSPHRASE` — the same passphrase saved on that PayFast settings page
 - `SITE_URL` — e.g. `https://www.creativearts.co.za` (used for return and notify links)
 
-PayFast confirms each payment by calling `https://<your site>/api/public/payfast/notify`; the site must be reachable on the internet over HTTPS for deposits to show as "paid".
+PayFast confirms each payment by calling `https://<your site>/api/public/payfast/notify`; the site must be reachable on the internet over HTTPS for booking fees to show as "paid".

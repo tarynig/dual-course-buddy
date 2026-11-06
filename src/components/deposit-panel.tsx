@@ -25,11 +25,10 @@ export function postToPayFast(checkout: { action: string; fields: [string, strin
 
 type Props = { plans: PaymentPlan[]; courseId?: string; dualCourseId?: string };
 
-/** Shows the payment plans and lets a student pay the deposit via PayFast, or talk to admissions instead. */
+/** Booking checkout with optional preferred plan selection for later admin-arranged payments. */
 export function DepositPanel({ plans, courseId, dualCourseId }: Props) {
   const start = useServerFn(startBookingPayment);
-  const payable = plans;
-  const [planId, setPlanId] = useState(payable[0]?.id ?? "");
+  const [planId, setPlanId] = useState(plans[0]?.id ?? "");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -78,7 +77,7 @@ export function DepositPanel({ plans, courseId, dualCourseId }: Props) {
         <form id={`deposit-${courseId ?? dualCourseId}`} onSubmit={onSubmit} className="mt-5 grid gap-3">
           <input name="fullName" aria-label="Full name" required minLength={2} placeholder="Full name" className={field} />
           <input name="email" aria-label="Email" type="email" required placeholder="Email" className={field} />
-          <input name="phone" aria-label="Phone" type="tel" required minLength={7} placeholder="Phone" className={field} />
+          <input name="phone" aria-label="Phone" type="tel" required minLength={6} placeholder="Phone" className={field} />
         </form>
       )}
 
