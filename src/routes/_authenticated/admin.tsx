@@ -11,6 +11,7 @@ import {
 } from "@/lib/admin.functions";
 import type { AdminEnquiry } from "@/lib/admin.functions";
 import { FeesPanel } from "@/components/admin-fees";
+import { PaymentsPanel } from "@/components/admin-payments";
 import { CoursesContentPanel, DualsContentPanel } from "@/components/admin-content";
 import { CatalogueError, CatalogueNotFound } from "@/components/route-fallbacks";
 
@@ -38,7 +39,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
 });
 
 const STATUSES = ["new", "contacted", "enrolled", "closed"] as const;
-const TABS = ["enquiries", "courses", "dual courses", "fees", "account"] as const;
+const TABS = ["enquiries", "payments", "courses", "dual courses", "fees", "account"] as const;
 
 function AdminPage() {
   const navigate = useNavigate();
@@ -113,6 +114,7 @@ function AdminPage() {
 
           <div className="mt-8">
             {tab === "enquiries" && <EnquiriesPanel />}
+            {tab === "payments" && <PaymentsPanel />}
             {tab === "courses" && <CoursesContentPanel />}
             {tab === "dual courses" && <DualsContentPanel />}
             {tab === "fees" && <FeesPanel />}

@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { FacultyPhoto } from "@/components/brochure-visuals";
 import { DualCard, FeeLine } from "@/components/course-cards";
+import { DepositPanel } from "@/components/deposit-panel";
 import { CatalogueError, CatalogueNotFound } from "@/components/route-fallbacks";
 import { catalogueQueryOptions } from "@/lib/catalogue-queries";
 import { courseById, dualsForCourse, facultyById } from "@/data/courses";
@@ -97,7 +98,10 @@ function CoursePage() {
             </Link>
           </div>
         </div>
-        <FacultyPhoto faculty={course.faculty} />
+        <div className="space-y-8">
+          <FacultyPhoto faculty={course.faculty} />
+          <DepositPanel plans={course.plans} courseId={course.id} />
+        </div>
       </section>
 
       {duals.length > 0 && (
