@@ -41,7 +41,7 @@ export function PaymentsPanel() {
           </div>
           <div className="text-right">
             <p className="font-display text-xl font-black">{formatZar(p.amount)}</p>
-            <span className={`mt-1 inline-block rounded-full px-3 py-1 text-xs font-bold capitalize ${BADGE[p.status] ?? BADGE.cancelled}`}>
+            <span className={`mt-1 inline-block rounded-full px-3 py-1 text-xs font-bold capitalize ${BADGE[p.status] ?? BADGE["cancelled"]}`}>
               {p.status}
             </span>
           </div>
