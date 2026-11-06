@@ -19,6 +19,8 @@ import { Route as DualCoursesRouteImport } from './routes/dual-courses'
 import { Route as HealthRouteImport } from './routes/health'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as CoursesCourseIdRouteImport } from './routes/courses_.$courseId'
+import { Route as PaymentCancelledRouteImport } from './routes/payment.cancelled'
+import { Route as PaymentSuccessRouteImport } from './routes/payment.success'
 import { Route as ApiPublicPayfastNotifyRouteImport } from './routes/api/public/payfast/notify'
 
 const IndexRoute = IndexRouteImport.update({
@@ -70,6 +72,16 @@ const CoursesCourseIdRoute = CoursesCourseIdRouteImport.update({
   path: '/courses/$courseId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PaymentCancelledRoute = PaymentCancelledRouteImport.update({
+  id: '/payment/cancelled',
+  path: '/payment/cancelled',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PaymentSuccessRoute = PaymentSuccessRouteImport.update({
+  id: '/payment/success',
+  path: '/payment/success',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicPayfastNotifyRoute = ApiPublicPayfastNotifyRouteImport.update({
   id: '/api/public/payfast/notify',
   path: '/api/public/payfast/notify',
@@ -86,6 +98,8 @@ export interface FileRoutesByFullPath {
   '/health': typeof HealthRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
+  '/payment/cancelled': typeof PaymentCancelledRoute
+  '/payment/success': typeof PaymentSuccessRoute
   '/api/public/payfast/notify': typeof ApiPublicPayfastNotifyRoute
 }
 export interface FileRoutesByTo {
@@ -98,6 +112,8 @@ export interface FileRoutesByTo {
   '/health': typeof HealthRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
+  '/payment/cancelled': typeof PaymentCancelledRoute
+  '/payment/success': typeof PaymentSuccessRoute
   '/api/public/payfast/notify': typeof ApiPublicPayfastNotifyRoute
 }
 export interface FileRoutesById {
@@ -112,6 +128,8 @@ export interface FileRoutesById {
   '/health': typeof HealthRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/courses_/$courseId': typeof CoursesCourseIdRoute
+  '/payment/cancelled': typeof PaymentCancelledRoute
+  '/payment/success': typeof PaymentSuccessRoute
   '/api/public/payfast/notify': typeof ApiPublicPayfastNotifyRoute
 }
 export interface FileRouteTypes {
@@ -126,6 +144,8 @@ export interface FileRouteTypes {
     | '/health'
     | '/admin'
     | '/courses/$courseId'
+    | '/payment/cancelled'
+    | '/payment/success'
     | '/api/public/payfast/notify'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -138,6 +158,8 @@ export interface FileRouteTypes {
     | '/health'
     | '/admin'
     | '/courses/$courseId'
+    | '/payment/cancelled'
+    | '/payment/success'
     | '/api/public/payfast/notify'
   id:
     | '__root__'
@@ -151,6 +173,8 @@ export interface FileRouteTypes {
     | '/health'
     | '/_authenticated/admin'
     | '/courses_/$courseId'
+    | '/payment/cancelled'
+    | '/payment/success'
     | '/api/public/payfast/notify'
   fileRoutesById: FileRoutesById
 }
@@ -164,6 +188,8 @@ export interface RootRouteChildren {
   DualCoursesRoute: typeof DualCoursesRoute
   HealthRoute: typeof HealthRoute
   CoursesCourseIdRoute: typeof CoursesCourseIdRoute
+  PaymentCancelledRoute: typeof PaymentCancelledRoute
+  PaymentSuccessRoute: typeof PaymentSuccessRoute
   ApiPublicPayfastNotifyRoute: typeof ApiPublicPayfastNotifyRoute
 }
 
@@ -239,6 +265,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CoursesCourseIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/payment/cancelled': {
+      id: '/payment/cancelled'
+      path: '/payment/cancelled'
+      fullPath: '/payment/cancelled'
+      preLoaderRoute: typeof PaymentCancelledRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payment/success': {
+      id: '/payment/success'
+      path: '/payment/success'
+      fullPath: '/payment/success'
+      preLoaderRoute: typeof PaymentSuccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/payfast/notify': {
       id: '/api/public/payfast/notify'
       path: '/api/public/payfast/notify'
@@ -270,6 +310,8 @@ const rootRouteChildren: RootRouteChildren = {
   DualCoursesRoute: DualCoursesRoute,
   HealthRoute: HealthRoute,
   CoursesCourseIdRoute: CoursesCourseIdRoute,
+  PaymentCancelledRoute: PaymentCancelledRoute,
+  PaymentSuccessRoute: PaymentSuccessRoute,
   ApiPublicPayfastNotifyRoute: ApiPublicPayfastNotifyRoute,
 }
 export const routeTree = rootRouteImport
