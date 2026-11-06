@@ -8,7 +8,8 @@ const nav = [
   { to: "/courses", label: "Courses" },
   { to: "/dual-courses", label: "Dual Courses" },
   { to: "/about", label: "About" },
-  { to: "/contact", label: "Apply" },
+  { to: "/contact", label: "Contact" },
+  { to: "/apply", label: "Apply" },
 ] as const;
 
 export function Logo({ compact = false }: { compact?: boolean }) {

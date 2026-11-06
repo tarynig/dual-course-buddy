@@ -93,6 +93,9 @@ function DualPage() {
             <Link to="/contact" className="mt-5 inline-block rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-foreground">
               Enquire about this dual course
             </Link>
+            <Link to="/apply" search={{ course: `dual:${dual.id}` }} className="mt-5 ml-3 inline-block rounded-full bg-secondary px-6 py-3 text-sm font-bold text-secondary-foreground">
+              Apply now
+            </Link>
           </div>
         </div>
         <div className="space-y-8">
