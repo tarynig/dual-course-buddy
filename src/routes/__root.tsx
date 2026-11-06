@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
+import { Toaster } from "@/components/ui/sonner";
 
 
 function NotFoundComponent() {
@@ -142,6 +143,7 @@ function RootComponent() {
         </main>
         <SiteFooter />
       </div>
+      <Toaster position="top-center" richColors />
     </QueryClientProvider>
   );
 }

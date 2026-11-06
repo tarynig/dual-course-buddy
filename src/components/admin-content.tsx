@@ -105,6 +105,9 @@ function CourseForm({
   });
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  // The record this form is writing: the course's own id, or the id handed back
+  // once a brand-new course has been saved for the first time.
+  const [savedId, setSavedId] = useState(course?.id ?? null);
   const set = (key: keyof typeof form, value: string | boolean) =>
     setForm((f) => ({ ...f, [key]: value }));
 
