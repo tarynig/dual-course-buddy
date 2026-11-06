@@ -125,6 +125,25 @@
   --brochure-shadow: 0 7px 0 color-mix(in oklab, var(--primary) 12%, transparent);
 }
 .brochure-faculty-bar { display:flex; align-items:center; gap:1rem; background:var(--primary); color:var(--primary-foreground); border-radius:999px; padding:.55rem 1.5rem .55rem .6rem; max-width:36rem; }
+
+/* Banner portrait: cut-out subject over a circular CI glow. */
+.hero-figure { position:relative; display:flex; align-items:flex-end; justify-content:center; min-height:18rem; }
+.hero-figure::before {
+  content:"";
+  position:absolute;
+  bottom:0;
+  width:min(23rem, 86%);
+  aspect-ratio:1;
+  border-radius:50%;
+  background:radial-gradient(circle at 50% 45%, color-mix(in oklab, var(--color-secondary) 34%, transparent) 0%, transparent 64%);
+  border:3px solid color-mix(in oklab, var(--color-secondary) 55%, transparent);
+}
+.hero-cutout { position:relative; width:min(21rem, 80%); filter:drop-shadow(0 1.5rem 2rem rgb(0 0 0 / .45)); }
+@media(min-width:1024px) {
+  .hero-figure { min-height:26rem; }
+  .hero-figure::before { width:min(28rem, 92%); }
+  .hero-cutout { width:min(26rem, 100%); }
+}
 .brochure-faculty-bar h2 { font-size:1.45rem; line-height:1.2; text-transform:uppercase; }
 .brochure-icon { width:2.9rem; height:2.9rem; flex-shrink:0; display:grid; place-items:center; border-radius:50%; background:var(--secondary); color:var(--secondary-foreground); }
 .brochure-icon svg { width:1.65rem; height:1.65rem; }
