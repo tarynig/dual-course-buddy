@@ -26,3 +26,4 @@
 
 - Fees live only on reusable payment plans linked to courses/duals; the public "from" price is derived from the cheapest linked plan. Why: one amount change updates every course using that plan.
 - Catalogue SQL returns lists as comma-joined text and runs queries one after another. Why: array types and pipelined queries hang or misparse in the edge runtime with fetch_types off.
+- Retire catalogue offerings with is_active rather than deleting rows, and filter inactive offerings from catalogue reads. Why: historical enquiries and payment-plan links must remain intact.

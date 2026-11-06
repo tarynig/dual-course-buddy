@@ -11,11 +11,15 @@ export const Route = createFileRoute("/")({
     meta: [
       { property: 'og:type', content: 'website' },
       { name: 'twitter:card', content: 'summary_large_image' },
+      ...(brochureStudent.startsWith("https://") ? [
+        { property: "og:image", content: brochureStudent },
+        { name: "twitter:image", content: brochureStudent },
+      ] : []),
       { title: "Creative Arts College | Where Education & Industry Meet" },
       {
         name: "description",
         content:
-          "30+ accredited SAQA qualifications in film, audio, design, fashion, IT and business. Practical, industry-based study in 12–24 months, plus great-value dual courses.",
+          "Accredited qualifications and skills programmes in film, audio, design, fashion, IT and business. Practical, industry-based study in 10–15 months, plus great-value dual courses.",
       },
       { property: "og:title", content: "Creative Arts College | 2027 Prospectus" },
       {
@@ -35,7 +39,7 @@ function Home() {
   const { data: catalogue } = useSuspenseQuery(catalogueQueryOptions);
 
   const featuredDuals = catalogue.duals.filter((d) =>
-    ["d-advanced-graphic", "d-film-content", "d-music-dj", "d-fashion-dd"].includes(d.id),
+    ["d-graphic-animation-101", "d-film-content", "d-music-dj", "d-fashion-dd"].includes(d.id),
   );
 
   return (
@@ -52,8 +56,8 @@ function Home() {
             </h1>
             <p className="mt-6 max-w-xl text-base opacity-85">
               Creative Arts College is a division of the South African Film Institute Group. Real
-              industry, relevant education — 30+ accredited SAQA qualifications completed in 12 to
-              24 months, with hands-on work on industry equipment.
+              industry, relevant education — accredited qualifications and skills programmes completed in 10 to
+              15 months, with hands-on work on industry equipment.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
@@ -73,7 +77,7 @@ function Home() {
 
           <dl className="grid gap-4 sm:grid-cols-2">
             <HeroStat value="30+" label="SAQA qualifications" />
-            <HeroStat value="12–24" label="Months to qualify" />
+            <HeroStat value="10–15" label="Months to qualify" />
             <HeroStat value={`${catalogue.duals.length}`} label="Dual pairings" />
             <HeroStat value="99%" label="Pass rate" />
           </dl>
@@ -138,7 +142,7 @@ function Home() {
           </h2>
           <p className="mt-4 max-w-3xl text-sm leading-relaxed text-muted-foreground md:text-base">
             At Creative Arts College you join the industry from day one. Focused, career-aligned
-            training, development and support puts you on your way to success in 12 to 24 months —
+            training, development and support puts you on your way to success in 10 to 15 months —
             with a portfolio, an industry reference and real work experience behind you.
           </p>
           <Link

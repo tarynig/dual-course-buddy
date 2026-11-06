@@ -115,6 +115,7 @@ export type Database = {
           faculty_id: string
           fee: number | null
           id: string
+          is_active: boolean
           months: number
           name: string
           saqa: string | null
@@ -130,6 +131,7 @@ export type Database = {
           faculty_id: string
           fee?: number | null
           id: string
+          is_active?: boolean
           months: number
           name: string
           saqa?: string | null
@@ -145,6 +147,7 @@ export type Database = {
           faculty_id?: string
           fee?: number | null
           id?: string
+          is_active?: boolean
           months?: number
           name?: string
           saqa?: string | null
@@ -201,6 +204,7 @@ export type Database = {
           faculty_id: string
           fee: number | null
           id: string
+          is_active: boolean
           months: number
           saving: number | null
           sort_order: number
@@ -211,6 +215,7 @@ export type Database = {
           faculty_id: string
           fee?: number | null
           id: string
+          is_active?: boolean
           months: number
           saving?: number | null
           sort_order?: number
@@ -221,6 +226,7 @@ export type Database = {
           faculty_id?: string
           fee?: number | null
           id?: string
+          is_active?: boolean
           months?: number
           saving?: number | null
           sort_order?: number

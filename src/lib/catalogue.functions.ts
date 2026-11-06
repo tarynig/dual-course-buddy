@@ -70,6 +70,7 @@ export const getCatalogue = createServerFn({ method: "GET" }).handler(
                  COALESCE((SELECT string_agg(p.plan_id::text, ',') FROM public.course_payment_plans p
                            WHERE p.course_id = courses.id), '') AS plan_ids
           FROM public.courses
+          WHERE is_active
           ORDER BY sort_order
         `,
         sql<Array<DualRow>>`
@@ -83,6 +84,12 @@ export const getCatalogue = createServerFn({ method: "GET" }).handler(
                    ''
                  ) AS course_ids
           FROM public.dual_courses d
+          WHERE d.is_active
+            AND NOT EXISTS (
+              SELECT 1 FROM public.dual_course_courses i
+              JOIN public.courses c ON c.id = i.course_id
+              WHERE i.dual_id = d.id AND NOT c.is_active
+            )
           ORDER BY d.sort_order
         `,
         sql<Array<PlanRow>>`
