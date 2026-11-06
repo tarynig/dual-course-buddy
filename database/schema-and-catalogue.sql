@@ -339,6 +339,7 @@ INSERT INTO public.dual_course_courses (dual_id, course_id, position) VALUES
 ON CONFLICT (dual_id, course_id) DO UPDATE SET position = EXCLUDED.position;
 CREATE TABLE public.deposit_payments (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  payment_kind text NOT NULL DEFAULT 'deposit',
   course_id text REFERENCES public.courses(id),
   dual_course_id text REFERENCES public.dual_courses(id),
   plan_id uuid REFERENCES public.payment_plans(id) ON DELETE SET NULL,

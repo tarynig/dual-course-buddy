@@ -1,4 +1,5 @@
 // Messages sent once PayFast confirms a deposit: one to admissions, one receipt to the student.
+import { BOOKING_TERMS, DIRECT_PAYMENT_TERMS } from "../booking-fee";
 type Paid = {
   reference: string;
   item_name: string;
@@ -7,6 +8,7 @@ type Paid = {
   full_name: string;
   email: string;
   phone: string;
+  payment_kind?: string;
 };
 
 const esc = (v: string) =>
@@ -22,29 +24,31 @@ ${lines.map((l) => `<p style="margin:0 0 10px">${esc(l)}</p>`).join("")}
 }
 
 export function depositEmails(p: Paid) {
+  const label = p.payment_kind === "booking" ? "Booking fee" : "Deposit";
   const details = [
     `Course: ${p.item_name}`,
     `Payment plan: ${p.plan_name ?? "—"}`,
-    `Deposit paid: ${zar(p.amount)}`,
+    `${label} paid: ${zar(p.amount)}`,
     `Reference: ${p.reference}`,
   ];
   const team = [`Student: ${p.full_name}`, `Email: ${p.email}`, `Phone: ${p.phone}`, ...details];
   const student = [
     `Hi ${p.full_name},`,
-    "Thank you — we've received your deposit via PayFast.",
+    `Thank you — we've received your ${label.toLowerCase()} via PayFast.`,
     ...details,
+    ...(p.payment_kind === "booking" ? [BOOKING_TERMS, DIRECT_PAYMENT_TERMS] : []),
     "Our admissions team will contact you shortly with the next steps.",
   ];
   return {
     team: {
-      subject: `Deposit paid: ${p.item_name} — ${p.full_name}`,
+      subject: `${label} paid: ${p.item_name} — ${p.full_name}`,
       text: team.join("\n"),
-      html: wrap("Deposit received", team),
+      html: wrap(`${label} received`, team),
     },
     student: {
-      subject: "Your Creative Arts College deposit receipt",
+      subject: `Your Creative Arts College ${label.toLowerCase()} receipt`,
       text: student.join("\n"),
-      html: wrap("Deposit received", student),
+      html: wrap(`${label} received`, student),
     },
   };
 }

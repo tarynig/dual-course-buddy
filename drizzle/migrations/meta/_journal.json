@@ -64,6 +64,13 @@
       "when": 1793952535252,
       "tag": "0008_applications_education_optional",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1793954677842,
+      "tag": "0009_booking_payment_kind",
+      "breakpoints": true
     }
   ]
 }

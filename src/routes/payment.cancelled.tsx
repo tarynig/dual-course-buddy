@@ -4,9 +4,9 @@ export const Route = createFileRoute("/payment/cancelled")({
   head: () => ({
     meta: [
       { title: "Payment cancelled | Creative Arts College" },
-      { name: "description", content: "Your deposit payment was cancelled — no money was taken." },
+      { name: "description", content: "Your booking fee payment was cancelled — no money was taken." },
       { property: "og:title", content: "Payment cancelled | Creative Arts College" },
-      { property: "og:description", content: "Your deposit payment was cancelled." },
+      { property: "og:description", content: "Your booking fee payment was cancelled." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
