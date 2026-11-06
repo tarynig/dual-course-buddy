@@ -1,4 +1,5 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { htmlToText, textToHtml } from "@/lib/rich-text";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -225,7 +226,7 @@ function CourseForm({
         <CoursePhoto course={{ name: form.name || "Course image", faculty: form.facultyId as Course["faculty"], imageUrl: form.imageUrl }} />
       </div>
       <p className="text-xs text-muted-foreground">
-        Course page sections — leave a blank line between paragraphs; start a line with "- " for a bullet point. Empty sections are hidden.
+        Course page sections — type as you want it to look: use Bold, Link and Bullets from the toolbar. Empty sections are hidden.
       </p>
       {([
         ["details", "Description", 8, "What the course is about and what students will learn."],
@@ -454,37 +455,57 @@ function DualForm({
 
 /** Plain textarea with a small toolbar: **bold**, [link](/path) and "- " bullets. */
 function RichTextBox(props: { rows: number; value: string; onChange: (v: string) => void; placeholder: string; className: string }) {
-  const ref = useRef<HTMLTextAreaElement>(null);
-  function wrap(before: string, after: string, fallback: string) {
-    const el = ref.current;
-    if (!el) return;
-    const { selectionStart: a, selectionEnd: b, value } = el;
-    const chosen = value.slice(a, b) || fallback;
-    props.onChange(value.slice(0, a) + before + chosen + after + value.slice(b));
-    requestAnimationFrame(() => {
-      el.focus();
-      el.setSelectionRange(a + before.length, a + before.length + chosen.length);
-    });
+  const ref = useRef<HTMLDivElement>(null);
+  const last = useRef<string | null>(null);
+  useEffect(() => {
+    if (ref.current && props.value !== last.current) {
+      ref.current.innerHTML = textToHtml(props.value);
+      last.current = props.value;
+    }
+  }, [props.value]);
+  function emit() {
+    if (!ref.current) return;
+    const v = htmlToText(ref.current);
+    last.current = v;
+    props.onChange(v);
+  }
+  function cmd(name: string, arg?: string) {
+    ref.current?.focus();
+    document.execCommand(name, false, arg);
+    emit();
   }
   function link() {
+    const sel = window.getSelection();
+    if (!sel || sel.isCollapsed) { window.alert("First select the words you want to turn into a link."); return; }
+    const range = sel.getRangeAt(0);
     const url = window.prompt("Link to (e.g. /courses/animation-101, /apply or a full https:// address)", "/courses/");
-    if (url) wrap("[", `](${url.trim()})`, "link text");
-  }
-  function bullet() {
-    const el = ref.current;
-    if (!el) return;
-    const start = el.value.lastIndexOf("\n", el.selectionStart - 1) + 1;
-    props.onChange(el.value.slice(0, start) + "- " + el.value.slice(start));
+    if (!url) return;
+    sel.removeAllRanges(); sel.addRange(range);
+    cmd("createLink", url.trim());
   }
   const btn = "rounded-md border border-border px-2 py-1 text-xs font-bold normal-case tracking-normal text-foreground hover:bg-muted";
+  const keep = (e: React.MouseEvent) => e.preventDefault();
   return (
     <span className="block">
-      <span className="mt-2 flex gap-2">
-        <button type="button" className={btn} onClick={() => wrap("**", "**", "bold text")}><b>B</b> Bold</button>
-        <button type="button" className={btn} onClick={link}>🔗 Link</button>
-        <button type="button" className={btn} onClick={bullet}>• Bullet</button>
+      <span className="mt-2 flex flex-wrap gap-2">
+        <button type="button" className={btn} onMouseDown={keep} onClick={() => cmd("bold")}><b>B</b> Bold</button>
+        <button type="button" className={btn} onMouseDown={keep} onClick={link}>🔗 Link</button>
+        <button type="button" className={btn} onMouseDown={keep} onClick={() => cmd("unlink")}>Remove link</button>
+        <button type="button" className={btn} onMouseDown={keep} onClick={() => cmd("insertUnorderedList")}>• Bullets</button>
       </span>
-      <textarea ref={ref} rows={props.rows} value={props.value} onChange={(e) => props.onChange(e.target.value)} placeholder={props.placeholder} className={props.className} />
+      <div
+        ref={ref}
+        contentEditable
+        suppressContentEditableWarning
+        role="textbox"
+        aria-multiline="true"
+        data-placeholder={props.placeholder}
+        onInput={emit}
+        onBlur={emit}
+        onPaste={(e) => { e.preventDefault(); document.execCommand("insertText", false, e.clipboardData.getData("text/plain")); }}
+        style={{ minHeight: `${props.rows * 1.6}rem` }}
+        className={`${props.className} rich-editor normal-case tracking-normal font-normal`}
+      />
     </span>
   );
 }
