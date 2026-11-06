@@ -87,7 +87,7 @@ function ApplyPage() {
     const el = formRef.current?.querySelector<HTMLInputElement>(`[name="${name}"]`);
     const box = el?.closest<HTMLElement>("[data-step]");
     if (!el || !box) return;
-    setStep(Number(box.dataset.step));
+    setStep(Number(box.dataset["step"]));
     setTimeout(() => {
       el.scrollIntoView({ behavior: "smooth", block: "center" });
       el.focus();
