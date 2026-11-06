@@ -1,6 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { FacultyPhoto } from "@/components/brochure-visuals";
+import { CoursePhoto } from "@/components/brochure-visuals";
+import { coursePhoto } from "@/lib/course-images";
 import { DualCard, FeeLine } from "@/components/course-cards";
 import { DepositPanel } from "@/components/deposit-panel";
 import { CatalogueError, CatalogueNotFound } from "@/components/route-fallbacks";
@@ -12,7 +13,7 @@ export const Route = createFileRoute("/courses_/$courseId")({
     const catalogue = await context.queryClient.ensureQueryData(catalogueQueryOptions);
     const course = courseById(catalogue, params.courseId);
     if (!course) throw notFound();
-    return { name: course.name, description: course.description };
+    return { name: course.name, description: course.description, image: coursePhoto(course).src };
   },
   head: ({ loaderData }) => {
     const title = `${loaderData?.name ?? "Course"} | Creative Arts College`;
@@ -25,6 +26,10 @@ export const Route = createFileRoute("/courses_/$courseId")({
         { property: "og:description", content: description },
         { property: "og:type", content: "article" },
         { name: "twitter:card", content: "summary_large_image" },
+        ...(loaderData?.image.startsWith("https://") ? [
+          { property: "og:image", content: loaderData.image },
+          { name: "twitter:image", content: loaderData.image },
+        ] : []),
       ],
     };
   },
@@ -159,7 +164,7 @@ function CoursePage() {
           </div>
         </div>
         <div className="space-y-8">
-          <FacultyPhoto faculty={course.faculty} />
+          <CoursePhoto course={course} />
           <DepositPanel plans={course.plans} courseId={course.id} />
         </div>
       </section>

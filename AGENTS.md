@@ -23,6 +23,7 @@
 - New capabilities go behind one small module with a swappable transport so a later host move is a
   single-file change.
 - Brochure visuals use shared photo/bar components and one image map; Node builds materialize the asset pointers into own-host public files so production never depends on the editor's CDN.
+- Course-specific photos use optional validated HTTPS URLs or own-host paths, rendered through the shared CoursePhoto with brochure fallback; no managed storage dependency.
 
 - Fees live only on reusable payment plans linked to courses/duals; the public "from" price is derived from the cheapest linked plan. Why: one amount change updates every course using that plan.
 - Catalogue SQL returns lists as comma-joined text and runs queries one after another. Why: array types and pipelined queries hang or misparse in the edge runtime with fetch_types off.

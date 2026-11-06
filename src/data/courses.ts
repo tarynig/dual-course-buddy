@@ -18,6 +18,7 @@ export interface Course {
   careers?: string;
   outline?: string;
   requirements?: string;
+  imageUrl?: string;
 }
 
 export const COURSE_TYPES: CourseType[] = ["OC", "AOC", "HOC", "FETC", "SC"];

@@ -62,7 +62,8 @@ CREATE TABLE public.courses (
     deposit numeric,
     signature boolean DEFAULT false NOT NULL,
     sort_order integer DEFAULT 0 NOT NULL,
-    details text
+    details text,
+    image_url text
 );
 
 CREATE TABLE public.dual_course_courses (

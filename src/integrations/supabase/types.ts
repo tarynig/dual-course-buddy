@@ -234,6 +234,7 @@ export type Database = {
           faculty_id: string
           fee: number | null
           id: string
+          image_url: string | null
           is_active: boolean
           months: number
           name: string
@@ -254,6 +255,7 @@ export type Database = {
           faculty_id: string
           fee?: number | null
           id: string
+          image_url?: string | null
           is_active?: boolean
           months: number
           name: string
@@ -274,6 +276,7 @@ export type Database = {
           faculty_id?: string
           fee?: number | null
           id?: string
+          image_url?: string | null
           is_active?: boolean
           months?: number
           name?: string

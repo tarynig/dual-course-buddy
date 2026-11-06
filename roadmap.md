@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Admin course image field with preview, brochure reset and per-course display; portable image addresses and existing-host update SQL.
+
 - [x] Update catalogue from the 4 November 2026 brochure: 31 active courses and 22 unique duals, revised durations, separate Graphic Design 101/Animation 101, retired old offerings with enquiries preserved. Updated fresh-import SQL and existing-database update script.
 - [ ] Update costing from the CAC Fee Schedule — college to supply; the brochure contains category keys but no monetary amounts.
 

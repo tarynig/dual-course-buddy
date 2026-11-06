@@ -1,0 +1,2 @@
+ALTER TABLE public.courses ADD COLUMN IF NOT EXISTS image_url text;
+COMMENT ON COLUMN public.courses.image_url IS 'Optional course photo URL or own-host absolute path; NULL uses the brochure faculty photo.';
