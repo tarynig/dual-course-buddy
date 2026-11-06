@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 const text = (max = 120) => z.string().trim().min(1).max(max);
+const phone = z.string().trim().refine((v) => v.replace(/\D/g, "").length >= 6, "Enter a phone number").pipe(z.string().max(40));
 const yes = z.enum(["yes", "no"]);
 
 export const applicationSchema = z
@@ -9,16 +10,16 @@ export const applicationSchema = z
     interest: z.string().max(100).nullable(),
     firstName: text(),
     lastName: text(),
-    idNumber: text(30),
-    dateOfBirth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+    idNumber: text(60),
+    dateOfBirth: z.string().trim().min(1).max(20),
     gender: z.enum(["Female", "Male"]),
     homeLanguage: text(60),
     location: z.enum(["Durban/Musgrave", "Pietermaritzburg"]),
     email: z.string().trim().email().max(200),
-    cell: z.string().trim().min(7).max(30),
+    cell: phone,
     lastSchool: text(),
-    highestGrade: text(30),
-    gradeYear: z.number().int().min(1950).max(2100),
+    highestGrade: text(60),
+    gradeYear: z.coerce.number().int().min(1900).max(2100),
     currentGrade: z.string().trim().max(30).nullable(),
     studiedElsewhere: yes,
     institutionName: z.string().trim().max(160).nullable(),
@@ -26,9 +27,9 @@ export const applicationSchema = z
     institutionCompleted: yes.nullable(),
     payerFirstName: text(),
     payerLastName: text(),
-    payerPhone: z.string().trim().min(7).max(30),
+    payerPhone: phone,
     payerEmail: z.string().trim().email().max(200),
-    payerIdNumber: text(30),
+    payerIdNumber: text(60),
     payerRelationship: text(60),
     payerAddress: text(400),
     payerEmployment: z.enum(["Employed", "Self-employed", "Funding"]),
@@ -40,11 +41,28 @@ export const applicationSchema = z
     { message: "Institution details are required", path: ["institutionName"] },
   );
 
+const FIELD_LABELS: Record<string, string> = {
+  firstName: "First name", lastName: "Last name", idNumber: "ID number", dateOfBirth: "Date of birth",
+  gender: "Gender", homeLanguage: "Home language", location: "Location", email: "Email", cell: "Cell number",
+  lastSchool: "Last school attended", highestGrade: "Highest grade passed", gradeYear: "Year",
+  currentGrade: "Current grade", studiedElsewhere: "Studied at another institution?", institutionName: "Name of institution",
+  institutionQualification: "Qualification", institutionCompleted: "Completed?", payerFirstName: "Payer first name",
+  payerLastName: "Payer last name", payerPhone: "Payer phone", payerEmail: "Payer email address",
+  payerIdNumber: "Payer ID number", payerRelationship: "Relationship", payerAddress: "Address", payerEmployment: "Employment status",
+};
+
 export type ApplicationInput = z.infer<typeof applicationSchema>;
 
 export const submitApplication = createServerFn({ method: "POST" })
-  .inputValidator((data: unknown) => applicationSchema.parse(data))
-  .handler(async ({ data }) => {
+  .inputValidator((data: unknown) => data as Record<string, unknown>)
+  .handler(async ({ data: raw }) => {
+    const parsed = applicationSchema.safeParse(raw);
+    if (!parsed.success) {
+      const issue = parsed.error.issues[0];
+      const field = String(issue?.path[0] ?? "");
+      return { ok: false as const, field, error: `Please check "${FIELD_LABELS[field] ?? field}".` };
+    }
+    const data = parsed.data;
     const { db } = await import("./db.server");
     const { sendMail, teamRecipients } = await import("./mail.server");
     const sql = db();
