@@ -56,6 +56,11 @@ the host runs `npm run build:node` rather than the default `npm run build`.
 
 ## Notes
 
+- For course image editing on an existing database, run
+  `database/update-course-images.sql` before starting the updated app. Fresh imports include
+  the field already. In the admin course editor, set an HTTPS image address or an own-host
+  path such as `/images/sound-engineering.jpg`; a blank field keeps the brochure photo.
+
 - For an existing database imported before the November brochure update, run
   `database/update-catalogue-2027-11-04.sql` once before starting the updated app.
   The fresh-import file already includes it. Older offerings are retained as inactive so
