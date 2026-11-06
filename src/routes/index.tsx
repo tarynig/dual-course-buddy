@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { DualCard } from "@/components/course-cards";
+import { CourseCard, DualCard } from "@/components/course-cards";
 import { FacultyBar, FacultyPhoto } from '@/components/brochure-visuals';
 import { brochureHeroDancer, brochureHeadphones } from '@/lib/brochure-images';
 import { CatalogueError, CatalogueNotFound } from "@/components/route-fallbacks";
@@ -116,6 +116,30 @@ function Home() {
               </div>
             </Link>
           ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-5 pb-16">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <FacultyBar title="Single courses" />
+            <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+              A taste of our courses — click any course for the full details, fees and deposit.
+            </p>
+          </div>
+          <Link
+            to="/courses"
+            className="rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-foreground"
+          >
+            See all {catalogue.courses.length} courses
+          </Link>
+        </div>
+        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {[...catalogue.courses].sort((a, b) => Number(b.signature) - Number(a.signature))
+            .slice(0, 6)
+            .map((c, index) => (
+              <CourseCard key={c.id} course={c} number={index + 1} />
+            ))}
         </div>
       </section>
 

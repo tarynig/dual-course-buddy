@@ -31,7 +31,7 @@ export function FeeLine({ plans }: { plans: PaymentPlan[] }) {
 
 export function CourseCard({ course, number = 1 }: { course: Course; number?: number }) {
   return (
-    <article className="brochure-course flex h-full flex-col">
+    <article className="brochure-course relative flex h-full cursor-pointer flex-col transition hover:-translate-y-0.5 hover:shadow-lg">
       <NumberedBar number={number} title={course.name} />
       <div className="flex items-start justify-between gap-3">
         <span className="shrink-0 rounded-full bg-accent px-3 py-1 text-xs font-bold text-accent-foreground">
@@ -59,7 +59,7 @@ export function CourseCard({ course, number = 1 }: { course: Course; number?: nu
         <Link
           to="/courses/$courseId"
           params={{ courseId: course.id }}
-          className="mt-3 inline-block text-sm font-bold text-primary underline"
+          className="mt-3 inline-block text-sm font-bold text-primary underline after:absolute after:inset-0 after:content-['']"
         >
           View full course info →
         </Link>
