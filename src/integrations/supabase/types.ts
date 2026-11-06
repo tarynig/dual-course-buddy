@@ -87,8 +87,8 @@ export type Database = {
           email: string
           first_name: string
           gender: string
-          grade_year: number
-          highest_grade: string
+          grade_year: number | null
+          highest_grade: string | null
           home_language: string
           id: string
           id_number: string
@@ -97,7 +97,7 @@ export type Database = {
           institution_qualification: string | null
           item_name: string | null
           last_name: string
-          last_school: string
+          last_school: string | null
           location: string
           payer_address: string
           payer_email: string
@@ -108,7 +108,7 @@ export type Database = {
           payer_phone: string
           payer_relationship: string
           status: string
-          studied_elsewhere: boolean
+          studied_elsewhere: boolean | null
         }
         Insert: {
           cell: string
@@ -120,8 +120,8 @@ export type Database = {
           email: string
           first_name: string
           gender: string
-          grade_year: number
-          highest_grade: string
+          grade_year?: number | null
+          highest_grade?: string | null
           home_language: string
           id?: string
           id_number: string
@@ -130,7 +130,7 @@ export type Database = {
           institution_qualification?: string | null
           item_name?: string | null
           last_name: string
-          last_school: string
+          last_school?: string | null
           location: string
           payer_address: string
           payer_email: string
@@ -141,7 +141,7 @@ export type Database = {
           payer_phone: string
           payer_relationship: string
           status?: string
-          studied_elsewhere?: boolean
+          studied_elsewhere?: boolean | null
         }
         Update: {
           cell?: string
@@ -153,8 +153,8 @@ export type Database = {
           email?: string
           first_name?: string
           gender?: string
-          grade_year?: number
-          highest_grade?: string
+          grade_year?: number | null
+          highest_grade?: string | null
           home_language?: string
           id?: string
           id_number?: string
@@ -163,7 +163,7 @@ export type Database = {
           institution_qualification?: string | null
           item_name?: string | null
           last_name?: string
-          last_school?: string
+          last_school?: string | null
           location?: string
           payer_address?: string
           payer_email?: string
@@ -174,7 +174,7 @@ export type Database = {
           payer_phone?: string
           payer_relationship?: string
           status?: string
-          studied_elsewhere?: boolean
+          studied_elsewhere?: boolean | null
         }
         Relationships: [
           {

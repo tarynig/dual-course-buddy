@@ -42,14 +42,14 @@ function Field({ label, name, type = "text", required = true, className = "" }: 
   );
 }
 
-function Choice({ label, name, options, onChange }: { label: string; name: string; options: string[]; onChange?: (v: string) => void }) {
+function Choice({ label, name, options, onChange, required = true }: { label: string; name: string; options: string[]; onChange?: (v: string) => void; required?: boolean }) {
   return (
     <fieldset>
-      <legend className="text-sm font-bold">{label} *</legend>
+      <legend className="text-sm font-bold">{label}{required && " *"}</legend>
       <div className="mt-2 flex flex-wrap gap-2">
         {options.map((o) => (
           <label key={o} className="flex cursor-pointer items-center gap-2 rounded-full border border-input px-4 py-2 text-sm has-[:checked]:border-primary has-[:checked]:bg-primary/10">
-            <input type="radio" name={name} value={o} required onChange={() => onChange?.(o)} className="accent-primary" />
+            <input type="radio" name={name} value={o} required={required} onChange={() => onChange?.(o)} className="accent-primary" />
             {o}
           </label>
         ))}
@@ -117,8 +117,9 @@ function ApplyPage() {
           firstName: g("firstName"), lastName: g("lastName"), idNumber: g("idNumber"),
           dateOfBirth: g("dateOfBirth"), gender: g("gender") as "Female", homeLanguage: g("homeLanguage"),
           location: g("location") as "Pietermaritzburg", email: g("email"), cell: g("cell"),
-          lastSchool: g("lastSchool"), highestGrade: g("highestGrade"), gradeYear: Number(g("gradeYear")),
-          currentGrade: opt("currentGrade"), studiedElsewhere: elsewhere ? "yes" : "no",
+          lastSchool: opt("lastSchool"), highestGrade: opt("highestGrade"), gradeYear: opt("gradeYear"),
+          currentGrade: opt("currentGrade"),
+          studiedElsewhere: f.get("studiedElsewhere") ? (g("studiedElsewhere") === "Yes" ? "yes" : "no") : null,
           institutionName: opt("institutionName"), institutionQualification: opt("institutionQualification"),
           institutionCompleted: (opt("institutionCompleted") as "yes" | "no" | null),
           payerFirstName: g("payerFirstName"), payerLastName: g("payerLastName"), payerPhone: g("payerPhone"),
@@ -222,24 +223,25 @@ function ApplyPage() {
 
         <section data-step="2" hidden={step !== 2}>
           <FacultyBar title="Applicant's education" />
+          <p className="mt-3 text-sm text-muted-foreground">You can leave any of these blank.</p>
           <div className="mt-6 grid gap-5 sm:grid-cols-2">
-            <Field label="Last school attended" name="lastSchool" className="sm:col-span-2" />
-            <Field label="Highest grade passed" name="highestGrade" />
-            <Field label="Year" name="gradeYear" type="number" />
-            <Field label="Current grade (optional)" name="currentGrade" required={false} />
+            <Field label="Last school attended" name="lastSchool" required={false} className="sm:col-span-2" />
+            <Field label="Highest grade passed" name="highestGrade" required={false} />
+            <Field label="Year" name="gradeYear" type="number" required={false} />
+            <Field label="Current grade" name="currentGrade" required={false} />
             <div />
-            <Choice label="Studied at another institution?" name="studiedElsewhere" options={["Yes", "No"]} onChange={(v) => setElsewhere(v === "Yes")} />
+            <Choice label="Studied at another institution?" name="studiedElsewhere" options={["Yes", "No"]} required={false} onChange={(v) => setElsewhere(v === "Yes")} />
             <div />
             {elsewhere && (
               <>
-                <Field label="Name of institution" name="institutionName" />
-                <Field label="Qualification" name="institutionQualification" />
+                <Field label="Name of institution" name="institutionName" required={false} />
+                <Field label="Qualification" name="institutionQualification" required={false} />
                 <fieldset>
-                  <legend className="text-sm font-bold">Completed? *</legend>
+                  <legend className="text-sm font-bold">Completed?</legend>
                   <div className="mt-2 flex gap-2">
                     {["yes", "no"].map((v) => (
                       <label key={v} className="flex cursor-pointer items-center gap-2 rounded-full border border-input px-4 py-2 text-sm capitalize has-[:checked]:border-primary has-[:checked]:bg-primary/10">
-                        <input type="radio" name="institutionCompleted" value={v} required className="accent-primary" />
+                        <input type="radio" name="institutionCompleted" value={v} className="accent-primary" />
                         {v}
                       </label>
                     ))}

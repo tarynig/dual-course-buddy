@@ -26,3 +26,4 @@
 - [x] Payment plans: admin Fees tab manages plans (deposit, number of payments, amount each); each course/dual picks its plans; site shows "From R…" (cheapest plan total); dual "Save R…" entered per dual.
 - [ ] Payment plan display layout — college to send the exact layout.
 - [ ] Enter real payment plans and savings in the Fees tab.
+- [x] Apply wizard: the applicant's education section is fully optional — every field may be left blank and the application still submits; blanks show as "—" in the admin Applications tab.

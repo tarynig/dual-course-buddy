@@ -29,3 +29,4 @@
 - Catalogue SQL returns lists as comma-joined text and runs queries one after another. Why: array types and pipelined queries hang or misparse in the edge runtime with fetch_types off.
 - Retire catalogue offerings with is_active rather than deleting rows, and filter inactive offerings from catalogue reads. Why: historical enquiries and payment-plan links must remain intact.
 - Online deposits go through PayFast only via `src/lib/payfast.server.ts` (signed form post + verified ITN); amounts are always read from the payment plan in the database, never from the browser. Why: one swappable file and no tampering with prices.
+- Apply-form validation lives in `src/lib/applications.schema.ts`, imported by `applications.functions.ts`, so the rules can be unit-tested without loading the server-function module. Why: `createServerFn` modules can't be imported by the test runner.
