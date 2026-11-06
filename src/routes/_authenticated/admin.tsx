@@ -10,7 +10,6 @@ import {
   setEnquiryStatus,
 } from "@/lib/admin.functions";
 import type { AdminEnquiry } from "@/lib/admin.functions";
-import { catalogueQueryOptions } from "@/lib/catalogue-queries";
 import { FeesPanel } from "@/components/admin-fees";
 import { CoursesContentPanel, DualsContentPanel } from "@/components/admin-content";
 import { CatalogueError, CatalogueNotFound } from "@/components/route-fallbacks";
@@ -134,7 +133,6 @@ function EnquiriesPanel() {
   const fetchEnquiries = useServerFn(getAdminEnquiries);
   const updateStatus = useServerFn(setEnquiryStatus);
   const enquiries = useQuery({ queryKey: ["admin-enquiries"], queryFn: () => fetchEnquiries() });
-  const catalogue = useQuery(catalogueQueryOptions);
   const queryClient = useQueryClient();
 
   const label = (e: AdminEnquiry) =>
