@@ -15,8 +15,8 @@ export const Route = createFileRoute("/api/public/payfast/notify")({
 
         const { db } = await import("@/lib/db.server");
         const sql = db();
-        const rows = await sql<Array<{ amount: string; status: string; item_name: string; full_name: string; email: string; phone: string; plan_name: string | null }>>`
-          SELECT amount::text AS amount, status, item_name, full_name, email, phone, plan_name
+        const rows = await sql<Array<{ amount: string; status: string; item_name: string; full_name: string; email: string; phone: string; plan_name: string | null; payment_kind: string }>>`
+          SELECT amount::text AS amount, status, item_name, full_name, email, phone, plan_name, payment_kind
           FROM public.deposit_payments WHERE id = ${id}`;
         const payment = rows[0];
         if (!payment || payment.status === "paid") return new Response("ok");
