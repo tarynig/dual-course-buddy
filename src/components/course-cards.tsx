@@ -110,6 +110,13 @@ export function DualCard({ dual, courses, number = 1 }: { dual: DualCourse; cour
 
       <div className="mt-auto border-t border-border pt-4">
         <FeeLine plans={dual.plans} />
+        <Link
+          to="/dual-courses/$dualId"
+          params={{ dualId: dual.id }}
+          className="mt-3 inline-block text-sm font-bold text-primary underline"
+        >
+          View full dual course info →
+        </Link>
       </div>
     </article>
   );
