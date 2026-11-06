@@ -17,12 +17,12 @@ export function PaymentsPanel() {
   if (q.isLoading) return <p className="text-sm text-muted-foreground">Loading…</p>;
   if (q.error) return <p className="text-sm text-destructive">Couldn't load payments.</p>;
   if (!q.data?.length)
-    return <p className="text-sm text-muted-foreground">No deposit payments yet. They appear here as soon as a student starts paying online.</p>;
+    return <p className="text-sm text-muted-foreground">No booking fee payments yet. They appear here as soon as a student starts paying online.</p>;
 
   return (
     <div className="space-y-3">
       <p className="text-sm text-muted-foreground">
-        "Pending" means the student opened PayFast but it hasn't confirmed payment (yet). Only "paid" deposits have been received.
+        "Pending" means the student opened PayFast but it hasn't confirmed payment (yet). Only "paid" payments have been received.
       </p>
       {q.data.map((p) => (
         <article key={p.id} className="flex flex-wrap items-start justify-between gap-4 rounded-2xl border border-border p-5">
@@ -33,6 +33,7 @@ export function PaymentsPanel() {
               <a href={`tel:${p.phone}`} className="text-primary underline">{p.phone}</a>
             </p>
             <p className="mt-2">{p.itemName}</p>
+            <p className="font-semibold">{p.paymentKind === "booking" ? "Booking fee" : "Deposit (historical)"}</p>
             <p className="text-muted-foreground">{p.planName ?? ""}</p>
             <p className="mt-1 text-xs text-muted-foreground">
               Ref {p.id.slice(0, 8).toUpperCase()} · started {new Date(p.createdAt).toLocaleString("en-ZA")}

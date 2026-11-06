@@ -7,9 +7,11 @@ import { FacultyBar } from "@/components/brochure-visuals";
 import { CatalogueError, CatalogueNotFound } from "@/components/route-fallbacks";
 import { catalogueQueryOptions } from "@/lib/catalogue-queries";
 import { submitApplication } from "@/lib/applications.functions";
-import { startDepositPayment } from "@/lib/payments.functions";
+import { startBookingPayment } from "@/lib/payments.functions";
 import { postToPayFast } from "@/components/deposit-panel";
 import { formatZar, planTotal } from "@/data/courses";
+import { BOOKING_FEE, BOOKING_TERMS, DIRECT_PAYMENT_TERMS } from "@/lib/booking-fee";
+import { Button } from "@/components/ui/button";
 
 const STEPS = ["Course", "The applicant", "Education", "Payment contact", "Review & submit"];
 
@@ -62,7 +64,7 @@ function ApplyPage() {
   const { data: catalogue } = useSuspenseQuery(catalogueQueryOptions);
   const { course } = Route.useSearch();
   const submit = useServerFn(submitApplication);
-  const pay = useServerFn(startDepositPayment);
+  const pay = useServerFn(startBookingPayment);
   const [elsewhere, setElsewhere] = useState(false);
   const [step, setStep] = useState(0);
   const [interest, setInterest] = useState(course ?? "");
@@ -71,9 +73,9 @@ function ApplyPage() {
   const formRef = useRef<HTMLFormElement>(null);
   const [kind, itemId] = interest.split(":");
   const item = kind === "course" ? catalogue.courses.find((c) => c.id === itemId) : kind === "dual" ? catalogue.duals.find((d) => d.id === itemId) : undefined;
-  const payable = (item?.plans ?? []).filter((p) => p.deposit > 0);
+  const payable = item?.plans ?? [];
   const chosenPlan = payable.find((p) => p.id === planId) ?? payable[0];
-  const canPay = payable.length > 0;
+  const canPay = !!item;
 
   function stepValid(i: number) {
     const box = formRef.current?.querySelector<HTMLElement>(`[data-step="${i}"]`);
@@ -127,13 +129,13 @@ function ApplyPage() {
           payerAddress: g("payerAddress"), payerEmployment: g("payerEmployment") as "Employed",
         },
       });
-      if (result.ok && canPay && payNow && chosenPlan) {
+      if (result.ok && canPay && payNow) {
         try {
           const checkout = await pay({
             data: {
               courseId: kind === "course" ? itemId : null,
               dualCourseId: kind === "dual" ? itemId : null,
-              planId: chosenPlan.id,
+              planId: chosenPlan?.id ?? null,
               fullName: `${g("firstName")} ${g("lastName")}`,
               email: g("email"),
               phone: g("cell"),
@@ -168,8 +170,8 @@ function ApplyPage() {
         </p>
         {state.paymentIssue && (
           <p className="mt-4 rounded-xl border border-border bg-muted p-4 text-sm">
-            Your application is saved, but the deposit payment couldn't open just now. No money was taken — please{" "}
-            <Link to="/contact" className="font-bold underline">speak to the college admin</Link> or call 081 589 1088 to pay your deposit.
+            Your application is saved, but the booking fee payment couldn't open just now. No money was taken — please{" "}
+            <Link to="/contact" className="font-bold underline">speak to the college admin</Link> or call 081 589 1088 about your booking fee.
           </p>
         )}
         <Link to="/courses" className="mt-8 inline-block rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-foreground">Back to courses</Link>
@@ -283,23 +285,24 @@ function ApplyPage() {
           </p>
           {canPay ? (
             <div className="brochure-frame mt-6 rounded-3xl p-6">
-              <h2 className="font-display text-2xl font-black">Secure your placement</h2>
+              <h2 className="font-display text-2xl font-black">Secure your booking</h2>
               <p className="mt-2 text-sm text-muted-foreground">
-                Optionally pay the upfront deposit now through PayFast. Placement is subject to confirmation by the college.
+                {BOOKING_TERMS}
               </p>
+              <p className="mt-3 text-sm text-muted-foreground">{DIRECT_PAYMENT_TERMS}</p>
               <div className="mt-4 grid gap-2 sm:grid-cols-2">
                 {[true, false].map((v) => (
                   <label key={String(v)} className="flex cursor-pointer items-center gap-2 rounded-xl border border-input p-3 text-sm font-bold has-[:checked]:border-primary has-[:checked]:bg-primary/10">
                     <input type="radio" name="payNow" checked={payNow === v} onChange={() => setPayNow(v)} className="accent-primary" />
-                    {v ? `Apply and pay ${formatZar(chosenPlan?.deposit ?? 0)} deposit now` : "Apply only — I'll pay later"}
+                    {v ? `Apply and pay ${formatZar(BOOKING_FEE)} booking fee now` : "Apply only — I'll pay later"}
                   </label>
                 ))}
               </div>
-              {payNow && (
+              {payNow && payable.length > 0 && (
                 <fieldset className="mt-6">
                   <legend className="font-display text-lg font-black">Choose your preferred payment plan</legend>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    This is a selection only — you are not paying the plan amount now. Once your placement is confirmed, the college will arrange the remaining payments with you.
+                    This is a selection only — you are not paying the plan amount now. The college admin will arrange all deposit and course payments directly with you.
                   </p>
                   <ul className="mt-3 space-y-3">
                     {payable.map((p) => (
@@ -309,7 +312,7 @@ function ApplyPage() {
                           <span className="text-sm">
                             <span className="block font-bold">{p.name}</span>
                             <span className="text-muted-foreground">After placement confirmation: {p.instalments} × {formatZar(p.instalmentAmount)}</span>
-                            <span className="mt-1 block text-xs text-muted-foreground">Upfront deposit: {formatZar(p.deposit)}</span>
+                            <span className="mt-1 block text-xs text-muted-foreground">Deposit arranged with admin: {formatZar(p.deposit)}</span>
                             <span className="mt-1 block font-bold text-primary">Total course fee: {formatZar(planTotal(p))}</span>
                           </span>
                         </label>
@@ -329,15 +332,15 @@ function ApplyPage() {
         )}
         <div className="mt-10 flex gap-3">
           {step > 0 && (
-            <button type="button" onClick={back} className="rounded-full border border-input px-6 py-4 text-sm font-bold">← Back</button>
+            <Button type="button" onClick={back} className="rounded-full border border-input px-6 py-4 text-sm font-bold">← Back</Button>
           )}
           {step < STEPS.length - 1 ? (
-            <button key="next" type="button" onClick={next} className="flex-1 rounded-full bg-primary px-6 py-4 text-sm font-bold text-primary-foreground">Continue →</button>
+            <Button key="next" type="button" onClick={next} className="flex-1 rounded-full bg-primary px-6 py-4 text-sm font-bold text-primary-foreground">Continue →</Button>
           ) : (
-            <button key="submit" type="button" onClick={() => formRef.current?.requestSubmit()} disabled={state.status === "sending"} className="flex flex-1 items-center justify-center gap-2 rounded-full bg-primary px-6 py-4 text-sm font-bold text-primary-foreground disabled:opacity-60">
+            <Button key="submit" type="button" onClick={() => formRef.current?.requestSubmit()} disabled={state.status === "sending"} className="flex flex-1 items-center justify-center gap-2 rounded-full bg-primary px-6 py-4 text-sm font-bold text-primary-foreground disabled:opacity-60">
               {canPay && payNow && <LockKeyhole aria-hidden="true" className="size-4" />}
-              {state.status === "sending" ? "Submitting…" : canPay && payNow ? `Submit & pay ${formatZar(chosenPlan?.deposit ?? 0)} deposit` : "Submit application"}
-            </button>
+              {state.status === "sending" ? "Submitting…" : canPay && payNow ? `Submit & pay ${formatZar(BOOKING_FEE)} booking fee` : "Submit application"}
+            </Button>
           )}
         </div>
       </form>
