@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Update catalogue from the 4 November 2026 brochure; costing requires the referenced CAC Fee Schedule (not included in the brochure).
+
 - [x] Align catalogue with the brochure: original photos, circular frames and numbered circular-bar headers; retain all fees and filters. Own-host builds include local photo copies.
 
 - [x] Course catalogue site (courses, dual courses, about, contact) — shipped, fees pending
