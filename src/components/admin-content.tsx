@@ -405,7 +405,7 @@ function DualForm({
       <button type="button" onClick={onDone} className="text-sm font-bold text-primary underline">
         ← Back to all dual courses
       </button>
-      <h2 className="font-display text-2xl font-black">{dual ? `Edit ${dual.title}` : "Add a dual course"}</h2>
+      <h2 className="font-display text-2xl font-black">{savedId ? `Edit ${title || "dual course"}` : "Add a dual course"}</h2>
       <div className="grid gap-5 sm:grid-cols-2">
         <label className={label}>
           First course
@@ -442,7 +442,7 @@ function DualForm({
         <button type="button" onClick={onDone} className="rounded-full border border-border px-6 py-2 text-sm font-bold">
           Cancel
         </button>
-        {dual && (
+        {savedId && (
           <button type="button" onClick={handleDelete} className="ml-auto text-sm font-bold text-destructive underline">
             Delete dual course
           </button>
