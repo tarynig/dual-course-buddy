@@ -386,3 +386,5 @@ CREATE TABLE public.applications (
   status text NOT NULL DEFAULT 'new',
   created_at timestamptz NOT NULL DEFAULT now()
 );
+
+ALTER TABLE public.courses ADD COLUMN IF NOT EXISTS certification text, ADD COLUMN IF NOT EXISTS careers text, ADD COLUMN IF NOT EXISTS outline text, ADD COLUMN IF NOT EXISTS requirements text;

@@ -92,6 +92,10 @@ function CourseForm({
     saqa: course?.saqa ?? "",
     description: course?.description ?? "",
     details: course?.details ?? "",
+    certification: course?.certification ?? "",
+    careers: course?.careers ?? "",
+    outline: course?.outline ?? "",
+    requirements: course?.requirements ?? "",
     signature: course?.signature ?? false,
   });
   const [error, setError] = useState<string | null>(null);
@@ -115,6 +119,10 @@ function CourseForm({
           saqa: form.saqa.trim() || null,
           description: form.description,
           details: form.details.trim() || null,
+          certification: form.certification.trim() || null,
+          careers: form.careers.trim() || null,
+          outline: form.outline.trim() || null,
+          requirements: form.requirements.trim() || null,
           signature: form.signature,
         },
       });
@@ -182,16 +190,21 @@ function CourseForm({
         Short summary (shown on course cards)
         <textarea required rows={3} value={form.description} onChange={(e) => set("description", e.target.value)} className={field} />
       </label>
-      <label className={label}>
-        Full course information (shown on the course's own page)
-        <textarea
-          rows={12}
-          value={form.details}
-          onChange={(e) => set("details", e.target.value)}
-          placeholder={"What you'll learn, modules, entry requirements, careers…\n\nLeave a blank line between paragraphs. Start a line with \"- \" for a bullet point."}
-          className={field}
-        />
-      </label>
+      <p className="text-xs text-muted-foreground">
+        Course page sections — leave a blank line between paragraphs; start a line with "- " for a bullet point. Empty sections are hidden.
+      </p>
+      {([
+        ["details", "Description", 8, "What the course is about and what students will learn."],
+        ["certification", "Certification", 3, "Qualification awarded, accrediting body, NQF level…"],
+        ["careers", "Careers", 4, "- Sound engineer\n- Live sound technician"],
+        ["outline", "Course outline (one item per line)", 8, "Module 1: Introduction\nModule 2: …"],
+        ["requirements", "Minimum requirements", 4, "- Grade 12 / matric\n- Own laptop"],
+      ] as const).map(([key, title, rows, hint]) => (
+        <label key={key} className={label}>
+          {title}
+          <textarea rows={rows} value={form[key]} onChange={(e) => set(key, e.target.value)} placeholder={hint} className={field} />
+        </label>
+      ))}
       <label className="flex items-center gap-2 text-sm font-semibold">
         <input type="checkbox" checked={form.signature} onChange={(e) => set("signature", e.target.checked)} />
         Mark as a signature course
