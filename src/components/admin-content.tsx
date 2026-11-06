@@ -226,7 +226,7 @@ function CourseForm({
         <CoursePhoto course={{ name: form.name || "Course image", faculty: form.facultyId as Course["faculty"], imageUrl: form.imageUrl }} />
       </div>
       <p className="text-xs text-muted-foreground">
-        Course page sections — leave a blank line between paragraphs; start a line with "- " for a bullet point. Empty sections are hidden.
+        Course page sections — type as you want it to look: use Bold, Link and Bullets from the toolbar. Empty sections are hidden.
       </p>
       {([
         ["details", "Description", 8, "What the course is about and what students will learn."],
