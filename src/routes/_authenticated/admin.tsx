@@ -12,6 +12,7 @@ import {
 import type { AdminEnquiry } from "@/lib/admin.functions";
 import { FeesPanel } from "@/components/admin-fees";
 import { PaymentsPanel } from "@/components/admin-payments";
+import { ApplicationsPanel } from "@/components/admin-applications";
 import { CoursesContentPanel, DualsContentPanel } from "@/components/admin-content";
 import { CatalogueError, CatalogueNotFound } from "@/components/route-fallbacks";
 
@@ -39,12 +40,12 @@ export const Route = createFileRoute("/_authenticated/admin")({
 });
 
 const STATUSES = ["new", "contacted", "enrolled", "closed"] as const;
-const TABS = ["enquiries", "payments", "courses", "dual courses", "fees", "account"] as const;
+const TABS = ["applications", "enquiries", "payments", "courses", "dual courses", "fees", "account"] as const;
 
 function AdminPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [tab, setTab] = useState<(typeof TABS)[number]>("enquiries");
+  const [tab, setTab] = useState<(typeof TABS)[number]>("applications");
 
   const fetchSession = useServerFn(getAdminSession);
   const endSession = useServerFn(signOut);
@@ -114,6 +115,7 @@ function AdminPage() {
 
           <div className="mt-8">
             {tab === "enquiries" && <EnquiriesPanel />}
+            {tab === "applications" && <ApplicationsPanel />}
             {tab === "payments" && <PaymentsPanel />}
             {tab === "courses" && <CoursesContentPanel />}
             {tab === "dual courses" && <DualsContentPanel />}
