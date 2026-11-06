@@ -11,6 +11,7 @@ import {
 } from "@/lib/admin.functions";
 import type { AdminEnquiry } from "@/lib/admin.functions";
 import { FeesPanel } from "@/components/admin-fees";
+import { StaffPanel } from "@/components/admin-staff";
 import { PaymentsPanel } from "@/components/admin-payments";
 import { ApplicationsPanel } from "@/components/admin-applications";
 import { CoursesContentPanel, DualsContentPanel } from "@/components/admin-content";
@@ -123,6 +124,7 @@ function AdminPage() {
             {tab === "account" && (
               <div className="space-y-12">
                 <AccountPanel />
+                <StaffPanel />
                 <EmailPanel />
               </div>
             )}
