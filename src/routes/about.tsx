@@ -1,4 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { Building2 } from "lucide-react";
+import { brochureCampus } from '@/lib/brochure-images';
 
 export const Route = createFileRoute("/about")({
   head: () => ({

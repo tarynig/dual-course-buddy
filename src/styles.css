@@ -124,6 +124,8 @@
   --brochure-ring: oklch(0.99 0.002 300);
   --brochure-shadow: 0 7px 0 color-mix(in oklab, var(--primary) 12%, transparent);
 }
+.brochure-frame { overflow:hidden; padding:.5rem; background:var(--brochure-ring); border:3px solid var(--color-secondary); border-radius:1.25rem; box-shadow:var(--brochure-shadow); }
+.brochure-frame img { display:block; width:100%; height:auto; border-radius:.8rem; }
 .brochure-faculty-bar { display:flex; align-items:center; gap:1rem; background:var(--primary); color:var(--primary-foreground); border-radius:999px; padding:.55rem 1.5rem .55rem .6rem; max-width:36rem; }
 
 /* Banner portrait: cut-out subject over a circular CI glow. */
