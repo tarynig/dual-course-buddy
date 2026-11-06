@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
 import { catalogueQueryOptions } from "@/lib/catalogue-queries";
 import { deleteCourse, deleteDual, saveCourse, saveDual } from "@/lib/content.functions";
 import { COURSE_TYPES, type Course, type CourseType, type DualCourse } from "@/data/courses";
@@ -104,6 +105,9 @@ function CourseForm({
   });
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  // The record this form is writing: the course's own id, or the id handed back
+  // once a brand-new course has been saved for the first time.
+  const [savedId, setSavedId] = useState(course?.id ?? null);
   const set = (key: keyof typeof form, value: string | boolean) =>
     setForm((f) => ({ ...f, [key]: value }));
 
@@ -117,9 +121,9 @@ function CourseForm({
     setBusy(true);
     setError(null);
     try {
-      await save({
+      const result = await save({
         data: {
-          id: course?.id ?? null,
+          id: savedId,
           facultyId: form.facultyId,
           name: form.name,
           months: Number(form.months),
@@ -137,7 +141,10 @@ function CourseForm({
         },
       });
       await queryClient.invalidateQueries({ queryKey: ["catalogue"] });
-      onDone();
+      // Stay on the form and just confirm the save; adopting the returned id means
+      // a second save updates the same course instead of adding a duplicate.
+      setSavedId(result.id);
+      toast.success(course || savedId ? "Course saved" : "Course added");
     } catch (err) {
       const text = err instanceof Error ? err.message : String(err);
       setError(
@@ -151,10 +158,12 @@ function CourseForm({
   }
 
   async function handleDelete() {
-    if (!course || !confirm(`Delete "${course.name}"? This can't be undone.`)) return;
-    const result = await remove({ data: { id: course.id } });
+    if (!savedId) return;
+    if (!confirm(`Delete "${form.name}"? This can't be undone.`)) return;
+    const result = await remove({ data: { id: savedId } });
     if (!result.ok) return setError(result.error);
     await queryClient.invalidateQueries({ queryKey: ["catalogue"] });
+    toast.success("Course deleted");
     onDone();
   }
 
@@ -163,7 +172,7 @@ function CourseForm({
       <button type="button" onClick={onDone} className="text-sm font-bold text-primary underline">
         ← Back to all courses
       </button>
-      <h2 className="font-display text-2xl font-black">{course ? `Edit ${course.name}` : "Add a course"}</h2>
+      <h2 className="font-display text-2xl font-black">{savedId ? `Edit ${form.name || "course"}` : "Add a course"}</h2>
 
       <label className={label}>
         Course name
@@ -243,7 +252,7 @@ function CourseForm({
         <button type="button" onClick={onDone} className="rounded-full border border-border px-6 py-2 text-sm font-bold">
           Cancel
         </button>
-        {course && (
+        {savedId && (
           <button type="button" onClick={handleDelete} className="ml-auto text-sm font-bold text-destructive underline">
             Delete course
           </button>
@@ -331,6 +340,8 @@ function DualForm({
   const [months, setMonths] = useState(String(dual?.months ?? 12));
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  // See CourseForm: the dual's id, or the id returned once a new dual is first saved.
+  const [savedId, setSavedId] = useState(dual?.id ?? null);
 
   const course = (id: string) => courses.find((c) => c.id === id);
   // When the pair changes, suggest a name, faculty and the longer of the two durations.
@@ -353,11 +364,12 @@ function DualForm({
     setError(null);
     try {
       const result = await save({
-        data: { id: dual?.id ?? null, title, facultyId, months: Number(months), courseIds: [first, second] },
+        data: { id: savedId, title, facultyId, months: Number(months), courseIds: [first, second] },
       });
       if (!result.ok) return setError(result.error);
       await queryClient.invalidateQueries({ queryKey: ["catalogue"] });
-      onDone();
+      setSavedId(result.id);
+      toast.success(dual || savedId ? "Dual course saved" : "Dual course added");
     } catch {
       setError("Couldn't save. Make sure both courses are chosen and a name is filled in.");
     } finally {
@@ -366,10 +378,12 @@ function DualForm({
   }
 
   async function handleDelete() {
-    if (!dual || !confirm(`Delete "${dual.title}"? The single courses stay.`)) return;
-    const result = await remove({ data: { id: dual.id } });
+    if (!savedId) return;
+    if (!confirm(`Delete "${title}"? The single courses stay.`)) return;
+    const result = await remove({ data: { id: savedId } });
     if (!result.ok) return setError(result.error);
     await queryClient.invalidateQueries({ queryKey: ["catalogue"] });
+    toast.success("Dual course deleted");
     onDone();
   }
 
@@ -391,7 +405,7 @@ function DualForm({
       <button type="button" onClick={onDone} className="text-sm font-bold text-primary underline">
         ← Back to all dual courses
       </button>
-      <h2 className="font-display text-2xl font-black">{dual ? `Edit ${dual.title}` : "Add a dual course"}</h2>
+      <h2 className="font-display text-2xl font-black">{savedId ? `Edit ${title || "dual course"}` : "Add a dual course"}</h2>
       <div className="grid gap-5 sm:grid-cols-2">
         <label className={label}>
           First course
@@ -428,7 +442,7 @@ function DualForm({
         <button type="button" onClick={onDone} className="rounded-full border border-border px-6 py-2 text-sm font-bold">
           Cancel
         </button>
-        {dual && (
+        {savedId && (
           <button type="button" onClick={handleDelete} className="ml-auto text-sm font-bold text-destructive underline">
             Delete dual course
           </button>
