@@ -1,57 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { applicationSchema, FIELD_LABELS } from "./applications.schema";
 
-const text = (max = 120) => z.string().trim().min(1).max(max);
-const phone = z.string().trim().refine((v) => v.replace(/\D/g, "").length >= 6, "Enter a phone number").pipe(z.string().max(40));
-const yes = z.enum(["yes", "no"]);
-
-export const applicationSchema = z
-  .object({
-    interest: z.string().max(100).nullable(),
-    firstName: text(),
-    lastName: text(),
-    idNumber: text(60),
-    dateOfBirth: z.string().trim().min(1).max(20),
-    gender: z.enum(["Female", "Male"]),
-    homeLanguage: text(60),
-    location: z.enum(["Durban/Musgrave", "Pietermaritzburg"]),
-    email: z.string().trim().email().max(200),
-    cell: phone,
-    lastSchool: text(),
-    highestGrade: text(60),
-    gradeYear: z.coerce.number().int().min(1900).max(2100),
-    currentGrade: z.string().trim().max(30).nullable(),
-    studiedElsewhere: yes,
-    institutionName: z.string().trim().max(160).nullable(),
-    institutionQualification: z.string().trim().max(160).nullable(),
-    institutionCompleted: yes.nullable(),
-    payerFirstName: text(),
-    payerLastName: text(),
-    payerPhone: phone,
-    payerEmail: z.string().trim().email().max(200),
-    payerIdNumber: text(60),
-    payerRelationship: text(60),
-    payerAddress: text(400),
-    payerEmployment: z.enum(["Employed", "Self-employed", "Funding"]),
-  })
-  .refine(
-    (d) =>
-      d.studiedElsewhere === "no" ||
-      (!!d.institutionName && !!d.institutionQualification && !!d.institutionCompleted),
-    { message: "Institution details are required", path: ["institutionName"] },
-  );
-
-const FIELD_LABELS: Record<string, string> = {
-  firstName: "First name", lastName: "Last name", idNumber: "ID number", dateOfBirth: "Date of birth",
-  gender: "Gender", homeLanguage: "Home language", location: "Location", email: "Email", cell: "Cell number",
-  lastSchool: "Last school attended", highestGrade: "Highest grade passed", gradeYear: "Year",
-  currentGrade: "Current grade", studiedElsewhere: "Studied at another institution?", institutionName: "Name of institution",
-  institutionQualification: "Qualification", institutionCompleted: "Completed?", payerFirstName: "Payer first name",
-  payerLastName: "Payer last name", payerPhone: "Payer phone", payerEmail: "Payer email address",
-  payerIdNumber: "Payer ID number", payerRelationship: "Relationship", payerAddress: "Address", payerEmployment: "Employment status",
-};
-
-export type ApplicationInput = z.infer<typeof applicationSchema>;
+export type { ApplicationInput } from "./applications.schema";
 
 export const submitApplication = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => data as Record<string, unknown>)
@@ -91,7 +42,7 @@ export const submitApplication = createServerFn({ method: "POST" })
           ${data.firstName}, ${data.lastName}, ${data.idNumber}, ${data.dateOfBirth},
           ${data.gender}, ${data.homeLanguage}, ${data.location}, ${data.email.toLowerCase()}, ${data.cell},
           ${data.lastSchool}, ${data.highestGrade}, ${data.gradeYear}, ${data.currentGrade || null},
-          ${elsewhere}, ${elsewhere ? data.institutionName : null},
+          ${data.studiedElsewhere === null ? null : elsewhere}, ${elsewhere ? data.institutionName : null},
           ${elsewhere ? data.institutionQualification : null},
           ${elsewhere ? data.institutionCompleted === "yes" : null},
           ${data.payerFirstName}, ${data.payerLastName}, ${data.payerPhone}, ${data.payerEmail.toLowerCase()},
