@@ -45,7 +45,7 @@ function Home() {
   return (
     <div>
       <section className="surface-deep relative overflow-hidden">
-        <img src={brochurePerformance} alt="" className="absolute inset-0 h-full w-full -scale-x-100 object-cover object-top opacity-25" fetchPriority="high" />
+        <img src={brochurePerformance} alt="" className="flip-x absolute inset-0 h-full w-full object-cover object-top opacity-25" fetchPriority="high" />
         <div className="relative mx-auto grid max-w-6xl gap-10 px-5 py-16 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
           <div>
             <span className="inline-block rounded-full bg-secondary px-4 py-1.5 text-xs font-black tracking-[0.2em] text-secondary-foreground uppercase">
