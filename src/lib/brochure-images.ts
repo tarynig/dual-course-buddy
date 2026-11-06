@@ -16,6 +16,7 @@ const source = (asset: { url: string; original_filename: string }) =>
   import.meta.env['VITE_CAC_LOCAL_IMAGES'] === 'true' ? `/brochure/${asset.original_filename}` : asset.url;
 export const brochureStudent = source(student);
 export const brochureDj = source(dj);
+export const brochurePerformance = source(performance);
 export const cacLogo = source(logo);
 export const brochureHeadphones = source(headphones);
 export const facultyImages: Record<FacultyId, { src: string; alt: string }> = {
