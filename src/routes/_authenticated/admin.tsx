@@ -9,7 +9,7 @@ import {
   sendTestEmail,
   setEnquiryStatus,
 } from "@/lib/admin.functions";
-import { catalogueQueryOptions } from "@/lib/catalogue-queries";
+import type { AdminEnquiry } from "@/lib/admin.functions";
 import { FeesPanel } from "@/components/admin-fees";
 import { CoursesContentPanel, DualsContentPanel } from "@/components/admin-content";
 import { CatalogueError, CatalogueNotFound } from "@/components/route-fallbacks";
@@ -133,15 +133,10 @@ function EnquiriesPanel() {
   const fetchEnquiries = useServerFn(getAdminEnquiries);
   const updateStatus = useServerFn(setEnquiryStatus);
   const enquiries = useQuery({ queryKey: ["admin-enquiries"], queryFn: () => fetchEnquiries() });
-  const catalogue = useQuery(catalogueQueryOptions);
   const queryClient = useQueryClient();
 
-  const label = (courseId: string | null, dualId: string | null) => {
-    const data = catalogue.data;
-    if (courseId) return data?.courses.find((c) => c.id === courseId)?.name ?? courseId;
-    if (dualId) return data?.duals.find((d) => d.id === dualId)?.title ?? dualId;
-    return "Not sure yet";
-  };
+  const label = (e: AdminEnquiry) =>
+    e.courseName ?? e.dualName ?? e.courseId ?? e.dualCourseId ?? "Not sure yet";
 
   if (enquiries.isLoading) return <p className="text-sm text-muted-foreground">Loading enquiries…</p>;
   if (enquiries.error)
@@ -166,7 +161,7 @@ function EnquiriesPanel() {
                 </a>
               </p>
               <p className="mt-2 text-sm">
-                <span className="font-semibold">{label(e.courseId, e.dualCourseId)}</span> ·{" "}
+                <span className="font-semibold">{label(e)}</span> ·{" "}
                 {e.campus} campus
               </p>
               {e.message && <p className="mt-2 text-sm text-muted-foreground">{e.message}</p>}

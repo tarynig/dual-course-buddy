@@ -8,6 +8,8 @@ export type AdminEnquiry = {
   email: string;
   courseId: string | null;
   dualCourseId: string | null;
+  courseName: string | null;
+  dualName: string | null;
   campus: string;
   message: string | null;
   status: string;
@@ -37,16 +39,21 @@ export const getAdminEnquiries = createServerFn({ method: "GET" }).handler(
         email: string;
         course_id: string | null;
         dual_course_id: string | null;
+        course_name: string | null;
+        dual_name: string | null;
         campus: string;
         message: string | null;
         status: string;
         created_at: Date;
       }>
     >`
-      SELECT id, full_name, phone, email, course_id, dual_course_id, campus,
-             message, status, created_at
-      FROM public.enquiries
-      ORDER BY created_at DESC
+      SELECT e.id, e.full_name, e.phone, e.email, e.course_id, e.dual_course_id,
+             e.campus, e.message, e.status, e.created_at,
+             c.name AS course_name, d.title AS dual_name
+      FROM public.enquiries e
+      LEFT JOIN public.courses c ON c.id = e.course_id
+      LEFT JOIN public.dual_courses d ON d.id = e.dual_course_id
+      ORDER BY e.created_at DESC
     `;
 
     return rows.map((row) => ({
@@ -56,6 +63,8 @@ export const getAdminEnquiries = createServerFn({ method: "GET" }).handler(
       email: row.email,
       courseId: row.course_id,
       dualCourseId: row.dual_course_id,
+      courseName: row.course_name,
+      dualName: row.dual_name,
       campus: row.campus,
       message: row.message,
       status: row.status,
