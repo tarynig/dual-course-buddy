@@ -108,30 +108,39 @@ function CoursePage() {
           {course.saqa && <p className="text-xs text-muted-foreground">SAQA ID: {course.saqa}</p>}
           <p className="mt-4 text-lg leading-relaxed">{course.description}</p>
           {[course.details, course.certification, course.careers, course.outline, course.requirements].some(Boolean) ? (
-            <div className="mt-8 space-y-8">
-              {([
-                ["Description", course.details],
-                ["Certification", course.certification],
-                ["Careers", course.careers],
-              ] as const).map(([title, text]) => text && (
-                <section key={title}>
-                  <h2 className="mb-3 font-display text-xl font-black text-primary">{title}</h2>
-                  <Details text={text} />
-                </section>
-              ))}
-              {course.outline && (
+            <div className="mt-8 space-y-10">
+              {course.details && (
                 <section>
-                  <h2 className="mb-3 font-display text-xl font-black text-primary">Course outline</h2>
-                  <ol className="list-decimal space-y-1 pl-5 text-sm md:text-base">
-                    {course.outline.split("\n").map((l) => l.trim().replace(/^-\s*/, "")).filter(Boolean).map((l, i) => <li key={i}><Inline text={l} /></li>)}
-                  </ol>
+                  <h2 className="mb-3 font-display text-xl font-black text-primary">Description</h2>
+                  <Details text={course.details} />
                 </section>
               )}
-              {course.requirements && (
-                <section>
-                  <h2 className="mb-3 font-display text-xl font-black text-primary">Minimum requirements</h2>
-                  <Details text={course.requirements} />
-                </section>
+              {(course.certification || course.careers || course.outline || course.requirements) && (
+                <div className="grid gap-x-10 gap-y-8 md:grid-cols-2">
+                  {([
+                    ["Certification", course.certification],
+                    ["Careers", course.careers],
+                  ] as const).map(([title, text]) => text && (
+                    <section key={title}>
+                      <h2 className="mb-3 font-display text-xl font-black text-primary">{title}</h2>
+                      <Details text={text} />
+                    </section>
+                  ))}
+                  {course.outline && (
+                    <section>
+                      <h2 className="mb-3 font-display text-xl font-black text-primary">Course outline</h2>
+                      <ol className="list-decimal space-y-1 pl-5 text-sm md:text-base">
+                        {course.outline.split("\n").map((l) => l.trim().replace(/^-\s*/, "")).filter(Boolean).map((l, i) => <li key={i}><Inline text={l} /></li>)}
+                      </ol>
+                    </section>
+                  )}
+                  {course.requirements && (
+                    <section>
+                      <h2 className="mb-3 font-display text-xl font-black text-primary">Minimum requirements</h2>
+                      <Details text={course.requirements} />
+                    </section>
+                  )}
+                </div>
               )}
             </div>
           ) : (
