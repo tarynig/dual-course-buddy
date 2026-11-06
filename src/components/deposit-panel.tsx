@@ -6,6 +6,22 @@ import { startDepositPayment } from "@/lib/payments.functions";
 import { Button } from "@/components/ui/button";
 import { LockKeyhole } from "lucide-react";
 
+/** Sends the browser to PayFast's hosted payment page with the signed fields from the server. */
+export function postToPayFast(checkout: { action: string; fields: [string, string][] }) {
+  const out = document.createElement("form");
+  out.method = "POST";
+  out.action = checkout.action;
+  for (const [name, value] of checkout.fields) {
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.name = name;
+    input.value = value;
+    out.appendChild(input);
+  }
+  document.body.appendChild(out);
+  out.submit();
+}
+
 type Props = { plans: PaymentPlan[]; courseId?: string; dualCourseId?: string };
 
 /** Shows the payment plans and lets a student pay the deposit via PayFast, or talk to admissions instead. */
@@ -34,18 +50,7 @@ export function DepositPanel({ plans, courseId, dualCourseId }: Props) {
           phone: String(form.get("phone") ?? ""),
         },
       });
-      const out = document.createElement("form");
-      out.method = "POST";
-      out.action = checkout.action;
-      for (const [name, value] of checkout.fields) {
-        const input = document.createElement("input");
-        input.type = "hidden";
-        input.name = name;
-        input.value = value;
-        out.appendChild(input);
-      }
-      document.body.appendChild(out);
-      out.submit();
+      postToPayFast(checkout);
     } catch {
       setError("We couldn't start the payment. Check your details, or speak to the college admin.");
       setBusy(false);
