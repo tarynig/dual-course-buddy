@@ -33,6 +33,31 @@ export const Route = createFileRoute("/courses_/$courseId")({
   component: CoursePage,
 });
 
+/** Inline formatting: **bold** and [text](/internal or https://external). */
+function Inline({ text }: { text: string }) {
+  const parts = text.split(/(\*\*[^*]+\*\*|\[[^\]]+\]\([^)\s]+\))/g);
+  return (
+    <>
+      {parts.map((part, i) => {
+        if (part.startsWith("**") && part.endsWith("**")) return <strong key={i}>{part.slice(2, -2)}</strong>;
+        const m = part.match(/^\[([^\]]+)\]\(([^)\s]+)\)$/);
+        if (m) {
+          const href = m[2] ?? "";
+          const safe = href.startsWith("/") || /^https?:\/\//.test(href) || href.startsWith("mailto:");
+          if (!safe) return m[1];
+          const external = !href.startsWith("/");
+          return (
+            <a key={i} href={href} className="font-semibold text-primary underline" {...(external ? { target: "_blank", rel: "noreferrer" } : {})}>
+              {m[1]}
+            </a>
+          );
+        }
+        return part;
+      })}
+    </>
+  );
+}
+
 /** Blank lines split paragraphs; lines starting with "- " become bullet lists. */
 function Details({ text }: { text: string }) {
   return (
@@ -42,10 +67,10 @@ function Details({ text }: { text: string }) {
         if (lines.length && lines.every((l) => l.startsWith("- ")))
           return (
             <ul key={i} className="list-disc space-y-1 pl-5">
-              {lines.map((l, j) => <li key={j}>{l.slice(2)}</li>)}
+              {lines.map((l, j) => <li key={j}><Inline text={l.slice(2)} /></li>)}
             </ul>
           );
-        return <p key={i} className="whitespace-pre-line">{block.trim()}</p>;
+        return <p key={i} className="whitespace-pre-line"><Inline text={block.trim()} /></p>;
       })}
     </div>
   );
@@ -98,7 +123,7 @@ function CoursePage() {
                 <section>
                   <h2 className="mb-3 font-display text-xl font-black text-primary">Course outline</h2>
                   <ol className="list-decimal space-y-1 pl-5 text-sm md:text-base">
-                    {course.outline.split("\n").map((l) => l.trim().replace(/^-\s*/, "")).filter(Boolean).map((l, i) => <li key={i}>{l}</li>)}
+                    {course.outline.split("\n").map((l) => l.trim().replace(/^-\s*/, "")).filter(Boolean).map((l, i) => <li key={i}><Inline text={l} /></li>)}
                   </ol>
                 </section>
               )}

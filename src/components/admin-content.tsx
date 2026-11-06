@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { catalogueQueryOptions } from "@/lib/catalogue-queries";
@@ -128,8 +128,13 @@ function CourseForm({
       });
       await queryClient.invalidateQueries({ queryKey: ["catalogue"] });
       onDone();
-    } catch {
-      setError("Couldn't save. Check every required field is filled in (summary needs 10+ characters).");
+    } catch (err) {
+      const text = err instanceof Error ? err.message : String(err);
+      setError(
+        /permission denied/i.test(text)
+          ? "This preview can't change saved records. Saving works on your own server."
+          : "Couldn't save. Check every required field is filled in (summary needs 10+ characters).",
+      );
     } finally {
       setBusy(false);
     }
@@ -202,7 +207,7 @@ function CourseForm({
       ] as const).map(([key, title, rows, hint]) => (
         <label key={key} className={label}>
           {title}
-          <textarea rows={rows} value={form[key]} onChange={(e) => set(key, e.target.value)} placeholder={hint} className={field} />
+          <RichTextBox rows={rows} value={form[key]} onChange={(v) => set(key, v)} placeholder={hint} className={field} />
         </label>
       ))}
       <label className="flex items-center gap-2 text-sm font-semibold">
@@ -410,5 +415,42 @@ function DualForm({
         )}
       </div>
     </form>
+  );
+}
+
+/** Plain textarea with a small toolbar: **bold**, [link](/path) and "- " bullets. */
+function RichTextBox(props: { rows: number; value: string; onChange: (v: string) => void; placeholder: string; className: string }) {
+  const ref = useRef<HTMLTextAreaElement>(null);
+  function wrap(before: string, after: string, fallback: string) {
+    const el = ref.current;
+    if (!el) return;
+    const { selectionStart: a, selectionEnd: b, value } = el;
+    const chosen = value.slice(a, b) || fallback;
+    props.onChange(value.slice(0, a) + before + chosen + after + value.slice(b));
+    requestAnimationFrame(() => {
+      el.focus();
+      el.setSelectionRange(a + before.length, a + before.length + chosen.length);
+    });
+  }
+  function link() {
+    const url = window.prompt("Link to (e.g. /courses/animation-101, /apply or a full https:// address)", "/courses/");
+    if (url) wrap("[", `](${url.trim()})`, "link text");
+  }
+  function bullet() {
+    const el = ref.current;
+    if (!el) return;
+    const start = el.value.lastIndexOf("\n", el.selectionStart - 1) + 1;
+    props.onChange(el.value.slice(0, start) + "- " + el.value.slice(start));
+  }
+  const btn = "rounded-md border border-border px-2 py-1 text-xs font-bold normal-case tracking-normal text-foreground hover:bg-muted";
+  return (
+    <span className="block">
+      <span className="mt-2 flex gap-2">
+        <button type="button" className={btn} onClick={() => wrap("**", "**", "bold text")}><b>B</b> Bold</button>
+        <button type="button" className={btn} onClick={link}>🔗 Link</button>
+        <button type="button" className={btn} onClick={bullet}>• Bullet</button>
+      </span>
+      <textarea ref={ref} rows={props.rows} value={props.value} onChange={(e) => props.onChange(e.target.value)} placeholder={props.placeholder} className={props.className} />
+    </span>
   );
 }
