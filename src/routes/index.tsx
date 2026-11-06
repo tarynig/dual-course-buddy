@@ -124,7 +124,7 @@ function Home() {
           <div>
             <FacultyBar title="Single courses" />
             <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-              Our signature courses — click any course for the full details, fees and deposit.
+              A taste of our courses — click any course for the full details, fees and deposit.
             </p>
           </div>
           <Link
