@@ -175,8 +175,7 @@ function ApplyPage() {
         <div data-step="0" hidden={step !== 0}>
           <FacultyBar title="Your course" />
           <label htmlFor="interest" className="mt-6 block text-sm font-bold">Course you're applying for</label>
-          <select id="interest" name="interest" value={interest} onChange={(e) => { setInterest(e.target.value); setPlanId(""); }} className={input}> className="text-sm font-bold">Course you're applying for</label>
-          <select id="interest" name="interest" defaultValue={course ?? ""} className={input}>
+          <select id="interest" name="interest" value={interest} onChange={(e) => { setInterest(e.target.value); setPlanId(""); }} className={input}>
             <option value="">Not sure yet</option>
             <optgroup label="Single courses">
               {catalogue.courses.map((c) => <option key={c.id} value={`course:${c.id}`}>{c.name}</option>)}
