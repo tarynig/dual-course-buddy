@@ -9,6 +9,7 @@ import fashion from '@/assets/brochure/fashion.jpg.asset.json';
 import tech from '@/assets/brochure/tech.jpg.asset.json';
 import business from '@/assets/brochure/business.jpg.asset.json';
 import headphones from '@/assets/brochure/headphone-boy.png.asset.json';
+import campus from '@/assets/brochure/campus.jpg.asset.json';
 import type { FacultyId } from '@/data/courses';
 
 // Node builds serve downloaded photos from the college's own host.
@@ -19,6 +20,7 @@ export const brochureDj = source(dj);
 export const brochurePerformance = source(performance);
 export const cacLogo = source(logo);
 export const brochureHeadphones = source(headphones);
+export const brochureCampus = source(campus);
 export const facultyImages: Record<FacultyId, { src: string; alt: string }> = {
   audio: { src: source(audio), alt: 'Sound recording equipment from the college prospectus' },
   content: { src: source(content), alt: 'A film camera recording a production' },

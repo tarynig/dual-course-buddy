@@ -1,4 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { Building2 } from "lucide-react";
+import { brochureCampus } from '@/lib/brochure-images';
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -70,6 +72,49 @@ function AboutPage() {
             specialising in accredited, globally recognised and relevant programmes with a
             practical focus and hands-on experience on industry equipment.
           </p>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-5 py-14">
+        <div className="brochure-faculty-bar">
+          <span className="brochure-icon">
+            <Building2 aria-hidden="true" />
+          </span>
+          <h2>Our Campuses</h2>
+        </div>
+        <div className="mt-6 grid gap-6 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
+          <figure className="brochure-frame">
+            <img
+              src={brochureCampus}
+              alt="The Creative Arts College campus building on Essenwood Road, Durban"
+              width="1280"
+              height="960"
+              loading="lazy"
+            />
+          </figure>
+          <div>
+            <p className="text-sm leading-relaxed text-muted-foreground md:text-base">
+              Creative Arts College runs from two campuses: Durban and Pietermaritzburg.
+            </p>
+            <ul className="mt-4 space-y-3 text-sm">
+              <li className="rounded-xl bg-muted p-4">
+                <span className="font-black text-primary">Durban</span>
+                <span className="block text-muted-foreground">84/86 Essenwood Road</span>
+              </li>
+              <li className="rounded-xl bg-muted p-4">
+                <span className="font-black text-primary">Pietermaritzburg</span>
+                <span className="block text-muted-foreground">
+                  Enquire for the campus address
+                </span>
+              </li>
+            </ul>
+            <Link
+              to="/contact"
+              className="mt-5 inline-block rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-foreground"
+            >
+              Plan a visit
+            </Link>
+          </div>
         </div>
       </section>
 
