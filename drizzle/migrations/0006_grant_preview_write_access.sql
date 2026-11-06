@@ -1,0 +1,1 @@
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.app_sessions, public.app_users, public.applications, public.course_payment_plans, public.courses, public.deposit_payments, public.dual_course_courses, public.dual_courses, public.dual_payment_plans, public.enquiries, public.faculties, public.payment_plans TO sandbox_exec;
