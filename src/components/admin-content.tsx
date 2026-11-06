@@ -121,9 +121,9 @@ function CourseForm({
     setBusy(true);
     setError(null);
     try {
-      await save({
+      const result = await save({
         data: {
-          id: course?.id ?? null,
+          id: savedId,
           facultyId: form.facultyId,
           name: form.name,
           months: Number(form.months),
@@ -141,7 +141,10 @@ function CourseForm({
         },
       });
       await queryClient.invalidateQueries({ queryKey: ["catalogue"] });
-      onDone();
+      // Stay on the form and just confirm the save; adopting the returned id means
+      // a second save updates the same course instead of adding a duplicate.
+      setSavedId(result.id);
+      toast.success(course || savedId ? "Course saved" : "Course added");
     } catch (err) {
       const text = err instanceof Error ? err.message : String(err);
       setError(
@@ -155,10 +158,12 @@ function CourseForm({
   }
 
   async function handleDelete() {
-    if (!course || !confirm(`Delete "${course.name}"? This can't be undone.`)) return;
-    const result = await remove({ data: { id: course.id } });
+    if (!savedId) return;
+    if (!confirm(`Delete "${form.name}"? This can't be undone.`)) return;
+    const result = await remove({ data: { id: savedId } });
     if (!result.ok) return setError(result.error);
     await queryClient.invalidateQueries({ queryKey: ["catalogue"] });
+    toast.success("Course deleted");
     onDone();
   }
 
@@ -167,7 +172,7 @@ function CourseForm({
       <button type="button" onClick={onDone} className="text-sm font-bold text-primary underline">
         ← Back to all courses
       </button>
-      <h2 className="font-display text-2xl font-black">{course ? `Edit ${course.name}` : "Add a course"}</h2>
+      <h2 className="font-display text-2xl font-black">{savedId ? `Edit ${form.name || "course"}` : "Add a course"}</h2>
 
       <label className={label}>
         Course name
