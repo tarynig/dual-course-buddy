@@ -82,15 +82,38 @@ function CoursePage() {
           <p className="font-semibold text-secondary">{course.award}</p>
           {course.saqa && <p className="text-xs text-muted-foreground">SAQA ID: {course.saqa}</p>}
           <p className="mt-4 text-lg leading-relaxed">{course.description}</p>
-          <div className="mt-8">
-            {course.details ? (
-              <Details text={course.details} />
-            ) : (
-              <p className="rounded-2xl border border-dashed border-border p-5 text-sm text-muted-foreground">
-                Full course information is coming soon. <Link to="/contact" className="text-primary underline">Ask us</Link> for the course outline in the meantime.
-              </p>
-            )}
-          </div>
+          {[course.details, course.certification, course.careers, course.outline, course.requirements].some(Boolean) ? (
+            <div className="mt-8 space-y-8">
+              {([
+                ["Description", course.details],
+                ["Certification", course.certification],
+                ["Careers", course.careers],
+              ] as const).map(([title, text]) => text && (
+                <section key={title}>
+                  <h2 className="mb-3 font-display text-xl font-black text-primary">{title}</h2>
+                  <Details text={text} />
+                </section>
+              ))}
+              {course.outline && (
+                <section>
+                  <h2 className="mb-3 font-display text-xl font-black text-primary">Course outline</h2>
+                  <ol className="list-decimal space-y-1 pl-5 text-sm md:text-base">
+                    {course.outline.split("\n").map((l) => l.trim().replace(/^-\s*/, "")).filter(Boolean).map((l, i) => <li key={i}>{l}</li>)}
+                  </ol>
+                </section>
+              )}
+              {course.requirements && (
+                <section>
+                  <h2 className="mb-3 font-display text-xl font-black text-primary">Minimum requirements</h2>
+                  <Details text={course.requirements} />
+                </section>
+              )}
+            </div>
+          ) : (
+            <p className="mt-8 rounded-2xl border border-dashed border-border p-5 text-sm text-muted-foreground">
+              Full course information is coming soon. <Link to="/contact" className="text-primary underline">Ask us</Link> for the course outline in the meantime.
+            </p>
+          )}
           <div className="mt-8 border-t border-border pt-5">
             <FeeLine plans={course.plans} />
             <Link to="/contact" className="mt-5 inline-block rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-foreground">

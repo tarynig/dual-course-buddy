@@ -22,6 +22,10 @@ type CourseRow = {
   description: string;
   signature: boolean;
   details: string | null;
+  certification: string | null;
+  careers: string | null;
+  outline: string | null;
+  requirements: string | null;
   plan_ids: string;
 };
 type PlanRow = {
@@ -66,7 +70,7 @@ export const getCatalogue = createServerFn({ method: "GET" }).handler(
         `,
         sql<Array<CourseRow>>`
           SELECT id, faculty_id, name, months, type, award, saqa, description,
-                 signature, details,
+                 signature, details, certification, careers, outline, requirements,
                  COALESCE((SELECT string_agg(p.plan_id::text, ',') FROM public.course_payment_plans p
                            WHERE p.course_id = courses.id), '') AS plan_ids
           FROM public.courses
@@ -128,6 +132,10 @@ export const getCatalogue = createServerFn({ method: "GET" }).handler(
         plans: pick(c.plan_ids),
         signature: c.signature,
         ...(c.details ? { details: c.details } : {}),
+        ...(c.certification ? { certification: c.certification } : {}),
+        ...(c.careers ? { careers: c.careers } : {}),
+        ...(c.outline ? { outline: c.outline } : {}),
+        ...(c.requirements ? { requirements: c.requirements } : {}),
       }));
 
       const duals: Array<DualCourse> = dualRows.map((d) => ({

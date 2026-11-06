@@ -14,6 +14,10 @@ export interface Course {
   signature?: boolean;
   /** Long-form course information shown on the course's own page. */
   details?: string;
+  certification?: string;
+  careers?: string;
+  outline?: string;
+  requirements?: string;
 }
 
 export const COURSE_TYPES: CourseType[] = ["OC", "AOC", "HOC", "FETC", "SC"];
