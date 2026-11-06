@@ -42,7 +42,7 @@ function Inline({ text }: { text: string }) {
         if (part.startsWith("**") && part.endsWith("**")) return <strong key={i}>{part.slice(2, -2)}</strong>;
         const m = part.match(/^\[([^\]]+)\]\(([^)\s]+)\)$/);
         if (m) {
-          const href = m[2];
+          const href = m[2] ?? "";
           const safe = href.startsWith("/") || /^https?:\/\//.test(href) || href.startsWith("mailto:");
           if (!safe) return m[1];
           const external = !href.startsWith("/");
