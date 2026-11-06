@@ -307,7 +307,7 @@ function ApplyPage() {
           {step < STEPS.length - 1 ? (
             <button key="next" type="button" onClick={next} className="flex-1 rounded-full bg-primary px-6 py-4 text-sm font-bold text-primary-foreground">Continue →</button>
           ) : (
-            <button key="submit" type="submit" disabled={state.status === "sending"} className="flex flex-1 items-center justify-center gap-2 rounded-full bg-primary px-6 py-4 text-sm font-bold text-primary-foreground disabled:opacity-60">
+            <button key="submit" type="button" onClick={() => formRef.current?.requestSubmit()} disabled={state.status === "sending"} className="flex flex-1 items-center justify-center gap-2 rounded-full bg-primary px-6 py-4 text-sm font-bold text-primary-foreground disabled:opacity-60">
               {canPay && payNow && <LockKeyhole aria-hidden="true" className="size-4" />}
               {state.status === "sending" ? "Submitting…" : canPay && payNow ? `Submit & pay ${formatZar(chosenPlan?.deposit ?? 0)} deposit` : "Submit application"}
             </button>
