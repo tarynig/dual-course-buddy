@@ -226,6 +226,8 @@ export type Database = {
       courses: {
         Row: {
           award: string
+          careers: string | null
+          certification: string | null
           deposit: number | null
           description: string
           details: string | null
@@ -235,6 +237,8 @@ export type Database = {
           is_active: boolean
           months: number
           name: string
+          outline: string | null
+          requirements: string | null
           saqa: string | null
           signature: boolean
           sort_order: number
@@ -242,6 +246,8 @@ export type Database = {
         }
         Insert: {
           award: string
+          careers?: string | null
+          certification?: string | null
           deposit?: number | null
           description: string
           details?: string | null
@@ -251,6 +257,8 @@ export type Database = {
           is_active?: boolean
           months: number
           name: string
+          outline?: string | null
+          requirements?: string | null
           saqa?: string | null
           signature?: boolean
           sort_order?: number
@@ -258,6 +266,8 @@ export type Database = {
         }
         Update: {
           award?: string
+          careers?: string | null
+          certification?: string | null
           deposit?: number | null
           description?: string
           details?: string | null
@@ -267,6 +277,8 @@ export type Database = {
           is_active?: boolean
           months?: number
           name?: string
+          outline?: string | null
+          requirements?: string | null
           saqa?: string | null
           signature?: boolean
           sort_order?: number
