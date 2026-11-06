@@ -86,7 +86,7 @@ function AboutPage() {
           <figure className="brochure-frame">
             <img
               src={brochureCampus}
-              alt="The Creative Arts College campus building on Essewood Road, Durban"
+              alt="The Creative Arts College campus building on Essenwood Road, Durban"
               width="1280"
               height="960"
               loading="lazy"
@@ -99,7 +99,7 @@ function AboutPage() {
             <ul className="mt-4 space-y-3 text-sm">
               <li className="rounded-xl bg-muted p-4">
                 <span className="font-black text-primary">Durban</span>
-                <span className="block text-muted-foreground">84/86 Essewood Road</span>
+                <span className="block text-muted-foreground">84/86 Essenwood Road</span>
               </li>
               <li className="rounded-xl bg-muted p-4">
                 <span className="font-black text-primary">Pietermaritzburg</span>
