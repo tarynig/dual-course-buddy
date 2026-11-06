@@ -135,10 +135,7 @@ function Home() {
           </Link>
         </div>
         <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {(catalogue.courses.some((c) => c.signature)
-            ? catalogue.courses.filter((c) => c.signature)
-            : catalogue.courses
-          )
+          {[...catalogue.courses].sort((a, b) => Number(b.signature) - Number(a.signature))
             .slice(0, 6)
             .map((c, index) => (
               <CourseCard key={c.id} course={c} number={index + 1} />
