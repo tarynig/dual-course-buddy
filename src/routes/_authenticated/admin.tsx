@@ -9,6 +9,7 @@ import {
   sendTestEmail,
   setEnquiryStatus,
 } from "@/lib/admin.functions";
+import type { AdminEnquiry } from "@/lib/admin.functions";
 import { catalogueQueryOptions } from "@/lib/catalogue-queries";
 import { FeesPanel } from "@/components/admin-fees";
 import { CoursesContentPanel, DualsContentPanel } from "@/components/admin-content";
@@ -162,7 +163,7 @@ function EnquiriesPanel() {
                 </a>
               </p>
               <p className="mt-2 text-sm">
-                <span className="font-semibold">{label(e.courseId, e.dualCourseId)}</span> ·{" "}
+                <span className="font-semibold">{label(e)}</span> ·{" "}
                 {e.campus} campus
               </p>
               {e.message && <p className="mt-2 text-sm text-muted-foreground">{e.message}</p>}
