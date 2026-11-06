@@ -1,11 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { LockKeyhole } from "lucide-react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { FacultyBar } from "@/components/brochure-visuals";
 import { CatalogueError, CatalogueNotFound } from "@/components/route-fallbacks";
 import { catalogueQueryOptions } from "@/lib/catalogue-queries";
 import { submitApplication } from "@/lib/applications.functions";
+import { startDepositPayment } from "@/lib/payments.functions";
+import { postToPayFast } from "@/components/deposit-panel";
+import { formatZar, planTotal } from "@/data/courses";
+
+const STEPS = ["Course", "The applicant", "Education", "Payment contact", "Review & submit"];
 
 export const Route = createFileRoute("/apply")({
   head: () => ({
@@ -56,11 +62,35 @@ function ApplyPage() {
   const { data: catalogue } = useSuspenseQuery(catalogueQueryOptions);
   const { course } = Route.useSearch();
   const submit = useServerFn(submitApplication);
+  const pay = useServerFn(startDepositPayment);
   const [elsewhere, setElsewhere] = useState(false);
+  const [step, setStep] = useState(0);
+  const [interest, setInterest] = useState(course ?? "");
+  const [payNow, setPayNow] = useState(true);
+  const [planId, setPlanId] = useState("");
+  const formRef = useRef<HTMLFormElement>(null);
+  const [kind, itemId] = interest.split(":");
+  const item = kind === "course" ? catalogue.courses.find((c) => c.id === itemId) : kind === "dual" ? catalogue.duals.find((d) => d.id === itemId) : undefined;
+  const payable = (item?.plans ?? []).filter((p) => p.deposit > 0);
+  const chosenPlan = payable.find((p) => p.id === planId) ?? payable[0];
+  const canPay = payable.length > 0;
+
+  function stepValid(i: number) {
+    const box = formRef.current?.querySelector<HTMLElement>(`[data-step="${i}"]`);
+    if (!box) return true;
+    for (const el of Array.from(box.querySelectorAll<HTMLInputElement>("input,select,textarea"))) {
+      if (!el.checkValidity()) { el.reportValidity(); return false; }
+    }
+    return true;
+  }
+  function next() { if (stepValid(step)) { setStep(step + 1); window.scrollTo({ top: 0, behavior: "smooth" }); } }
+  function back() { setStep(step - 1); window.scrollTo({ top: 0, behavior: "smooth" }); }
   const [state, setState] = useState<{ status: "idle" | "sending" | "error"; message?: string } | { status: "sent"; reference: string }>({ status: "idle" });
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (step < STEPS.length - 1) { next(); return; }
+    for (let i = 0; i < STEPS.length; i++) if (!stepValid(i)) { setStep(i); return; }
     const f = new FormData(e.currentTarget);
     const g = (k: string) => String(f.get(k) ?? "").trim();
     const opt = (k: string) => g(k) || null;
@@ -81,6 +111,25 @@ function ApplyPage() {
           payerAddress: g("payerAddress"), payerEmployment: g("payerEmployment") as "Employed",
         },
       });
+      if (result.ok && canPay && payNow && chosenPlan) {
+        try {
+          const checkout = await pay({
+            data: {
+              courseId: kind === "course" ? itemId : null,
+              dualCourseId: kind === "dual" ? itemId : null,
+              planId: chosenPlan.id,
+              fullName: `${g("firstName")} ${g("lastName")}`,
+              email: g("email"),
+              phone: g("cell"),
+            },
+          });
+          postToPayFast(checkout);
+          return;
+        } catch {
+          setState({ status: "sent", reference: result.reference + " — your application is saved, but the deposit payment couldn't start. Please speak to the college admin." });
+          return;
+        }
+      }
       if (result.ok) {
         setState({ status: "sent", reference: result.reference });
         window.scrollTo({ top: 0 });
@@ -113,10 +162,20 @@ function ApplyPage() {
         </div>
       </section>
 
-      <form onSubmit={onSubmit} className="mx-auto max-w-4xl space-y-12 px-5 py-14">
-        <div>
-          <label htmlFor="interest" className="text-sm font-bold">Course you're applying for</label>
-          <select id="interest" name="interest" defaultValue={course ?? ""} className={input}>
+      <form ref={formRef} noValidate onSubmit={onSubmit} className="mx-auto max-w-4xl px-5 py-14">
+        <ol className="mb-10 grid grid-cols-5 gap-2" aria-label="Application steps">
+          {STEPS.map((label, i) => (
+            <li key={label} aria-current={i === step ? "step" : undefined}>
+              <span className={`block h-2 rounded-full ${i <= step ? "bg-primary" : "bg-muted"}`} />
+              <span className={`mt-2 hidden text-xs font-bold sm:block ${i === step ? "text-primary" : "text-muted-foreground"}`}>{i + 1}. {label}</span>
+            </li>
+          ))}
+        </ol>
+        <p className="mb-6 text-sm font-semibold text-muted-foreground sm:hidden">Step {step + 1} of {STEPS.length}: {STEPS[step]}</p>
+        <div data-step="0" hidden={step !== 0}>
+          <FacultyBar title="Your course" />
+          <label htmlFor="interest" className="mt-6 block text-sm font-bold">Course you're applying for</label>
+          <select id="interest" name="interest" value={interest} onChange={(e) => { setInterest(e.target.value); setPlanId(""); }} className={input}>
             <option value="">Not sure yet</option>
             <optgroup label="Single courses">
               {catalogue.courses.map((c) => <option key={c.id} value={`course:${c.id}`}>{c.name}</option>)}
@@ -127,7 +186,7 @@ function ApplyPage() {
           </select>
         </div>
 
-        <section>
+        <section data-step="1" hidden={step !== 1}>
           <FacultyBar title="The applicant" />
           <div className="mt-6 grid gap-5 sm:grid-cols-2">
             <Field label="First name" name="firstName" />
@@ -143,7 +202,7 @@ function ApplyPage() {
           </div>
         </section>
 
-        <section>
+        <section data-step="2" hidden={step !== 2}>
           <FacultyBar title="Applicant's education" />
           <div className="mt-6 grid gap-5 sm:grid-cols-2">
             <Field label="Last school attended" name="lastSchool" className="sm:col-span-2" />
@@ -173,7 +232,7 @@ function ApplyPage() {
           </div>
         </section>
 
-        <section>
+        <section data-step="3" hidden={step !== 3}>
           <FacultyBar title="Person responsible for payments" />
           <div className="mt-6 grid gap-5 sm:grid-cols-2">
             <Field label="First name" name="payerFirstName" />
@@ -190,12 +249,70 @@ function ApplyPage() {
           </div>
         </section>
 
+        <section data-step="4" hidden={step !== 4}>
+          <FacultyBar title="Review & submit" />
+          <p className="mt-6 text-sm text-muted-foreground">
+            Applying for: <strong className="text-foreground">{item ? ("name" in item ? item.name : item.title) : "Not sure yet"}</strong>
+          </p>
+          {canPay ? (
+            <div className="brochure-frame mt-6 rounded-3xl p-6">
+              <h2 className="font-display text-2xl font-black">Secure your placement</h2>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Optionally pay the upfront deposit now through PayFast. Placement is subject to confirmation by the college.
+              </p>
+              <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                {[true, false].map((v) => (
+                  <label key={String(v)} className="flex cursor-pointer items-center gap-2 rounded-xl border border-input p-3 text-sm font-bold has-[:checked]:border-primary has-[:checked]:bg-primary/10">
+                    <input type="radio" name="payNow" checked={payNow === v} onChange={() => setPayNow(v)} className="accent-primary" />
+                    {v ? `Apply and pay ${formatZar(chosenPlan?.deposit ?? 0)} deposit now` : "Apply only — I'll pay later"}
+                  </label>
+                ))}
+              </div>
+              {payNow && (
+                <fieldset className="mt-6">
+                  <legend className="font-display text-lg font-black">Choose your preferred payment plan</legend>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    This is a selection only — you are not paying the plan amount now. Once your placement is confirmed, the college will arrange the remaining payments with you.
+                  </p>
+                  <ul className="mt-3 space-y-3">
+                    {payable.map((p) => (
+                      <li key={p.id}>
+                        <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-border p-3 has-[:checked]:border-primary">
+                          <input type="radio" name="planChoice" checked={chosenPlan?.id === p.id} onChange={() => setPlanId(p.id)} className="mt-1 accent-primary" />
+                          <span className="text-sm">
+                            <span className="block font-bold">{p.name}</span>
+                            <span className="text-muted-foreground">After placement confirmation: {p.instalments} × {formatZar(p.instalmentAmount)}</span>
+                            <span className="mt-1 block text-xs text-muted-foreground">Upfront deposit: {formatZar(p.deposit)}</span>
+                            <span className="mt-1 block font-bold text-primary">Total course fee: {formatZar(planTotal(p))}</span>
+                          </span>
+                        </label>
+                      </li>
+                    ))}
+                  </ul>
+                </fieldset>
+              )}
+            </div>
+          ) : (
+            <p className="mt-4 text-sm text-muted-foreground">Our admissions team will contact you about fees and securing your placement.</p>
+          )}
+        </section>
+
         {state.status === "error" && (
-          <p className="rounded-xl bg-destructive/10 px-4 py-3 text-sm font-semibold text-destructive">{state.message}</p>
+          <p className="mt-6 rounded-xl bg-destructive/10 px-4 py-3 text-sm font-semibold text-destructive">{state.message}</p>
         )}
-        <button type="submit" disabled={state.status === "sending"} className="w-full rounded-full bg-primary px-6 py-4 text-sm font-bold text-primary-foreground disabled:opacity-60">
-          {state.status === "sending" ? "Submitting…" : "Submit application"}
-        </button>
+        <div className="mt-10 flex gap-3">
+          {step > 0 && (
+            <button type="button" onClick={back} className="rounded-full border border-input px-6 py-4 text-sm font-bold">← Back</button>
+          )}
+          {step < STEPS.length - 1 ? (
+            <button key="next" type="button" onClick={next} className="flex-1 rounded-full bg-primary px-6 py-4 text-sm font-bold text-primary-foreground">Continue →</button>
+          ) : (
+            <button key="submit" type="button" onClick={() => formRef.current?.requestSubmit()} disabled={state.status === "sending"} className="flex flex-1 items-center justify-center gap-2 rounded-full bg-primary px-6 py-4 text-sm font-bold text-primary-foreground disabled:opacity-60">
+              {canPay && payNow && <LockKeyhole aria-hidden="true" className="size-4" />}
+              {state.status === "sending" ? "Submitting…" : canPay && payNow ? `Submit & pay ${formatZar(chosenPlan?.deposit ?? 0)} deposit` : "Submit application"}
+            </button>
+          )}
+        </div>
       </form>
     </div>
   );
