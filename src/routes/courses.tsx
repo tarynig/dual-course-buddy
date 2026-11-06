@@ -23,7 +23,7 @@ export const Route = createFileRoute("/courses")({
       {
         property: "og:description",
         content:
-          "Accredited, practical, industry-based courses from 12 to 24 months across seven faculties.",
+          "Accredited, practical, industry-based courses from 10 to 15 months across seven faculties.",
       },
     ],
   }),
@@ -36,7 +36,7 @@ export const Route = createFileRoute("/courses")({
 function CoursesPage() {
   const { data: catalogue } = useSuspenseQuery(catalogueQueryOptions);
   const [faculty, setFaculty] = useState<FacultyId | "all">("all");
-  const [maxMonths, setMaxMonths] = useState(24);
+  const [maxMonths, setMaxMonths] = useState(15);
 
   const filtered = catalogue.courses.filter(
     (c) => (faculty === "all" || c.faculty === faculty) && c.months <= maxMonths,
@@ -54,7 +54,7 @@ function CoursesPage() {
           </h1>
           <p className="mt-4 max-w-2xl text-sm opacity-85 md:text-base">
             Accredited qualifications and CAC skills programmes across seven faculties. Each course
-            is practical, industry-based and completed in 12 to 24 months.
+            is practical, industry-based and completed in 10 to 15 months.
           </p>
         </div>
       </section>
@@ -95,9 +95,9 @@ function CoursesPage() {
           <input
             id="duration"
             type="range"
-            min={12}
-            max={24}
-            step={3}
+            min={10}
+            max={15}
+            step={1}
             value={maxMonths}
             onChange={(e) => setMaxMonths(Number(e.target.value))}
             className="h-2 w-56 cursor-pointer accent-[var(--color-secondary)]"
