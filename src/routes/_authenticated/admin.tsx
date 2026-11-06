@@ -136,12 +136,8 @@ function EnquiriesPanel() {
   const catalogue = useQuery(catalogueQueryOptions);
   const queryClient = useQueryClient();
 
-  const label = (courseId: string | null, dualId: string | null) => {
-    const data = catalogue.data;
-    if (courseId) return data?.courses.find((c) => c.id === courseId)?.name ?? courseId;
-    if (dualId) return data?.duals.find((d) => d.id === dualId)?.title ?? dualId;
-    return "Not sure yet";
-  };
+  const label = (e: AdminEnquiry) =>
+    e.courseName ?? e.dualName ?? e.courseId ?? e.dualCourseId ?? "Not sure yet";
 
   if (enquiries.isLoading) return <p className="text-sm text-muted-foreground">Loading enquiries…</p>;
   if (enquiries.error)

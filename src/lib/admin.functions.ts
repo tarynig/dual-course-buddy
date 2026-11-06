@@ -63,6 +63,8 @@ export const getAdminEnquiries = createServerFn({ method: "GET" }).handler(
       email: row.email,
       courseId: row.course_id,
       dualCourseId: row.dual_course_id,
+      courseName: row.course_name,
+      dualName: row.dual_name,
       campus: row.campus,
       message: row.message,
       status: row.status,
