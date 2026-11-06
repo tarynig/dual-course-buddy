@@ -83,6 +83,20 @@ function ApplyPage() {
     }
     return true;
   }
+  function goToField(name: string, message: string) {
+    const el = formRef.current?.querySelector<HTMLInputElement>(`[name="${name}"]`);
+    const box = el?.closest<HTMLElement>("[data-step]");
+    if (!el || !box) return;
+    setStep(Number(box.dataset.step));
+    setTimeout(() => {
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+      el.focus();
+      el.setCustomValidity(message);
+      el.reportValidity();
+      el.addEventListener("input", () => el.setCustomValidity(""), { once: true });
+      el.addEventListener("change", () => el.setCustomValidity(""), { once: true });
+    }, 50);
+  }
   function next() { if (stepValid(step)) { setStep(step + 1); window.scrollTo({ top: 0, behavior: "smooth" }); } }
   function back() { setStep(step - 1); window.scrollTo({ top: 0, behavior: "smooth" }); }
   const [state, setState] = useState<{ status: "idle" | "sending" | "error"; message?: string } | { status: "sent"; reference: string }>({ status: "idle" });
@@ -133,7 +147,10 @@ function ApplyPage() {
       if (result.ok) {
         setState({ status: "sent", reference: result.reference });
         window.scrollTo({ top: 0 });
-      } else setState({ status: "error", message: result.error });
+      } else {
+        setState({ status: "error", message: result.error });
+        if ("field" in result && result.field) goToField(result.field, result.error);
+      }
     } catch {
       setState({ status: "error", message: "Some details look incomplete or invalid — please check the form and try again." });
     }
