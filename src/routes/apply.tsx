@@ -83,6 +83,20 @@ function ApplyPage() {
     }
     return true;
   }
+  function goToField(name: string, message: string) {
+    const el = formRef.current?.querySelector<HTMLInputElement>(`[name="${name}"]`);
+    const box = el?.closest<HTMLElement>("[data-step]");
+    if (!el || !box) return;
+    setStep(Number(box.dataset["step"]));
+    setTimeout(() => {
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+      el.focus();
+      el.setCustomValidity(message);
+      el.reportValidity();
+      el.addEventListener("input", () => el.setCustomValidity(""), { once: true });
+      el.addEventListener("change", () => el.setCustomValidity(""), { once: true });
+    }, 50);
+  }
   function next() { if (stepValid(step)) { setStep(step + 1); window.scrollTo({ top: 0, behavior: "smooth" }); } }
   function back() { setStep(step - 1); window.scrollTo({ top: 0, behavior: "smooth" }); }
   const [state, setState] = useState<{ status: "idle" | "sending" | "error"; message?: string } | { status: "sent"; reference: string }>({ status: "idle" });
@@ -90,7 +104,8 @@ function ApplyPage() {
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (step < STEPS.length - 1) { next(); return; }
-    for (let i = 0; i < STEPS.length; i++) if (!stepValid(i)) { setStep(i); return; }
+    const bad = Array.from(formRef.current?.querySelectorAll<HTMLInputElement>("input,select,textarea") ?? []).find((el) => !el.checkValidity());
+    if (bad) { goToField(bad.name, bad.validationMessage); return; }
     const f = new FormData(e.currentTarget);
     const g = (k: string) => String(f.get(k) ?? "").trim();
     const opt = (k: string) => g(k) || null;
@@ -133,9 +148,12 @@ function ApplyPage() {
       if (result.ok) {
         setState({ status: "sent", reference: result.reference });
         window.scrollTo({ top: 0 });
-      } else setState({ status: "error", message: result.error });
+      } else {
+        setState({ status: "error", message: result.error });
+        if ("field" in result && result.field) goToField(result.field, result.error);
+      }
     } catch {
-      setState({ status: "error", message: "Some details look incomplete or invalid — please check the form and try again." });
+      setState({ status: "error", message: "We couldn't submit your application just now — please try again, or call us on 081 589 1088." });
     }
   }
 
