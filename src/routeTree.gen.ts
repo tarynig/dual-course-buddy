@@ -19,6 +19,7 @@ import { Route as DualCoursesRouteImport } from './routes/dual-courses'
 import { Route as HealthRouteImport } from './routes/health'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as CoursesCourseIdRouteImport } from './routes/courses_.$courseId'
+import { Route as DualCoursesDualIdRouteImport } from './routes/dual-courses_.$dualId'
 import { Route as PaymentCancelledRouteImport } from './routes/payment.cancelled'
 import { Route as PaymentSuccessRouteImport } from './routes/payment.success'
 import { Route as ApiPublicPayfastNotifyRouteImport } from './routes/api/public/payfast/notify'
@@ -72,6 +73,11 @@ const CoursesCourseIdRoute = CoursesCourseIdRouteImport.update({
   path: '/courses/$courseId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DualCoursesDualIdRoute = DualCoursesDualIdRouteImport.update({
+  id: '/dual-courses_/$dualId',
+  path: '/dual-courses/$dualId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PaymentCancelledRoute = PaymentCancelledRouteImport.update({
   id: '/payment/cancelled',
   path: '/payment/cancelled',
@@ -98,6 +104,7 @@ export interface FileRoutesByFullPath {
   '/health': typeof HealthRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
+  '/dual-courses/$dualId': typeof DualCoursesDualIdRoute
   '/payment/cancelled': typeof PaymentCancelledRoute
   '/payment/success': typeof PaymentSuccessRoute
   '/api/public/payfast/notify': typeof ApiPublicPayfastNotifyRoute
@@ -112,6 +119,7 @@ export interface FileRoutesByTo {
   '/health': typeof HealthRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
+  '/dual-courses/$dualId': typeof DualCoursesDualIdRoute
   '/payment/cancelled': typeof PaymentCancelledRoute
   '/payment/success': typeof PaymentSuccessRoute
   '/api/public/payfast/notify': typeof ApiPublicPayfastNotifyRoute
@@ -128,6 +136,7 @@ export interface FileRoutesById {
   '/health': typeof HealthRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/courses_/$courseId': typeof CoursesCourseIdRoute
+  '/dual-courses_/$dualId': typeof DualCoursesDualIdRoute
   '/payment/cancelled': typeof PaymentCancelledRoute
   '/payment/success': typeof PaymentSuccessRoute
   '/api/public/payfast/notify': typeof ApiPublicPayfastNotifyRoute
@@ -144,6 +153,7 @@ export interface FileRouteTypes {
     | '/health'
     | '/admin'
     | '/courses/$courseId'
+    | '/dual-courses/$dualId'
     | '/payment/cancelled'
     | '/payment/success'
     | '/api/public/payfast/notify'
@@ -158,6 +168,7 @@ export interface FileRouteTypes {
     | '/health'
     | '/admin'
     | '/courses/$courseId'
+    | '/dual-courses/$dualId'
     | '/payment/cancelled'
     | '/payment/success'
     | '/api/public/payfast/notify'
@@ -173,6 +184,7 @@ export interface FileRouteTypes {
     | '/health'
     | '/_authenticated/admin'
     | '/courses_/$courseId'
+    | '/dual-courses_/$dualId'
     | '/payment/cancelled'
     | '/payment/success'
     | '/api/public/payfast/notify'
@@ -188,6 +200,7 @@ export interface RootRouteChildren {
   DualCoursesRoute: typeof DualCoursesRoute
   HealthRoute: typeof HealthRoute
   CoursesCourseIdRoute: typeof CoursesCourseIdRoute
+  DualCoursesDualIdRoute: typeof DualCoursesDualIdRoute
   PaymentCancelledRoute: typeof PaymentCancelledRoute
   PaymentSuccessRoute: typeof PaymentSuccessRoute
   ApiPublicPayfastNotifyRoute: typeof ApiPublicPayfastNotifyRoute
@@ -265,6 +278,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CoursesCourseIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dual-courses_/$dualId': {
+      id: '/dual-courses_/$dualId'
+      path: '/dual-courses/$dualId'
+      fullPath: '/dual-courses/$dualId'
+      preLoaderRoute: typeof DualCoursesDualIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/payment/cancelled': {
       id: '/payment/cancelled'
       path: '/payment/cancelled'
@@ -310,6 +330,7 @@ const rootRouteChildren: RootRouteChildren = {
   DualCoursesRoute: DualCoursesRoute,
   HealthRoute: HealthRoute,
   CoursesCourseIdRoute: CoursesCourseIdRoute,
+  DualCoursesDualIdRoute: DualCoursesDualIdRoute,
   PaymentCancelledRoute: PaymentCancelledRoute,
   PaymentSuccessRoute: PaymentSuccessRoute,
   ApiPublicPayfastNotifyRoute: ApiPublicPayfastNotifyRoute,
