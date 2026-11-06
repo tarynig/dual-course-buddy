@@ -10,6 +10,7 @@ import tech from '@/assets/brochure/tech.jpg.asset.json';
 import business from '@/assets/brochure/business.jpg.asset.json';
 import headphones from '@/assets/brochure/headphone-boy.png.asset.json';
 import campus from '@/assets/brochure/campus.jpg.asset.json';
+import heroDancer from '@/assets/brochure/hero-dancer.jpg.asset.json';
 import type { FacultyId } from '@/data/courses';
 
 // Node builds serve downloaded photos from the college's own host.
@@ -18,6 +19,7 @@ const source = (asset: { url: string; original_filename: string }) =>
 export const brochureStudent = source(student);
 export const brochureDj = source(dj);
 export const brochurePerformance = source(performance);
+export const brochureHeroDancer = source(heroDancer);
 export const cacLogo = source(logo);
 export const brochureHeadphones = source(headphones);
 export const brochureCampus = source(campus);
