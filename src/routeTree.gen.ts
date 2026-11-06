@@ -19,6 +19,7 @@ import { Route as DualCoursesRouteImport } from './routes/dual-courses'
 import { Route as HealthRouteImport } from './routes/health'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as CoursesCourseIdRouteImport } from './routes/courses_.$courseId'
+import { Route as ApiPublicPayfastNotifyRouteImport } from './routes/api/public/payfast/notify'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -69,6 +70,11 @@ const CoursesCourseIdRoute = CoursesCourseIdRouteImport.update({
   path: '/courses/$courseId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicPayfastNotifyRoute = ApiPublicPayfastNotifyRouteImport.update({
+  id: '/api/public/payfast/notify',
+  path: '/api/public/payfast/notify',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -80,6 +86,7 @@ export interface FileRoutesByFullPath {
   '/health': typeof HealthRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
+  '/api/public/payfast/notify': typeof ApiPublicPayfastNotifyRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -91,6 +98,7 @@ export interface FileRoutesByTo {
   '/health': typeof HealthRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
+  '/api/public/payfast/notify': typeof ApiPublicPayfastNotifyRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -104,6 +112,7 @@ export interface FileRoutesById {
   '/health': typeof HealthRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/courses_/$courseId': typeof CoursesCourseIdRoute
+  '/api/public/payfast/notify': typeof ApiPublicPayfastNotifyRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -117,6 +126,7 @@ export interface FileRouteTypes {
     | '/health'
     | '/admin'
     | '/courses/$courseId'
+    | '/api/public/payfast/notify'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -128,6 +138,7 @@ export interface FileRouteTypes {
     | '/health'
     | '/admin'
     | '/courses/$courseId'
+    | '/api/public/payfast/notify'
   id:
     | '__root__'
     | '/'
@@ -140,6 +151,7 @@ export interface FileRouteTypes {
     | '/health'
     | '/_authenticated/admin'
     | '/courses_/$courseId'
+    | '/api/public/payfast/notify'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -152,6 +164,7 @@ export interface RootRouteChildren {
   DualCoursesRoute: typeof DualCoursesRoute
   HealthRoute: typeof HealthRoute
   CoursesCourseIdRoute: typeof CoursesCourseIdRoute
+  ApiPublicPayfastNotifyRoute: typeof ApiPublicPayfastNotifyRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -226,6 +239,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CoursesCourseIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/payfast/notify': {
+      id: '/api/public/payfast/notify'
+      path: '/api/public/payfast/notify'
+      fullPath: '/api/public/payfast/notify'
+      preLoaderRoute: typeof ApiPublicPayfastNotifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -250,6 +270,7 @@ const rootRouteChildren: RootRouteChildren = {
   DualCoursesRoute: DualCoursesRoute,
   HealthRoute: HealthRoute,
   CoursesCourseIdRoute: CoursesCourseIdRoute,
+  ApiPublicPayfastNotifyRoute: ApiPublicPayfastNotifyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
