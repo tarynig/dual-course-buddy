@@ -43,6 +43,13 @@
       "when": 1793949876959,
       "tag": "0005_course_content_sections",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1793950423101,
+      "tag": "0006_grant_preview_write_access",
+      "breakpoints": true
     }
   ]
 }
