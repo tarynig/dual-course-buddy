@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { DualCard } from "@/components/course-cards";
 import { FacultyBar, FacultyPhoto } from '@/components/brochure-visuals';
-import { brochureStudent } from '@/lib/brochure-images';
+import { brochureStudent, brochureHeadphones } from '@/lib/brochure-images';
 import { CatalogueError, CatalogueNotFound } from "@/components/route-fallbacks";
 import { catalogueQueryOptions } from "@/lib/catalogue-queries";
 
@@ -46,7 +46,7 @@ function Home() {
     <div>
       <section className="surface-deep relative overflow-hidden">
         <img src={brochureStudent} alt="" className="absolute inset-0 h-full w-full object-cover object-top opacity-25" fetchPriority="high" />
-        <div className="relative mx-auto grid max-w-6xl gap-10 px-5 py-16 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
+        <div className="relative mx-auto grid max-w-6xl gap-10 px-5 py-16 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
           <div>
             <span className="inline-block rounded-full bg-secondary px-4 py-1.5 text-xs font-black tracking-[0.2em] text-secondary-foreground uppercase">
               2027 Prospectus
@@ -75,7 +75,16 @@ function Home() {
             </div>
           </div>
 
-          <dl className="grid gap-4 sm:grid-cols-2">
+          <figure className="hero-figure">
+            <img
+              src={brochureHeadphones}
+              alt="Student wearing red studio headphones, listening intently"
+              className="hero-cutout"
+              fetchPriority="high"
+            />
+          </figure>
+
+          <dl className="grid gap-4 sm:grid-cols-2 lg:col-span-2 lg:grid-cols-4">
             <HeroStat value="30+" label="SAQA qualifications" />
             <HeroStat value="10–15" label="Months to qualify" />
             <HeroStat value={`${catalogue.duals.length}`} label="Dual pairings" />
