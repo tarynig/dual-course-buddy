@@ -99,7 +99,7 @@ function ApplyPage() {
   }
   function next() { if (stepValid(step)) { setStep(step + 1); window.scrollTo({ top: 0, behavior: "smooth" }); } }
   function back() { setStep(step - 1); window.scrollTo({ top: 0, behavior: "smooth" }); }
-  const [state, setState] = useState<{ status: "idle" | "sending" | "error"; message?: string } | { status: "sent"; reference: string }>({ status: "idle" });
+  const [state, setState] = useState<{ status: "idle" | "sending" | "error"; message?: string } | { status: "sent"; reference: string; paymentIssue?: boolean }>({ status: "idle" });
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -142,7 +142,8 @@ function ApplyPage() {
           postToPayFast(checkout);
           return;
         } catch {
-          setState({ status: "sent", reference: result.reference + " — your application is saved, but the deposit payment couldn't start. Please speak to the college admin." });
+          setState({ status: "sent", reference: result.reference, paymentIssue: true });
+          window.scrollTo({ top: 0 });
           return;
         }
       }
@@ -165,6 +166,12 @@ function ApplyPage() {
         <p className="mt-4 text-muted-foreground">
           Your reference is <strong className="text-foreground">{state.reference}</strong>. Our admissions team will review it and be in touch shortly.
         </p>
+        {state.paymentIssue && (
+          <p className="mt-4 rounded-xl border border-border bg-muted p-4 text-sm">
+            Your application is saved, but the deposit payment couldn't open just now. No money was taken — please{" "}
+            <Link to="/contact" className="font-bold underline">speak to the college admin</Link> or call 081 589 1088 to pay your deposit.
+          </p>
+        )}
         <Link to="/courses" className="mt-8 inline-block rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-foreground">Back to courses</Link>
       </section>
     );
