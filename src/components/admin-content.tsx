@@ -4,6 +4,9 @@ import { useServerFn } from "@tanstack/react-start";
 import { catalogueQueryOptions } from "@/lib/catalogue-queries";
 import { deleteCourse, deleteDual, saveCourse, saveDual } from "@/lib/content.functions";
 import { COURSE_TYPES, type Course, type CourseType, type DualCourse } from "@/data/courses";
+import { CoursePhoto } from "@/components/brochure-visuals";
+import { Button } from "@/components/ui/button";
+import { courseImageSchema } from "@/lib/course-images";
 
 const field =
   "mt-1 block w-full rounded-lg border border-border bg-background px-3 py-2 text-sm font-normal normal-case tracking-normal text-foreground";
@@ -97,6 +100,7 @@ function CourseForm({
     outline: course?.outline ?? "",
     requirements: course?.requirements ?? "",
     signature: course?.signature ?? false,
+    imageUrl: course?.imageUrl ?? "",
   });
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -105,6 +109,11 @@ function CourseForm({
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
+    const image = courseImageSchema.safeParse(form.imageUrl);
+    if (!image.success) {
+      setError("Use an https:// image address or a path starting with /.");
+      return;
+    }
     setBusy(true);
     setError(null);
     try {
@@ -124,6 +133,7 @@ function CourseForm({
           outline: form.outline.trim() || null,
           requirements: form.requirements.trim() || null,
           signature: form.signature,
+          imageUrl: image.data || null,
         },
       });
       await queryClient.invalidateQueries({ queryKey: ["catalogue"] });
@@ -195,6 +205,16 @@ function CourseForm({
         Short summary (shown on course cards)
         <textarea required rows={3} value={form.description} onChange={(e) => set("description", e.target.value)} className={field} />
       </label>
+      <div className="grid items-start gap-5 sm:grid-cols-[1fr_160px]">
+        <div className="space-y-3">
+          <label className={label}>
+            Course image address (optional)
+            <input value={form.imageUrl} onChange={(e) => set("imageUrl", e.target.value)} placeholder="https://… or /images/course.jpg" className={field} />
+          </label>
+          <Button type="button" variant="outline" size="sm" disabled={!form.imageUrl} onClick={() => set("imageUrl", "")}>Use brochure image</Button>
+        </div>
+        <CoursePhoto course={{ name: form.name || "Course image", faculty: form.facultyId as Course["faculty"], imageUrl: form.imageUrl }} />
+      </div>
       <p className="text-xs text-muted-foreground">
         Course page sections — leave a blank line between paragraphs; start a line with "- " for a bullet point. Empty sections are hidden.
       </p>

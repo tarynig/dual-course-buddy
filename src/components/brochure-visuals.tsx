@@ -1,5 +1,6 @@
 import { AudioLines, Clapperboard, Drama, Monitor, Shirt, Cpu, MessagesSquare, Layers } from 'lucide-react';
-import type { FacultyId } from '@/data/courses';
+import type { Course, FacultyId } from '@/data/courses';
+import { coursePhoto } from '@/lib/course-images';
 import { facultyImages } from '@/lib/brochure-images';
 import { cn } from '@/lib/utils';
 
@@ -17,4 +18,16 @@ export function NumberedBar({ number, title, dual = false }: { number: number; t
 export function FacultyPhoto({ faculty, className }: { faculty: FacultyId; className?: string }) {
   const photo = facultyImages[faculty];
   return <div className={cn('brochure-photo', className)}><img src={photo.src} alt={photo.alt} loading="lazy" width="600" height="600" /></div>;
+}
+
+export function CoursePhoto({ course, className }: { course: Pick<Course, 'name' | 'faculty' | 'imageUrl'>; className?: string }) {
+  const photo = coursePhoto(course);
+  const fallback = facultyImages[course.faculty];
+  return <div className={cn('brochure-photo', className)}><img key={photo.src} src={photo.src} alt={photo.alt} loading="lazy" width="600" height="600" onError={(event) => {
+    const image = event.currentTarget;
+    if (image.getAttribute('src') !== fallback.src) {
+      image.src = fallback.src;
+      image.alt = fallback.alt;
+    }
+  }} /></div>;
 }

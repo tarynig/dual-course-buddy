@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { courseImageSchema } from "./course-images";
 
 const slug = (text: string) =>
   text
@@ -23,6 +24,7 @@ const courseSchema = z.object({
   outline: z.string().trim().max(20000).nullable(),
   requirements: z.string().trim().max(10000).nullable(),
   signature: z.boolean(),
+  imageUrl: courseImageSchema.nullable().optional(),
 });
 
 export const saveCourse = createServerFn({ method: "POST" })
@@ -38,6 +40,7 @@ export const saveCourse = createServerFn({ method: "POST" })
     const careers = data.careers || null;
     const outline = data.outline || null;
     const requirements = data.requirements || null;
+    const imageUrl = data.imageUrl || null;
 
     if (data.id) {
       await sql`
@@ -45,7 +48,7 @@ export const saveCourse = createServerFn({ method: "POST" })
           faculty_id = ${data.facultyId}, name = ${data.name}, months = ${data.months},
           type = ${data.type}, award = ${data.award}, saqa = ${saqa},
           description = ${data.description}, details = ${details}, signature = ${data.signature},
-          certification = ${certification}, careers = ${careers}, outline = ${outline}, requirements = ${requirements}
+          certification = ${certification}, careers = ${careers}, outline = ${outline}, requirements = ${requirements}, image_url = ${imageUrl}
         WHERE id = ${data.id}
       `;
       return { ok: true as const, id: data.id };
@@ -61,11 +64,11 @@ export const saveCourse = createServerFn({ method: "POST" })
 
     await sql`
       INSERT INTO public.courses
-        (id, faculty_id, name, months, type, award, saqa, description, details, signature, certification, careers, outline, requirements, sort_order)
+        (id, faculty_id, name, months, type, award, saqa, description, details, signature, certification, careers, outline, requirements, image_url, sort_order)
       VALUES (
         ${id}, ${data.facultyId}, ${data.name}, ${data.months}, ${data.type}, ${data.award},
         ${saqa}, ${data.description}, ${details}, ${data.signature},
-        ${certification}, ${careers}, ${outline}, ${requirements},
+        ${certification}, ${careers}, ${outline}, ${requirements}, ${imageUrl},
         (SELECT COALESCE(MAX(sort_order), 0) + 1 FROM public.courses)
       )
     `;
