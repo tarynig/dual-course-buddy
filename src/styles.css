@@ -164,3 +164,10 @@
 .brochure-faculty-link .brochure-photo { width:6rem; flex-shrink:0; padding:.25rem; }
 @media(max-width:900px) { .brochure-faculty-layout { grid-template-columns:minmax(0,1fr); } .brochure-faculty-layout > .brochure-photo { width:13rem; grid-row:1; justify-self:center; position:static; margin:0; } }
 @media(max-width:480px) { .brochure-faculty-bar h2 { font-size:1.1rem; } .brochure-faculty-bar { gap:.6rem; } .brochure-course-bar h3 { font-size:.9rem; } }
+
+.rich-editor { white-space: pre-wrap; overflow-y: auto; outline: none; }
+.rich-editor:empty::before, .rich-editor:has(> div:only-child > br:only-child)::before { content: attr(data-placeholder); color: var(--muted-foreground); pointer-events: none; }
+.rich-editor:has(> div:only-child > br:only-child)::before { position: absolute; }
+.rich-editor ul { list-style: disc; padding-left: 1.25rem; }
+.rich-editor a { color: var(--primary); text-decoration: underline; }
+.rich-editor b, .rich-editor strong { font-weight: 700; }
