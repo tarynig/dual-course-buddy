@@ -7,7 +7,7 @@ test("November brochure durations, replacements and pairings match the stored ca
   assert.ok(url, "DATABASE_URL is required for the catalogue regression test");
   const sql = postgres(url, { ssl: "require", prepare: false, fetch_types: false, max: 1 });
   try {
-    const courses = await sql`SELECT id, months, is_active FROM public.courses`;
+    const courses = await sql<Array<{ id: string; months: number; is_active: boolean }>>`SELECT id, months, is_active FROM public.courses`;
     const expected = {
       "sound-engineering": 12, "dj-mio": 10, "radio-podcasting": 12,
       "content-production": 15, "motion-graphics": 12, animation: 12,
@@ -20,11 +20,11 @@ test("November brochure durations, replacements and pairings match the stored ca
     }
     assert.equal(courses.find(c => c.id === "graphic-animation")?.is_active, false);
     assert.equal(courses.filter(c => c.is_active).length, 31);
-    const duals = await sql`SELECT id, months, is_active FROM public.dual_courses`;
+    const duals = await sql<Array<{ id: string; months: number; is_active: boolean }>>`SELECT id, months, is_active FROM public.dual_courses`;
     assert.equal(duals.filter(d => d.is_active).length, 22);
     for (const id of ["d-advanced-graphic", "d-graphic-animation", "d-graphic-web", "d-fashion-sewing"])
       assert.equal(duals.find(d => d.id === id)?.is_active, false, id);
-    const links = await sql`SELECT dual_id, course_id FROM public.dual_course_courses`;
+    const links = await sql<Array<{ dual_id: string; course_id: string }>>`SELECT dual_id, course_id FROM public.dual_course_courses`;
     for (const [id, ids] of Object.entries({
       "d-graphic-animation-101": ["graphic-media", "animation-101"],
       "d-animation-graphic-101": ["animation", "graphic-design-101"],
