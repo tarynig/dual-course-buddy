@@ -76,6 +76,123 @@ export type Database = {
         }
         Relationships: []
       }
+      applications: {
+        Row: {
+          cell: string
+          course_id: string | null
+          created_at: string
+          current_grade: string | null
+          date_of_birth: string
+          dual_course_id: string | null
+          email: string
+          first_name: string
+          gender: string
+          grade_year: number
+          highest_grade: string
+          home_language: string
+          id: string
+          id_number: string
+          institution_completed: boolean | null
+          institution_name: string | null
+          institution_qualification: string | null
+          item_name: string | null
+          last_name: string
+          last_school: string
+          location: string
+          payer_address: string
+          payer_email: string
+          payer_employment: string
+          payer_first_name: string
+          payer_id_number: string
+          payer_last_name: string
+          payer_phone: string
+          payer_relationship: string
+          status: string
+          studied_elsewhere: boolean
+        }
+        Insert: {
+          cell: string
+          course_id?: string | null
+          created_at?: string
+          current_grade?: string | null
+          date_of_birth: string
+          dual_course_id?: string | null
+          email: string
+          first_name: string
+          gender: string
+          grade_year: number
+          highest_grade: string
+          home_language: string
+          id?: string
+          id_number: string
+          institution_completed?: boolean | null
+          institution_name?: string | null
+          institution_qualification?: string | null
+          item_name?: string | null
+          last_name: string
+          last_school: string
+          location: string
+          payer_address: string
+          payer_email: string
+          payer_employment: string
+          payer_first_name: string
+          payer_id_number: string
+          payer_last_name: string
+          payer_phone: string
+          payer_relationship: string
+          status?: string
+          studied_elsewhere?: boolean
+        }
+        Update: {
+          cell?: string
+          course_id?: string | null
+          created_at?: string
+          current_grade?: string | null
+          date_of_birth?: string
+          dual_course_id?: string | null
+          email?: string
+          first_name?: string
+          gender?: string
+          grade_year?: number
+          highest_grade?: string
+          home_language?: string
+          id?: string
+          id_number?: string
+          institution_completed?: boolean | null
+          institution_name?: string | null
+          institution_qualification?: string | null
+          item_name?: string | null
+          last_name?: string
+          last_school?: string
+          location?: string
+          payer_address?: string
+          payer_email?: string
+          payer_employment?: string
+          payer_first_name?: string
+          payer_id_number?: string
+          payer_last_name?: string
+          payer_phone?: string
+          payer_relationship?: string
+          status?: string
+          studied_elsewhere?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "applications_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "applications_dual_course_id_fkey"
+            columns: ["dual_course_id"]
+            isOneToOne: false
+            referencedRelation: "dual_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       course_payment_plans: {
         Row: {
           course_id: string
