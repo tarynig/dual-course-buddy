@@ -68,3 +68,14 @@ the host runs `npm run build:node` rather than the default `npm run build`.
   plain PostgreSQL functions — no external login service is involved.
 - Outbound mail goes through `src/lib/mail.server.ts` only. Swapping to a different mail provider
   later means editing that one file.
+
+## PayFast deposits
+
+Set these in the server's environment (cPanel → Setup Node.js App → Environment Variables):
+
+- `PAYFAST_MODE` — `live` for real payments; leave unset to use PayFast's test sandbox
+- `PAYFAST_MERCHANT_ID`, `PAYFAST_MERCHANT_KEY` — PayFast dashboard → Settings → Integration
+- `PAYFAST_PASSPHRASE` — the same passphrase saved on that PayFast settings page
+- `SITE_URL` — e.g. `https://www.creativearts.co.za` (used for return and notify links)
+
+PayFast confirms each payment by calling `https://<your site>/api/public/payfast/notify`; the site must be reachable on the internet over HTTPS for deposits to show as "paid".
