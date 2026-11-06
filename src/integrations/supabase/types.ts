@@ -165,6 +165,82 @@ export type Database = {
           },
         ]
       }
+      deposit_payments: {
+        Row: {
+          amount: number
+          amount_paid: number | null
+          course_id: string | null
+          created_at: string
+          dual_course_id: string | null
+          email: string
+          full_name: string
+          id: string
+          item_name: string
+          paid_at: string | null
+          phone: string
+          plan_id: string | null
+          plan_name: string | null
+          provider_ref: string | null
+          status: string
+        }
+        Insert: {
+          amount: number
+          amount_paid?: number | null
+          course_id?: string | null
+          created_at?: string
+          dual_course_id?: string | null
+          email: string
+          full_name: string
+          id?: string
+          item_name: string
+          paid_at?: string | null
+          phone: string
+          plan_id?: string | null
+          plan_name?: string | null
+          provider_ref?: string | null
+          status?: string
+        }
+        Update: {
+          amount?: number
+          amount_paid?: number | null
+          course_id?: string | null
+          created_at?: string
+          dual_course_id?: string | null
+          email?: string
+          full_name?: string
+          id?: string
+          item_name?: string
+          paid_at?: string | null
+          phone?: string
+          plan_id?: string | null
+          plan_name?: string | null
+          provider_ref?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deposit_payments_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deposit_payments_dual_course_id_fkey"
+            columns: ["dual_course_id"]
+            isOneToOne: false
+            referencedRelation: "dual_courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deposit_payments_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "payment_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dual_course_courses: {
         Row: {
           course_id: string
