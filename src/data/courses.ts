@@ -88,6 +88,7 @@ export const separateMonths = (courses: Course[], dual: DualCourse): number =>
 
 export const contact = {
   phone: "081 589 1088",
+  whatsapp: "https://api.whatsapp.com/send?phone=27815891088",
   website: "www.creativearts.co.za",
   campuses: [
     { city: "Durban", phone: "031 301 3313", address: "86 Stephen Dlamini Road, Musgrave" },
