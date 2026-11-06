@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
 import { catalogueQueryOptions } from "@/lib/catalogue-queries";
 import { deleteCourse, deleteDual, saveCourse, saveDual } from "@/lib/content.functions";
 import { COURSE_TYPES, type Course, type CourseType, type DualCourse } from "@/data/courses";
