@@ -56,6 +56,11 @@ the host runs `npm run build:node` rather than the default `npm run build`.
 
 ## Notes
 
+- For an existing database imported before the November brochure update, run
+  `database/update-catalogue-2027-11-04.sql` once before starting the updated app.
+  The fresh-import file already includes it. Older offerings are retained as inactive so
+  historical enquiries remain intact; payment plans and savings are not changed.
+
 - Editor-only leftovers, not used by the site and safe to delete on your server: the
   `src/integrations` folder, the `supabase` folder, the editor's `.env`, and the `@supabase/supabase-js`
   package entry. The editor regenerates these, so they are only removed from your copy.

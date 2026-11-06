@@ -11,6 +11,10 @@ export const Route = createFileRoute("/")({
     meta: [
       { property: 'og:type', content: 'website' },
       { name: 'twitter:card', content: 'summary_large_image' },
+      ...(brochureStudent.startsWith("https://") ? [
+        { property: "og:image", content: brochureStudent },
+        { name: "twitter:image", content: brochureStudent },
+      ] : []),
       { title: "Creative Arts College | Where Education & Industry Meet" },
       {
         name: "description",
