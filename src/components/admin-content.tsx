@@ -252,7 +252,7 @@ function CourseForm({
         <button type="button" onClick={onDone} className="rounded-full border border-border px-6 py-2 text-sm font-bold">
           Cancel
         </button>
-        {course && (
+        {savedId && (
           <button type="button" onClick={handleDelete} className="ml-auto text-sm font-bold text-destructive underline">
             Delete course
           </button>
@@ -340,6 +340,8 @@ function DualForm({
   const [months, setMonths] = useState(String(dual?.months ?? 12));
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  // See CourseForm: the dual's id, or the id returned once a new dual is first saved.
+  const [savedId, setSavedId] = useState(dual?.id ?? null);
 
   const course = (id: string) => courses.find((c) => c.id === id);
   // When the pair changes, suggest a name, faculty and the longer of the two durations.
@@ -362,11 +364,12 @@ function DualForm({
     setError(null);
     try {
       const result = await save({
-        data: { id: dual?.id ?? null, title, facultyId, months: Number(months), courseIds: [first, second] },
+        data: { id: savedId, title, facultyId, months: Number(months), courseIds: [first, second] },
       });
       if (!result.ok) return setError(result.error);
       await queryClient.invalidateQueries({ queryKey: ["catalogue"] });
-      onDone();
+      setSavedId(result.id);
+      toast.success(dual || savedId ? "Dual course saved" : "Dual course added");
     } catch {
       setError("Couldn't save. Make sure both courses are chosen and a name is filled in.");
     } finally {
@@ -375,10 +378,12 @@ function DualForm({
   }
 
   async function handleDelete() {
-    if (!dual || !confirm(`Delete "${dual.title}"? The single courses stay.`)) return;
-    const result = await remove({ data: { id: dual.id } });
+    if (!savedId) return;
+    if (!confirm(`Delete "${title}"? The single courses stay.`)) return;
+    const result = await remove({ data: { id: savedId } });
     if (!result.ok) return setError(result.error);
     await queryClient.invalidateQueries({ queryKey: ["catalogue"] });
+    toast.success("Dual course deleted");
     onDone();
   }
 
