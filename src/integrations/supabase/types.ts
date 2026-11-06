@@ -309,6 +309,7 @@ export type Database = {
           id: string
           item_name: string
           paid_at: string | null
+          payment_kind: string
           phone: string
           plan_id: string | null
           plan_name: string | null
@@ -326,6 +327,7 @@ export type Database = {
           id?: string
           item_name: string
           paid_at?: string | null
+          payment_kind?: string
           phone: string
           plan_id?: string | null
           plan_name?: string | null
@@ -343,6 +345,7 @@ export type Database = {
           id?: string
           item_name?: string
           paid_at?: string | null
+          payment_kind?: string
           phone?: string
           plan_id?: string | null
           plan_name?: string | null

@@ -1,0 +1,1 @@
+ALTER TABLE public.deposit_payments ADD COLUMN IF NOT EXISTS payment_kind text NOT NULL DEFAULT 'deposit'; COMMENT ON COLUMN public.deposit_payments.payment_kind IS 'deposit for historical payments; booking for the only current online payment';
