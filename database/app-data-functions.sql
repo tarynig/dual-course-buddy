@@ -13,6 +13,16 @@
 --
 -- Safe to re-run: everything is CREATE OR REPLACE.
 
+-- --------------------------------------------------------------- shared helper --
+
+-- Timestamps as text the browser can turn back into a date.
+create or replace function public.app_iso(ts timestamptz)
+returns text
+language sql immutable
+as $$
+  select replace(to_char(ts at time zone 'UTC', 'YYYY-MM-DD HH24:MI:SS'), ' ', 'T') || 'Z';
+$$;
+
 -- ---------------------------------------------------------------- catalogue --
 
 -- Everything the public site needs to show in one call.
@@ -214,9 +224,7 @@ begin
     lower(payload->>'email'), payload->>'cell',
     nullif(payload->>'lastSchool', ''), nullif(payload->>'highestGrade', ''),
     nullif(payload->>'gradeYear', '')::int, nullif(payload->>'currentGrade', ''),
-    case when payload ? 'studiedElsewhere' and payload->>'studiedElsewhere' is not null
-         then v_elsewhere else null end,
-    case when v_elsewhere then nullif(payload->>'institutionName', '') end,
+    case when v_elsewhere then (payload->>'institutionCompleted') = 'yes' else null end,
     case when v_elsewhere then nullif(payload->>'institutionQualification', '') end,
     case when v_elsewhere then (payload->>'institutionCompleted') = 'yes' else null end,
     payload->>'payerFirstName', payload->>'payerLastName', payload->>'payerPhone',
@@ -435,17 +443,13 @@ $$;
 -- -------------------------------------------------------------- course content --
 
 -- Turns a name into a web address fragment, e.g. "Sound Engineering" -> "sound-engineering".
-create or replace function public.app_slug(text)
+create or replace function public.app_slug(input text)
 returns text
 language sql immutable
 as $$
   select coalesce(
     nullif(
-      regexp_replace(
-        trim(both '-' from
-          regexp_replace(lower(coalesce($1, '')), '[^a-z0-9]+', '-', 'g')
-        ),
-        ''),
+      btrim(regexp_replace(lower(coalesce(input, '')), '[^a-z0-9]+', '-', 'g'), '-'),
       'item');
 $$;
 
