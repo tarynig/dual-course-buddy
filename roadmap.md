@@ -30,3 +30,5 @@
 - [ ] Enter real payment plans and savings in the Fees tab.
 - [x] Apply wizard: the applicant's education section is fully optional — every field may be left blank and the application still submits; blanks show as "—" in the admin Applications tab.
 - [x] Demo address loading again: every data operation moved into saved database routines (`database/app-data-functions.sql`) reached through `src/lib/data.server.ts`, which picks Lovable's Data API or plain SQL over `DATABASE_URL` from the server's environment. Own-hosting pieces kept, directions in `LIVE-HOSTING.md`.
+
+- [ ] Admin email notifications to one shared inbox: new enquiry, new application, booking fee paid, payment failed/cancelled. Blocked: waiting on SMTP login details + inbox address from Taryn.
