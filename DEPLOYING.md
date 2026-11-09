@@ -44,8 +44,11 @@ step is skipped with a note in the server log.
   then start the app.
 5. Create the database tables and load the data: run the plain PostgreSQL file
    `database/schema-and-catalogue.sql` against the empty database
-   (`psql "your connection string" -f database/schema-and-catalogue.sql`), then create the first
-   admin with the INSERT shown at the end of that file.
+   (`psql "your connection string" -f database/schema-and-catalogue.sql`), then run
+   `database/app-data-functions.sql` the same way — that file holds the saved
+   operations the site calls by name (see `LIVE-HOSTING.md`). Both are safe to run
+   more than once and neither changes existing rows. Then create the first admin
+   with the INSERT shown at the end of the schema file.
 6. Check: the course pages render, the Apply form stores an enquiry, and the sign-in works.
 
 ## First deploy: one thing to confirm
@@ -66,9 +69,12 @@ the host runs `npm run build:node` rather than the default `npm run build`.
   The fresh-import file already includes it. Older offerings are retained as inactive so
   historical enquiries remain intact; payment plans and savings are not changed.
 
-- Editor-only leftovers, not used by the site and safe to delete on your server: the
-  `src/integrations` folder, the `supabase` folder, the editor's `.env`, and the `@supabase/supabase-js`
-  package entry. The editor regenerates these, so they are only removed from your copy.
+- Editor-only leftovers, not used at runtime on your server but **keep them in the
+  code**: the `src/integrations` folder and the `@supabase/supabase-js` package entry
+  are read by the build even though your server never uses them — deleting them makes
+  the build fail. With no Lovable database credentials in your environment, nothing in
+  them is ever reached. The editor's own `.env` and the `supabase` folder can go.
+  See `LIVE-HOSTING.md` for the whole picture.
 - Accounts, logins and password hashing are the site's own tables (`app_users`, `app_sessions`) and
   plain PostgreSQL functions — no external login service is involved.
 - Outbound mail goes through `src/lib/mail.server.ts` only. Swapping to a different mail provider
