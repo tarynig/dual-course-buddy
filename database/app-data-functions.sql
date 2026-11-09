@@ -62,6 +62,10 @@ as $$
           'type', c.type,
           'award', c.award,
           'saqa', c.saqa,
+          'nqfLevel', c.nqf_level,
+          'credits', c.credits,
+          'accreditation', c.accreditation,
+          'courseCode', c.course_code,
           'description', c.description,
           'signature', c.signature,
           'details', c.details,
@@ -470,6 +474,10 @@ begin
       type = payload->>'type',
       award = payload->>'award',
       saqa = nullif(payload->>'saqa', ''),
+      nqf_level = nullif(payload->>'nqfLevel', ''),
+      credits = nullif(payload->>'credits', '')::int,
+      accreditation = nullif(payload->>'accreditation', ''),
+      course_code = nullif(payload->>'courseCode', ''),
       description = payload->>'description',
       details = nullif(payload->>'details', ''),
       certification = nullif(payload->>'certification', ''),
@@ -490,11 +498,13 @@ begin
   end loop;
 
   insert into public.courses
-    (id, faculty_id, name, months, type, award, saqa, description, details,
+    (id, faculty_id, name, months, type, award, saqa, nqf_level, credits, accreditation, course_code, description, details,
      certification, careers, outline, requirements, signature, image_url, sort_order)
   values (
     v_new, payload->>'facultyId', payload->>'name', (payload->>'months')::int,
     payload->>'type', payload->>'award', nullif(payload->>'saqa', ''),
+    nullif(payload->>'nqfLevel', ''), nullif(payload->>'credits', '')::int,
+    nullif(payload->>'accreditation', ''), nullif(payload->>'courseCode', ''),
     payload->>'description', nullif(payload->>'details', ''),
     nullif(payload->>'certification', ''), nullif(payload->>'careers', ''),
     nullif(payload->>'outline', ''), nullif(payload->>'requirements', ''),
