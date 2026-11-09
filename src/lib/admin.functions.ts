@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { callData } from "./data.server";
 
 export type AdminEnquiry = {
   id: string;
@@ -27,49 +28,9 @@ export const getAdminSession = createServerFn({ method: "GET" }).handler(async (
 
 export const getAdminEnquiries = createServerFn({ method: "GET" }).handler(
   async (): Promise<Array<AdminEnquiry>> => {
-    const { db } = await import("./db.server");
     const { requireAdmin } = await import("./session.server");
     await requireAdmin();
-
-    const rows = await db()<
-      Array<{
-        id: string;
-        full_name: string;
-        phone: string;
-        email: string;
-        course_id: string | null;
-        dual_course_id: string | null;
-        course_name: string | null;
-        dual_name: string | null;
-        campus: string;
-        message: string | null;
-        status: string;
-        created_at: Date;
-      }>
-    >`
-      SELECT e.id, e.full_name, e.phone, e.email, e.course_id, e.dual_course_id,
-             e.campus, e.message, e.status, e.created_at,
-             c.name AS course_name, d.title AS dual_name
-      FROM public.enquiries e
-      LEFT JOIN public.courses c ON c.id = e.course_id
-      LEFT JOIN public.dual_courses d ON d.id = e.dual_course_id
-      ORDER BY e.created_at DESC
-    `;
-
-    return rows.map((row) => ({
-      id: row.id,
-      fullName: row.full_name,
-      phone: row.phone,
-      email: row.email,
-      courseId: row.course_id,
-      dualCourseId: row.dual_course_id,
-      courseName: row.course_name,
-      dualName: row.dual_name,
-      campus: row.campus,
-      message: row.message,
-      status: row.status,
-      createdAt: new Date(row.created_at).toISOString(),
-    }));
+    return (await callData<AdminEnquiry[]>("app_list_enquiries")) ?? [];
   },
 );
 
@@ -83,13 +44,9 @@ export const setEnquiryStatus = createServerFn({ method: "POST" })
       .parse(data),
   )
   .handler(async ({ data }) => {
-    const { db } = await import("./db.server");
     const { requireAdmin } = await import("./session.server");
     await requireAdmin();
-
-    await db()`
-      UPDATE public.enquiries SET status = ${data.status} WHERE id = ${data.id}
-    `;
+    await callData("app_set_enquiry_status", { ...data });
     return { ok: true as const };
   });
 
@@ -109,35 +66,20 @@ export const savePlan = createServerFn({ method: "POST" })
       .parse(data),
   )
   .handler(async ({ data }) => {
-    const { db } = await import("./db.server");
     const { requireAdmin } = await import("./session.server");
     await requireAdmin();
-    const sql = db();
-    const notes = data.notes || null;
-    if (data.id) {
-      await sql`
-        UPDATE public.payment_plans SET name = ${data.name}, deposit = ${data.deposit},
-          instalments = ${data.instalments}, instalment_amount = ${data.instalmentAmount},
-          notes = ${notes}
-        WHERE id = ${data.id}
-      `;
-    } else {
-      await sql`
-        INSERT INTO public.payment_plans (name, deposit, instalments, instalment_amount, notes, sort_order)
-        VALUES (${data.name}, ${data.deposit}, ${data.instalments}, ${data.instalmentAmount}, ${notes},
-          (SELECT COALESCE(MAX(sort_order), 0) + 1 FROM public.payment_plans))
-      `;
-    }
+    const result = await callData<{ ok: boolean; error?: string }>("app_save_plan", { ...data });
+    if (!result?.ok) return { ok: false as const, error: result?.error ?? "Couldn't save the plan." };
     return { ok: true as const };
   });
 
 export const deletePlan = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => z.object({ id: z.string().uuid() }).parse(data))
   .handler(async ({ data }) => {
-    const { db } = await import("./db.server");
     const { requireAdmin } = await import("./session.server");
     await requireAdmin();
-    await db()`DELETE FROM public.payment_plans WHERE id = ${data.id}`;
+    const result = await callData<{ ok: boolean; error?: string }>("app_delete_plan", { ...data });
+    if (!result?.ok) return { ok: false as const, error: result?.error ?? "Couldn't delete the plan." };
     return { ok: true as const };
   });
 
@@ -154,22 +96,10 @@ export const setItemPlans = createServerFn({ method: "POST" })
       .parse(data),
   )
   .handler(async ({ data }) => {
-    const { db } = await import("./db.server");
     const { requireAdmin } = await import("./session.server");
     await requireAdmin();
-    const sql = db();
-    await sql.begin(async (tx) => {
-      if (data.kind === "course") {
-        await tx`DELETE FROM public.course_payment_plans WHERE course_id = ${data.id}`;
-        for (const planId of data.planIds)
-          await tx`INSERT INTO public.course_payment_plans (course_id, plan_id) VALUES (${data.id}, ${planId})`;
-      } else {
-        await tx`DELETE FROM public.dual_payment_plans WHERE dual_id = ${data.id}`;
-        for (const planId of data.planIds)
-          await tx`INSERT INTO public.dual_payment_plans (dual_id, plan_id) VALUES (${data.id}, ${planId})`;
-        await tx`UPDATE public.dual_courses SET saving = ${data.saving ?? null} WHERE id = ${data.id}`;
-      }
-    });
+    const result = await callData<{ ok: boolean; error?: string }>("app_set_item_plans", { ...data });
+    if (!result?.ok) return { ok: false as const, error: result?.error ?? "Couldn't save the plan choices." };
     return { ok: true as const };
   });
 

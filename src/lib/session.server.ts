@@ -1,6 +1,6 @@
 // Cookie-backed sessions stored in our own Postgres tables.
 import { getCookie, setCookie, deleteCookie } from "@tanstack/react-start/server";
-import { db } from "./db.server";
+import { callData } from "./data.server";
 
 export const SESSION_COOKIE = "cac_session";
 const SESSION_DAYS = 14;
@@ -26,10 +26,11 @@ export async function createSession(userId: string): Promise<void> {
   const tokenHash = await sha256(token);
   const expiresAt = new Date(Date.now() + SESSION_DAYS * 24 * 60 * 60 * 1000);
 
-  await db()`
-    INSERT INTO public.app_sessions (user_id, token_hash, expires_at)
-    VALUES (${userId}, ${tokenHash}, ${expiresAt})
-  `;
+  await callData("app_add_session", {
+    userId,
+    tokenHash,
+    expiresAt: expiresAt.toISOString(),
+  });
 
   setCookie(SESSION_COOKIE, token, {
     httpOnly: true,
@@ -49,23 +50,14 @@ export async function readSession(): Promise<SessionUser | null> {
   if (!token) return null;
 
   const tokenHash = await sha256(token);
-  const rows = await db()<Array<SessionUser>>`
-    SELECT u.id, u.email, u.role
-    FROM public.app_sessions s
-    JOIN public.app_users u ON u.id = s.user_id
-    WHERE s.token_hash = ${tokenHash}
-      AND s.expires_at > now()
-      AND u.is_active
-    LIMIT 1
-  `;
-  return rows[0] ?? null;
+  return await callData<SessionUser | null>("app_read_session", { tokenHash });
 }
 
 export async function destroySession(): Promise<void> {
   const token = getCookie(SESSION_COOKIE);
   if (token) {
     const tokenHash = await sha256(token);
-    await db()`DELETE FROM public.app_sessions WHERE token_hash = ${tokenHash}`;
+    await callData("app_delete_session", { tokenHash });
   }
   deleteCookie(SESSION_COOKIE, { path: "/", secure: true, sameSite: "none", partitioned: true });
 }

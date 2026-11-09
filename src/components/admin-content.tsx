@@ -142,6 +142,7 @@ function CourseForm({
         },
       });
       await queryClient.invalidateQueries({ queryKey: ["catalogue"] });
+      if (!result.ok) return setError(result.error);
       // Stay on the form and just confirm the save; adopting the returned id means
       // a second save updates the same course instead of adding a duplicate.
       setSavedId(result.id);
