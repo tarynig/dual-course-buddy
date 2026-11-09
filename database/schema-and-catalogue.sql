@@ -63,7 +63,11 @@ CREATE TABLE public.courses (
     signature boolean DEFAULT false NOT NULL,
     sort_order integer DEFAULT 0 NOT NULL,
     details text,
-    image_url text
+    image_url text,
+    nqf_level text,
+    credits integer,
+    accreditation text,
+    course_code text
 );
 
 CREATE TABLE public.dual_course_courses (
