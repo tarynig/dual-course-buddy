@@ -9,11 +9,20 @@ import type {
   PaymentPlan,
   FacultyId,
 } from "@/data/courses";
+import { callData } from "./data.server";
 
-type FacultyRow = { id: string; name: string; tagline: string };
-type CourseRow = {
+// Shapes returned by the saved catalogue operation (database/app-data-functions.sql).
+type PlanPayload = {
   id: string;
-  faculty_id: string;
+  name: string;
+  deposit: string | number;
+  instalments: number;
+  instalmentAmount: string | number;
+  notes: string | null;
+};
+type CoursePayload = {
+  id: string;
+  facultyId: string;
   name: string;
   months: number;
   type: string;
@@ -26,127 +35,76 @@ type CourseRow = {
   careers: string | null;
   outline: string | null;
   requirements: string | null;
-  image_url: string | null;
-  plan_ids: string;
+  imageUrl: string | null;
+  planIds: string[];
 };
-type PlanRow = {
-  id: string;
-  name: string;
-  deposit: string | number;
-  instalments: number;
-  instalment_amount: string | number;
-  notes: string | null;
-};
-type DualRow = {
+type DualPayload = {
   id: string;
   title: string;
-  faculty_id: string;
+  facultyId: string;
   months: number;
   saving: string | number | null;
-  plan_ids: string;
-  course_ids: string;
+  courseIds: string[];
+  planIds: string[];
+};
+type FacultyPayload = { id: string; name: string; tagline: string };
+type CataloguePayload = {
+  faculties: FacultyPayload[];
+  courses: CoursePayload[];
+  duals: DualPayload[];
+  plans: PlanPayload[];
 };
 
 const toNumber = (value: string | number | null): number | null =>
   value === null || value === undefined ? null : Number(value);
 
-// Run one query at a time over the single connection rather than pipelining them.
-async function sequential<T extends ReadonlyArray<unknown>>(
-  queries: { [K in keyof T]: PromiseLike<T[K]> },
-): Promise<T> {
-  const out: unknown[] = [];
-  for (const q of queries as ReadonlyArray<PromiseLike<unknown>>) out.push(await q);
-  return out as unknown as T;
-}
-
 export const getCatalogue = createServerFn({ method: "GET" }).handler(
   async (): Promise<Catalogue> => {
-    const { db } = await import("./db.server");
-    const sql = db();
-
     try {
-      const [facultyRows, courseRows, dualRows, planRows] = await sequential([
-        sql<Array<FacultyRow>>`
-          SELECT id, name, tagline FROM public.faculties ORDER BY sort_order
-        `,
-        sql<Array<CourseRow>>`
-          SELECT id, faculty_id, name, months, type, award, saqa, description,
-                 signature, details, certification, careers, outline, requirements, image_url,
-                 COALESCE((SELECT string_agg(p.plan_id::text, ',') FROM public.course_payment_plans p
-                           WHERE p.course_id = courses.id), '') AS plan_ids
-          FROM public.courses
-          WHERE is_active
-          ORDER BY sort_order
-        `,
-        sql<Array<DualRow>>`
-          SELECT d.id, d.title, d.faculty_id, d.months, d.saving,
-                 COALESCE((SELECT string_agg(p.plan_id::text, ',') FROM public.dual_payment_plans p
-                           WHERE p.dual_id = d.id), '') AS plan_ids,
-                 COALESCE(
-                   (SELECT string_agg(i.course_id, ',' ORDER BY i.position)
-                    FROM public.dual_course_courses i
-                    WHERE i.dual_id = d.id),
-                   ''
-                 ) AS course_ids
-          FROM public.dual_courses d
-          WHERE d.is_active
-            AND NOT EXISTS (
-              SELECT 1 FROM public.dual_course_courses i
-              JOIN public.courses c ON c.id = i.course_id
-              WHERE i.dual_id = d.id AND NOT c.is_active
-            )
-          ORDER BY d.sort_order
-        `,
-        sql<Array<PlanRow>>`
-          SELECT id::text AS id, name, deposit, instalments, instalment_amount, notes
-          FROM public.payment_plans ORDER BY sort_order, created_at
-        `,
-      ]);
+      const raw = await callData<CataloguePayload>("app_get_catalogue");
 
-      const plans: Array<PaymentPlan> = planRows.map((p) => ({
+      const plans: Array<PaymentPlan> = (raw?.plans ?? []).map((p) => ({
         id: p.id,
         name: p.name,
         deposit: Number(p.deposit),
         instalments: p.instalments,
-        instalmentAmount: Number(p.instalment_amount),
+        instalmentAmount: Number(p.instalmentAmount),
         notes: p.notes,
       }));
-      // Lists arrive as comma-joined text so they parse the same on every Postgres driver setup.
-      const list = (text: string) => (text ? text.split(",") : []);
-      const pick = (ids: string) => plans.filter((p) => list(ids).includes(p.id));
+      const pick = (ids: string[]) => plans.filter((p) => ids.includes(p.id));
 
-      const faculties: Array<Faculty> = facultyRows.map((f) => ({
+      const faculties: Array<Faculty> = (raw?.faculties ?? []).map((f) => ({
         id: f.id as FacultyId,
         name: f.name,
         tagline: f.tagline,
       }));
 
-      const courses: Array<Course> = courseRows.map((c) => ({
+      const courses: Array<Course> = (raw?.courses ?? []).map((c) => ({
         id: c.id,
         name: c.name,
-        faculty: c.faculty_id as FacultyId,
+        faculty: c.facultyId as FacultyId,
         months: c.months,
         type: c.type as CourseType,
         award: c.award,
         ...(c.saqa ? { saqa: c.saqa } : {}),
         description: c.description,
-        plans: pick(c.plan_ids),
+        plans: pick(c.planIds),
         signature: c.signature,
         ...(c.details ? { details: c.details } : {}),
         ...(c.certification ? { certification: c.certification } : {}),
         ...(c.careers ? { careers: c.careers } : {}),
         ...(c.outline ? { outline: c.outline } : {}),
         ...(c.requirements ? { requirements: c.requirements } : {}),
-        ...(c.image_url ? { imageUrl: c.image_url } : {}),
+        ...(c.imageUrl ? { imageUrl: c.imageUrl } : {}),
       }));
 
-      const duals: Array<DualCourse> = dualRows.map((d) => ({
+      const duals: Array<DualCourse> = (raw?.duals ?? []).map((d) => ({
         id: d.id,
         title: d.title,
-        faculty: d.faculty_id as FacultyId,
-        courseIds: [list(d.course_ids)[0] ?? "", list(d.course_ids)[1] ?? ""] as [string, string],
+        faculty: d.facultyId as FacultyId,
+        courseIds: [d.courseIds[0] ?? "", d.courseIds[1] ?? ""] as [string, string],
         months: d.months,
-        plans: pick(d.plan_ids),
+        plans: pick(d.planIds),
         saving: toNumber(d.saving),
       }));
 
@@ -171,51 +129,26 @@ const enquirySchema = z.object({
 export const submitEnquiry = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => enquirySchema.parse(data))
   .handler(async ({ data }) => {
-    const { db } = await import("./db.server");
     const { sendMail, teamRecipients } = await import("./mail.server");
     const { applicantEnquiryEmail, teamEnquiryEmail } = await import(
       "./emails/enquiry-emails"
     );
 
-    const sql = db();
-
     try {
-      // Name the course they picked so the notification is useful at a glance.
-      let interest = "Not sure yet";
-      if (data.courseId) {
-        const rows = await sql<Array<{ name: string }>>`
-          SELECT name FROM public.courses WHERE id = ${data.courseId} LIMIT 1
-        `;
-        interest = rows[0]?.name ?? interest;
-      } else if (data.dualCourseId) {
-        const rows = await sql<Array<{ title: string }>>`
-          SELECT title FROM public.dual_courses WHERE id = ${data.dualCourseId} LIMIT 1
-        `;
-        interest = rows[0]?.title ?? interest;
-      }
-
-      const inserted = await sql<Array<{ id: string }>>`
-        INSERT INTO public.enquiries
-          (full_name, phone, email, course_id, dual_course_id, campus, message)
-        VALUES (
-          ${data.fullName},
-          ${data.phone},
-          ${data.email},
-          ${data.courseId ?? null},
-          ${data.dualCourseId ?? null},
-          ${data.campus},
-          ${data.message ?? null}
-        )
-        RETURNING id
-      `;
+      const saved = await callData<{ id: string; courseName: string | null; dualName: string | null }>(
+        "app_add_enquiry",
+        { ...data },
+      );
+      if (!saved?.id) throw new Error("Enquiry was not saved");
 
       const enquiry = {
-        reference: (inserted[0]?.id ?? "").slice(0, 8).toUpperCase(),
+        reference: saved.id.slice(0, 8).toUpperCase(),
         fullName: data.fullName,
         email: data.email,
         phone: data.phone,
         campus: data.campus,
-        interest,
+        // Name the course they picked so the notification is useful at a glance.
+        interest: saved.courseName ?? saved.dualName ?? "Not sure yet",
         message: data.message ?? null,
         receivedAt: new Date(),
       };
