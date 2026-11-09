@@ -444,14 +444,11 @@ $$;
 -- -------------------------------------------------------------- course content --
 
 -- Turns a name into a web address fragment, e.g. "Sound Engineering" -> "sound-engineering".
-create or replace function public.app_slug(input text)
+create or replace function public.app_slug(txt text)
 returns text
 language sql immutable
 as $$
-  select coalesce(
-    nullif(
-      btrim(regexp_replace(lower(coalesce(input, '')), '[^a-z0-9]+', '-', 'g'), '-'),
-      'item');
+  select coalesce(nullif(btrim(regexp_replace(lower(coalesce(txt, '')), '[^a-z0-9]+', '-', 'g'), '-'), ''), 'item');
 $$;
 
 create or replace function public.app_save_course(payload jsonb)
