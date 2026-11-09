@@ -169,7 +169,7 @@ as $$
       'campus', e.campus,
       'message', e.message,
       'status', e.status,
-      'createdAt', to_char(e.created_at at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"')
+      'createdAt', public.app_iso(e.created_at)
     ) order by e.created_at desc),
     '[]'::jsonb)
   from public.enquiries e
@@ -224,7 +224,8 @@ begin
     lower(payload->>'email'), payload->>'cell',
     nullif(payload->>'lastSchool', ''), nullif(payload->>'highestGrade', ''),
     nullif(payload->>'gradeYear', '')::int, nullif(payload->>'currentGrade', ''),
-    case when v_elsewhere then (payload->>'institutionCompleted') = 'yes' else null end,
+    v_elsewhere,
+    case when v_elsewhere then nullif(payload->>'institutionName', '') end,
     case when v_elsewhere then nullif(payload->>'institutionQualification', '') end,
     case when v_elsewhere then (payload->>'institutionCompleted') = 'yes' else null end,
     payload->>'payerFirstName', payload->>'payerLastName', payload->>'payerPhone',
@@ -274,7 +275,7 @@ as $$
       'payerAddress', a.payer_address,
       'payerEmployment', a.payer_employment,
       'status', a.status,
-      'createdAt', to_char(a.created_at at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"')
+      'createdAt', public.app_iso(a.created_at)
     ) order by a.created_at desc),
     '[]'::jsonb)
   from public.applications a
@@ -663,8 +664,7 @@ begin
       values (v_id, (v_plan #>> '{}')::uuid);
     end loop;
     update public.dual_courses
-    set saving = case when payload ? 'saving' and payload->>'saving' is not null
-                      then (payload->>'saving')::numeric else null end
+    set saving = (payload->>'saving')::numeric
     where id = v_id;
   end if;
 
@@ -739,9 +739,9 @@ as $$
       'email', p.email,
       'phone', p.phone,
       'status', p.status,
-      'createdAt', to_char(p.created_at at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"'),
+      'createdAt', public.app_iso(p.created_at),
       'paidAt', case when p.paid_at is null then null
-                     else to_char(p.paid_at at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') end,
+                     else public.app_iso(p.paid_at) end,
       'paymentKind', p.payment_kind
     ) order by p.created_at desc),
     '[]'::jsonb)
