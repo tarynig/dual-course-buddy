@@ -8,6 +8,10 @@ export interface Course {
   type: CourseType;
   award: string;
   saqa?: string;
+  nqfLevel?: string;
+  credits?: number;
+  accreditation?: string;
+  courseCode?: string;
   description: string;
   /** Payment plans offered for this course (amounts live on the plan). */
   plans: PaymentPlan[];

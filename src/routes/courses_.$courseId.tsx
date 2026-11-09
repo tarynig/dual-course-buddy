@@ -110,7 +110,7 @@ function CoursePage() {
       <section className="mx-auto grid max-w-6xl gap-10 px-5 py-12 md:grid-cols-[2fr_1fr]">
         <div>
           <p className="font-semibold text-secondary">{course.award}</p>
-          {course.saqa && <p className="text-xs text-muted-foreground">SAQA ID: {course.saqa}</p>}
+          <QualificationFacts course={course} />
           <p className="mt-4 text-lg leading-relaxed">{course.description}</p>
           {[course.details, course.certification, course.careers, course.outline, course.requirements].some(Boolean) ? (
             <div className="mt-8 space-y-10">
@@ -183,5 +183,25 @@ function CoursePage() {
         </section>
       )}
     </div>
+  );
+}
+
+function QualificationFacts({ course }: { course: Course }) {
+  const facts: Array<[string, string]> = [];
+  if (course.saqa) facts.push(["SAQA ID", course.saqa]);
+  if (course.nqfLevel) facts.push(["NQF level", course.nqfLevel]);
+  if (course.credits) facts.push(["Credits", String(course.credits)]);
+  if (course.accreditation) facts.push(["Accredited by", course.accreditation]);
+  if (course.courseCode) facts.push(["Course code", course.courseCode]);
+  if (!facts.length) return null;
+  return (
+    <dl className="mt-3 flex flex-wrap gap-x-6 gap-y-2 text-sm">
+      {facts.map(([k, v]) => (
+        <div key={k}>
+          <dt className="text-xs font-bold tracking-widest text-muted-foreground uppercase">{k}</dt>
+          <dd className="font-semibold">{v}</dd>
+        </div>
+      ))}
+    </dl>
   );
 }

@@ -28,6 +28,10 @@ type CoursePayload = {
   type: string;
   award: string;
   saqa: string | null;
+  nqfLevel: string | null;
+  credits: number | null;
+  accreditation: string | null;
+  courseCode: string | null;
   description: string;
   signature: boolean;
   details: string | null;
@@ -87,6 +91,10 @@ export const getCatalogue = createServerFn({ method: "GET" }).handler(
         type: c.type as CourseType,
         award: c.award,
         ...(c.saqa ? { saqa: c.saqa } : {}),
+        ...(c.nqfLevel ? { nqfLevel: c.nqfLevel } : {}),
+        ...(c.credits ? { credits: c.credits } : {}),
+        ...(c.accreditation ? { accreditation: c.accreditation } : {}),
+        ...(c.courseCode ? { courseCode: c.courseCode } : {}),
         description: c.description,
         plans: pick(c.planIds),
         signature: c.signature,

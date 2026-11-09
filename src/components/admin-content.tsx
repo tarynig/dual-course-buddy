@@ -95,6 +95,10 @@ function CourseForm({
     type: (course?.type ?? "OC") as CourseType,
     award: course?.award ?? "",
     saqa: course?.saqa ?? "",
+    nqfLevel: course?.nqfLevel ?? "",
+    credits: course?.credits ? String(course.credits) : "",
+    accreditation: course?.accreditation ?? "",
+    courseCode: course?.courseCode ?? "",
     description: course?.description ?? "",
     details: course?.details ?? "",
     certification: course?.certification ?? "",
@@ -131,6 +135,10 @@ function CourseForm({
           type: form.type,
           award: form.award,
           saqa: form.saqa.trim() || null,
+          nqfLevel: form.nqfLevel.trim() || null,
+          credits: form.credits.trim() ? Number(form.credits) : null,
+          accreditation: form.accreditation.trim() || null,
+          courseCode: form.courseCode.trim() || null,
           description: form.description,
           details: form.details.trim() || null,
           certification: form.certification.trim() || null,
@@ -210,6 +218,24 @@ function CourseForm({
         <label className={label}>
           SAQA ID (optional)
           <input value={form.saqa} onChange={(e) => set("saqa", e.target.value)} className={field} />
+        </label>
+      </div>
+      <div className="grid gap-5 sm:grid-cols-4">
+        <label className={label}>
+          NQF level (optional)
+          <input value={form.nqfLevel} placeholder="Level 5" onChange={(e) => set("nqfLevel", e.target.value)} className={field} />
+        </label>
+        <label className={label}>
+          Credits (optional)
+          <input type="number" min={0} value={form.credits} onChange={(e) => set("credits", e.target.value)} className={field} />
+        </label>
+        <label className={label}>
+          Accredited by (optional)
+          <input value={form.accreditation} placeholder="MICT SETA" onChange={(e) => set("accreditation", e.target.value)} className={field} />
+        </label>
+        <label className={label}>
+          Course code (optional)
+          <input value={form.courseCode} placeholder="CAC2701" onChange={(e) => set("courseCode", e.target.value)} className={field} />
         </label>
       </div>
       <label className={label}>
