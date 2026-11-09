@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { BOOKING_FEE } from "./booking-fee";
+import { callData } from "./data.server";
 
 /** Records the global booking fee; no course deposit can be charged online. */
 export const startBookingPayment = createServerFn({ method: "POST" })
@@ -18,40 +19,26 @@ export const startBookingPayment = createServerFn({ method: "POST" })
       .parse(data),
   )
   .handler(async ({ data }) => {
-    const { db } = await import("./db.server");
     const { buildCheckout } = await import("./payfast.server");
     const { getRequest } = await import("@tanstack/react-start/server");
-    const sql = db();
 
     // Names and plan association come from the database; the fee is global.
-    const rows = data.courseId
-      ? await sql<Array<{ item: string; plan: string | null }>>`
-          SELECT c.name AS item, p.name AS plan FROM public.courses c
-          LEFT JOIN public.course_payment_plans l ON l.course_id = c.id AND l.plan_id = ${data.planId}
-          LEFT JOIN public.payment_plans p ON p.id = l.plan_id
-          WHERE c.id = ${data.courseId} AND c.is_active`
-      : await sql<Array<{ item: string; plan: string | null }>>`
-          SELECT d.title AS item, p.name AS plan FROM public.dual_courses d
-          LEFT JOIN public.dual_payment_plans l ON l.dual_id = d.id AND l.plan_id = ${data.planId}
-          LEFT JOIN public.payment_plans p ON p.id = l.plan_id
-          WHERE d.id = ${data.dualCourseId} AND d.is_active`;
-    const row = rows[0];
-    if (!row || (data.planId && !row.plan)) throw new Error("That course or payment plan isn't available.");
-    const amount = BOOKING_FEE;
+    const booking = await callData<{
+      ok: boolean;
+      id?: string;
+      item?: string;
+      plan?: string | null;
+      error?: string;
+    }>("app_start_booking", { ...data, amount: BOOKING_FEE });
 
-    const inserted = await sql<Array<{ id: string }>>`
-      INSERT INTO public.deposit_payments
-        (course_id, dual_course_id, plan_id, item_name, plan_name, amount, full_name, email, phone, payment_kind)
-      VALUES (${data.courseId}, ${data.dualCourseId}, ${data.planId}, ${row.item}, ${row.plan},
-              ${amount}, ${data.fullName}, ${data.email.toLowerCase()}, ${data.phone}, 'booking')
-      RETURNING id`;
+    if (!booking?.ok || !booking.id || !booking.item) {
+      throw new Error(booking?.error ?? "That course or payment plan isn't available.");
+    }
 
     const siteUrl = (process.env["SITE_URL"] ?? new URL(getRequest().url).origin).replace(/\/$/, "");
-    const payment = inserted[0];
-    if (!payment) throw new Error("Couldn't record your booking fee.");
     return buildCheckout({
-      paymentId: payment.id,
-      itemName: row.item,
+      paymentId: booking.id,
+      itemName: booking.item,
       fullName: data.fullName,
       email: data.email,
       siteUrl,
@@ -74,30 +61,8 @@ export type AdminPayment = {
 
 export const getAdminPayments = createServerFn({ method: "GET" }).handler(
   async (): Promise<Array<AdminPayment>> => {
-    const { db } = await import("./db.server");
     const { requireAdmin } = await import("./session.server");
     await requireAdmin();
-    const rows = await db()<
-      Array<{
-        id: string; item_name: string; plan_name: string | null; amount: string;
-        full_name: string; email: string; phone: string; status: string;
-         created_at: Date; paid_at: Date | null; payment_kind: string;
-      }>
-    >`SELECT id, item_name, plan_name, amount::text AS amount, full_name, email, phone, status,
-              created_at, paid_at, payment_kind
-      FROM public.deposit_payments ORDER BY created_at DESC LIMIT 300`;
-    return rows.map((r) => ({
-      id: r.id,
-      itemName: r.item_name,
-      planName: r.plan_name,
-      amount: Number(r.amount),
-      fullName: r.full_name,
-      email: r.email,
-      phone: r.phone,
-      status: r.status,
-      createdAt: new Date(r.created_at).toISOString(),
-      paidAt: r.paid_at ? new Date(r.paid_at).toISOString() : null,
-      paymentKind: r.payment_kind,
-    }));
+    return (await callData<AdminPayment[]>("app_list_payments")) ?? [];
   },
 );
