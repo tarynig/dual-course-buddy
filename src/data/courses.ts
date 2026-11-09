@@ -1,4 +1,4 @@
-export type CourseType = "OC" | "AOC" | "HOC" | "FETC" | "SC";
+export type CourseType = "OC" | "HOC" | "AOC" | "NOC" | "FETC" | "SC";
 
 export interface Course {
   id: string;
@@ -25,7 +25,17 @@ export interface Course {
   imageUrl?: string;
 }
 
-export const COURSE_TYPES: CourseType[] = ["OC", "AOC", "HOC", "FETC", "SC"];
+export const COURSE_TYPES: CourseType[] = ["OC", "HOC", "AOC", "NOC", "FETC", "SC"];
+
+/** Accreditation type labels, as the college writes them (e.g. "Higher OC"). */
+export const COURSE_TYPE_LABELS: Record<CourseType, string> = {
+  OC: "OC – Occupational Certificate",
+  HOC: "Higher OC – Higher Occupational Certificate",
+  AOC: "Advanced OC – Advanced Occupational Certificate",
+  NOC: "National OC – National Occupational Certificate",
+  FETC: "FETC – Further Education and Training Certificate",
+  SC: "SC – Short Course",
+};
 
 export interface DualCourse {
   id: string;

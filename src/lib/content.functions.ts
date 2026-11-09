@@ -8,7 +8,7 @@ const courseSchema = z.object({
   facultyId: z.string().min(1).max(40),
   name: z.string().trim().min(2).max(160),
   months: z.number().int().min(1).max(60),
-  type: z.enum(["OC", "AOC", "HOC", "FETC", "SC"]),
+  type: z.enum(["OC", "HOC", "AOC", "NOC", "FETC", "SC"]),
   award: z.string().trim().min(2).max(200),
   saqa: z.string().trim().max(40).nullable(),
   nqfLevel: z.string().trim().max(40).nullable().optional(),

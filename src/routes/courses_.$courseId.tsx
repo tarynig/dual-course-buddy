@@ -6,7 +6,7 @@ import { DualCard, FeeLine } from "@/components/course-cards";
 import { DepositPanel } from "@/components/deposit-panel";
 import { CatalogueError, CatalogueNotFound } from "@/components/route-fallbacks";
 import { catalogueQueryOptions } from "@/lib/catalogue-queries";
-import { courseById, dualsForCourse, facultyById } from "@/data/courses";
+import { courseById, dualsForCourse, facultyById, COURSE_TYPE_LABELS } from "@/data/courses";
 import type { Course } from "@/data/courses";
 
 export const Route = createFileRoute("/courses_/$courseId")({
@@ -189,6 +189,7 @@ function CoursePage() {
 
 function QualificationFacts({ course }: { course: Course }) {
   const facts: Array<[string, string]> = [];
+  facts.push(["Accreditation type", COURSE_TYPE_LABELS[course.type] ?? course.type]);
   if (course.saqa) facts.push(["SAQA ID", course.saqa]);
   if (course.nqfLevel) facts.push(["NQF level", course.nqfLevel]);
   if (course.credits) facts.push(["Credits", String(course.credits)]);

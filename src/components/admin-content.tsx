@@ -5,7 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { catalogueQueryOptions } from "@/lib/catalogue-queries";
 import { deleteCourse, deleteDual, saveCourse, saveDual } from "@/lib/content.functions";
-import { COURSE_TYPES, type Course, type CourseType, type DualCourse } from "@/data/courses";
+import { COURSE_TYPES, COURSE_TYPE_LABELS, type Course, type CourseType, type DualCourse } from "@/data/courses";
 import { CoursePhoto } from "@/components/brochure-visuals";
 import { Button } from "@/components/ui/button";
 import { courseImageSchema } from "@/lib/course-images";
@@ -202,17 +202,17 @@ function CourseForm({
           <input type="number" min={1} max={60} required value={form.months} onChange={(e) => set("months", e.target.value)} className={field} />
         </label>
         <label className={label}>
-          Type
+          Accreditation type
           <select value={form.type} onChange={(e) => set("type", e.target.value)} className={field}>
             {COURSE_TYPES.map((t) => (
-              <option key={t} value={t}>{t}</option>
+              <option key={t} value={t}>{COURSE_TYPE_LABELS[t]}</option>
             ))}
           </select>
         </label>
       </div>
       <div className="grid gap-5 sm:grid-cols-[2fr_1fr]">
         <label className={label}>
-          Award / qualification
+          Qualification name (without OC/SC etc.)
           <input required value={form.award} onChange={(e) => set("award", e.target.value)} className={field} />
         </label>
         <label className={label}>
