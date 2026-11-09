@@ -225,9 +225,12 @@ export type Database = {
       }
       courses: {
         Row: {
+          accreditation: string | null
           award: string
           careers: string | null
           certification: string | null
+          course_code: string | null
+          credits: number | null
           deposit: number | null
           description: string
           details: string | null
@@ -238,6 +241,7 @@ export type Database = {
           is_active: boolean
           months: number
           name: string
+          nqf_level: string | null
           outline: string | null
           requirements: string | null
           saqa: string | null
@@ -246,9 +250,12 @@ export type Database = {
           type: string
         }
         Insert: {
+          accreditation?: string | null
           award: string
           careers?: string | null
           certification?: string | null
+          course_code?: string | null
+          credits?: number | null
           deposit?: number | null
           description: string
           details?: string | null
@@ -259,6 +266,7 @@ export type Database = {
           is_active?: boolean
           months: number
           name: string
+          nqf_level?: string | null
           outline?: string | null
           requirements?: string | null
           saqa?: string | null
@@ -267,9 +275,12 @@ export type Database = {
           type: string
         }
         Update: {
+          accreditation?: string | null
           award?: string
           careers?: string | null
           certification?: string | null
+          course_code?: string | null
+          credits?: number | null
           deposit?: number | null
           description?: string
           details?: string | null
@@ -280,6 +291,7 @@ export type Database = {
           is_active?: boolean
           months?: number
           name?: string
+          nqf_level?: string | null
           outline?: string | null
           requirements?: string | null
           saqa?: string | null
