@@ -596,6 +596,35 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      app_add_application: { Args: { payload: Json }; Returns: Json }
+      app_add_enquiry: { Args: { payload: Json }; Returns: Json }
+      app_add_session: { Args: { payload: Json }; Returns: Json }
+      app_add_staff: { Args: { payload: Json }; Returns: Json }
+      app_apply_payment_result: { Args: { payload: Json }; Returns: Json }
+      app_change_password: { Args: { payload: Json }; Returns: Json }
+      app_delete_course: { Args: { payload: Json }; Returns: Json }
+      app_delete_dual: { Args: { payload: Json }; Returns: Json }
+      app_delete_plan: { Args: { payload: Json }; Returns: Json }
+      app_delete_session: { Args: { payload: Json }; Returns: Json }
+      app_get_catalogue: { Args: { payload?: Json }; Returns: Json }
+      app_iso: { Args: { ts: string }; Returns: string }
+      app_list_applications: { Args: { payload?: Json }; Returns: Json }
+      app_list_enquiries: { Args: { payload?: Json }; Returns: Json }
+      app_list_payments: { Args: { payload?: Json }; Returns: Json }
+      app_list_staff: { Args: { payload?: Json }; Returns: Json }
+      app_payment_record: { Args: { payload: Json }; Returns: Json }
+      app_read_session: { Args: { payload: Json }; Returns: Json }
+      app_reset_staff_password: { Args: { payload: Json }; Returns: Json }
+      app_save_course: { Args: { payload: Json }; Returns: Json }
+      app_save_dual: { Args: { payload: Json }; Returns: Json }
+      app_save_plan: { Args: { payload: Json }; Returns: Json }
+      app_set_application_status: { Args: { payload: Json }; Returns: Json }
+      app_set_enquiry_status: { Args: { payload: Json }; Returns: Json }
+      app_set_item_plans: { Args: { payload: Json }; Returns: Json }
+      app_set_staff_active: { Args: { payload: Json }; Returns: Json }
+      app_sign_in: { Args: { payload: Json }; Returns: Json }
+      app_slug: { Args: { txt: string }; Returns: string }
+      app_start_booking: { Args: { payload: Json }; Returns: Json }
       hash_password: { Args: { plain: string }; Returns: string }
       verify_password: {
         Args: { hashed: string; plain: string }
