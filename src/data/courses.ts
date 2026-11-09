@@ -34,7 +34,7 @@ export const COURSE_TYPE_LABELS: Record<CourseType, string> = {
   AOC: "Advanced OC – Advanced Occupational Certificate",
   NOC: "National OC – National Occupational Certificate",
   FETC: "FETC – Further Education and Training Certificate",
-  SC: "SC – Short Course",
+  SC: "SC – CAC Skills Programme",
 };
 
 export interface DualCourse {
