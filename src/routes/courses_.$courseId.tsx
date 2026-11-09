@@ -7,6 +7,7 @@ import { DepositPanel } from "@/components/deposit-panel";
 import { CatalogueError, CatalogueNotFound } from "@/components/route-fallbacks";
 import { catalogueQueryOptions } from "@/lib/catalogue-queries";
 import { courseById, dualsForCourse, facultyById } from "@/data/courses";
+import type { Course } from "@/data/courses";
 
 export const Route = createFileRoute("/courses_/$courseId")({
   loader: async ({ context, params }) => {
