@@ -45,13 +45,19 @@ async function throughDataApi<T>(fn: string, payload: Payload): Promise<T> {
   return (data ?? null) as T;
 }
 
+// Saved operation names come from this file only, but the shape is checked
+// anyway before it is placed into a statement.
+const SAFE_NAME = /^[a-z_][a-z0-9_]*$/;
+
 async function throughPostgres<T>(fn: string, payload: Payload): Promise<T> {
+  if (!SAFE_NAME.test(fn)) throw new Error(`Unknown operation: ${fn}`);
   const { db } = await import("./db.server");
   const sql = db();
-  const rows = await sql<Array<{ result: T }>>`
-    select public.${sql.ident(fn)}(${JSON.stringify(payload)}::jsonb) as result
-  `;
-  return rows[0]?.result ?? null;
+  const rows = await sql.unsafe<Array<{ result: T }>>(
+    `select public.${fn}($1::jsonb) as result`,
+    [JSON.stringify(payload)],
+  );
+  return (rows[0]?.result ?? null) as T;
 }
 
 /**
