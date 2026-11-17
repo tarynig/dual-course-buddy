@@ -75,6 +75,32 @@ export async function sendMail(mail: OutgoingMail): Promise<SendResult> {
     return { sent: false, reason: "not_configured" };
   }
 
+  // The editor's hosted servers can't upgrade a plain connection to an encrypted
+  // one through nodemailer, so they use a sender built for that runtime. A normal
+  // Node host (cPanel) keeps using nodemailer below.
+  if (typeof navigator !== "undefined" && navigator.userAgent === "Cloudflare-Workers") {
+    try {
+      const { WorkerMailer } = await import("worker-mailer");
+      await WorkerMailer.send(
+        {
+          host: config.host,
+          port: config.port,
+          secure: config.secure,
+          startTls: !config.secure,
+          ...(config.auth ? { credentials: { username: config.auth.user, password: config.auth.pass } } : {}),
+          authType: ["plain", "login"],
+          socketTimeoutMs: 20000,
+          responseTimeoutMs: 20000,
+        },
+        { from: parseAddress(config.from), to: mail.to, subject: mail.subject, text: mail.text, html: mail.html },
+      );
+      return { sent: true };
+    } catch (error) {
+      console.error("[mail] send failed:", error);
+      return { sent: false, reason: "send_failed" };
+    }
+  }
+
   // One short-lived connection per message: nothing is pooled between requests.
   const transport = nodemailer.createTransport({
     host: config.host,
@@ -95,4 +121,13 @@ export async function sendMail(mail: OutgoingMail): Promise<SendResult> {
   } finally {
     transport.close();
   }
+}
+
+/** Splits `"Name" <a@b.c>` into its parts for senders that want them separately. */
+function parseAddress(value: string): { name?: string; email: string } {
+  const match = value.match(/^\s*"?([^"<]*?)"?\s*<([^>]+)>\s*$/);
+  const name = match?.[1]?.trim();
+  const email = match?.[2]?.trim();
+  if (!email) return { email: value.trim() };
+  return name ? { name, email } : { email };
 }
