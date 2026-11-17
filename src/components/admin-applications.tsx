@@ -1,6 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getAdminApplications, setApplicationStatus, type AdminApplication } from "@/lib/applications.functions";
+import { downloadCsv, downloadButtonClass } from "@/lib/download";
 
 const STATUSES = ["new", "contacted", "accepted", "enrolled", "declined"] as const;
 const yn = (v: unknown) => (v === true ? "Yes" : v === false ? "No" : "—");

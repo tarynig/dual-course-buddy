@@ -10,6 +10,7 @@ import {
   setEnquiryStatus,
 } from "@/lib/admin.functions";
 import type { AdminEnquiry } from "@/lib/admin.functions";
+import { downloadCsv, downloadButtonClass } from "@/lib/download";
 import { FeesPanel } from "@/components/admin-fees";
 import { StaffPanel } from "@/components/admin-staff";
 import { PaymentsPanel } from "@/components/admin-payments";
