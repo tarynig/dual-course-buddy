@@ -296,12 +296,22 @@ function ApplyPage() {
               </p>
               <p className="mt-3 text-sm text-muted-foreground">{DIRECT_PAYMENT_TERMS}</p>
               <div className="mt-4 grid gap-2">
-                {payable.length > 0 && (
-                  <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-input p-3 text-sm font-bold has-[:checked]:border-primary has-[:checked]:bg-primary/10">
-                    <input type="radio" name="payChoice" checked={effectivePayChoice === "plan"} onChange={() => setPayChoice("plan")} className="accent-primary" />
-                    Pay my plan's Due now amount{chosenPlan ? ` — ${formatZar(dueNowAmount(chosenPlan))}` : ""}
+                {payable.map((p) => (
+                  <label key={p.id} className="flex cursor-pointer items-start gap-3 rounded-xl border border-input p-3 text-sm has-[:checked]:border-primary has-[:checked]:bg-primary/10">
+                    <input type="radio" name="payChoice" checked={effectivePayChoice === "plan" && chosenPlan?.id === p.id} onChange={() => { setPayChoice("plan"); setPlanId(p.id); }} className="mt-1 accent-primary" />
+                    <span>
+                      <span className="block font-bold">{publicPlanName(p.name)}</span>
+                      {p.instalments > 1 ? (
+                        <>
+                          <span className="font-bold text-primary">Due now: {formatZar(p.deposit)}</span>
+                          <span className="mt-1 block text-muted-foreground">Due after deposit: {p.instalments} × {formatZar(p.instalmentAmount)} pm</span>
+                        </>
+                      ) : (
+                        <span className="font-bold text-primary">Due now: {formatZar(p.instalmentAmount)}</span>
+                      )}
+                    </span>
                   </label>
-                )}
+                ))}
                 <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-input p-3 text-sm font-bold has-[:checked]:border-primary has-[:checked]:bg-primary/10">
                   <input type="radio" name="payChoice" checked={effectivePayChoice === "booking"} onChange={() => setPayChoice("booking")} className="accent-primary" />
                   Pay the {formatZar(BOOKING_FEE)} booking fee to secure my spot
@@ -311,34 +321,6 @@ function ApplyPage() {
                   Apply only — I'll pay later
                 </label>
               </div>
-              {effectivePayChoice === "plan" && payable.length > 0 && (
-                <fieldset className="mt-6">
-                  <legend className="font-display text-lg font-black">Choose your payment plan</legend>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    You pay the Due now amount now. The college admin will arrange all remaining payments directly with you.
-                  </p>
-                  <ul className="mt-3 space-y-3">
-                    {payable.map((p) => (
-                      <li key={p.id}>
-                        <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-border p-3 has-[:checked]:border-primary">
-                          <input type="radio" name="planChoice" checked={chosenPlan?.id === p.id} onChange={() => setPlanId(p.id)} className="mt-1 accent-primary" />
-                          <span className="text-sm">
-                            <span className="block font-bold">{publicPlanName(p.name)}</span>
-                            {p.instalments > 1 ? (
-                              <>
-                                <span className="font-bold text-primary">Due now: {formatZar(p.deposit)}</span>
-                                <span className="mt-1 block text-muted-foreground">Due after deposit: {p.instalments} × {formatZar(p.instalmentAmount)} pm</span>
-                              </>
-                            ) : (
-                              <span className="font-bold text-primary">Due now: {formatZar(p.instalmentAmount)}</span>
-                            )}
-                          </span>
-                        </label>
-                      </li>
-                    ))}
-                  </ul>
-                </fieldset>
-              )}
             </div>
           ) : (
             <p className="mt-4 text-sm text-muted-foreground">Our admissions team will contact you about fees and securing your placement.</p>
