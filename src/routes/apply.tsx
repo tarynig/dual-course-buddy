@@ -285,7 +285,7 @@ function ApplyPage() {
           </p>
           {canPay ? (
             <div className="brochure-frame mt-6 rounded-3xl p-6">
-              <h2 className="font-display text-2xl font-black">Secure your booking</h2>
+              <h2 className="font-display text-2xl font-black">Register now</h2>
               <p className="mt-2 text-sm text-muted-foreground">
                 {BOOKING_TERMS}
               </p>
