@@ -86,7 +86,7 @@ function Home() {
 
           <dl className="grid gap-4 sm:grid-cols-2 lg:col-span-2 lg:grid-cols-4">
             <HeroStat value="30+" label="SAQA qualifications" />
-            <HeroStat value="10–15" label="Months to qualify" />
+            <HeroStat value="10–15" label="Months to qualify = Industry Ready & Earning" long />
             <HeroStat value={`${catalogue.duals.length}`} label="Dual pairings" />
             <HeroStat value="99%" label="Pass rate" />
           </dl>
@@ -190,11 +190,19 @@ function Home() {
   );
 }
 
-function HeroStat({ value, label }: { value: string; label: string }) {
+function HeroStat({ value, label, long = false }: { value: string; label: string; long?: boolean }) {
   return (
     <div className="rounded-2xl bg-primary-foreground/10 p-5 backdrop-blur">
       <dt className="font-display text-4xl font-black text-secondary">{value}</dt>
-      <dd className="mt-1 text-xs font-bold tracking-widest uppercase opacity-75">{label}</dd>
+      <dd
+        className={
+          long
+            ? "mt-1 text-[0.7rem] leading-snug font-bold opacity-75"
+            : "mt-1 text-xs font-bold tracking-widest uppercase opacity-75"
+        }
+      >
+        {label}
+      </dd>
     </div>
   );
 }
