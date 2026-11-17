@@ -202,7 +202,7 @@ function CourseForm({
           <input type="number" min={1} max={60} required value={form.months} onChange={(e) => set("months", e.target.value)} className={field} />
         </label>
         <label className={label}>
-          Accreditation type
+          Programme type
           <select value={form.type} onChange={(e) => set("type", e.target.value)} className={field}>
             {COURSE_TYPES.map((t) => (
               <option key={t} value={t}>{COURSE_TYPE_LABELS[t]}</option>

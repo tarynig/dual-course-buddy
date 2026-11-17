@@ -189,7 +189,7 @@ function CoursePage() {
 
 function QualificationFacts({ course }: { course: Course }) {
   const facts: Array<[string, string]> = [];
-  facts.push(["Accreditation type", COURSE_TYPE_LABELS[course.type] ?? course.type]);
+  facts.push(["Programme type", COURSE_TYPE_LABELS[course.type] ?? course.type]);
   if (course.saqa) facts.push(["SAQA ID", course.saqa]);
   if (course.nqfLevel) facts.push(["NQF level", course.nqfLevel]);
   if (course.credits) facts.push(["Credits", String(course.credits)]);

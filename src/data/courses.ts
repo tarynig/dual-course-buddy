@@ -27,7 +27,7 @@ export interface Course {
 
 export const COURSE_TYPES: CourseType[] = ["OC", "HOC", "AOC", "NOC", "FETC", "SC"];
 
-/** Accreditation type labels, as the college writes them (e.g. "Higher OC"). */
+/** Programme type labels, as the college writes them (e.g. "Higher OC"). */
 export const COURSE_TYPE_LABELS: Record<CourseType, string> = {
   OC: "OC – Occupational Certificate",
   HOC: "Higher OC – Higher Occupational Certificate",
