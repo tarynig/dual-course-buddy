@@ -10,6 +10,7 @@ import {
   setEnquiryStatus,
 } from "@/lib/admin.functions";
 import type { AdminEnquiry } from "@/lib/admin.functions";
+import { downloadCsv, downloadButtonClass } from "@/lib/download";
 import { FeesPanel } from "@/components/admin-fees";
 import { StaffPanel } from "@/components/admin-staff";
 import { PaymentsPanel } from "@/components/admin-payments";
@@ -150,8 +151,30 @@ function EnquiriesPanel() {
   if (!enquiries.data?.length)
     return <p className="text-sm text-muted-foreground">No enquiries yet.</p>;
 
+  const handleDownload = () => {
+    downloadCsv(
+      `enquiries-${new Date().toISOString().slice(0, 10)}.csv`,
+      ["Date", "Name", "Email", "Phone", "Course", "Campus", "Message", "Status"],
+      enquiries.data.map((e) => [
+        new Date(e.createdAt).toLocaleString("en-ZA"),
+        e.fullName,
+        e.email,
+        e.phone,
+        label(e),
+        e.campus,
+        e.message ?? "",
+        e.status,
+      ]),
+    );
+  };
+
   return (
     <div className="space-y-4">
+      <div className="flex justify-end">
+        <button type="button" onClick={handleDownload} className={downloadButtonClass()}>
+          Download spreadsheet
+        </button>
+      </div>
       {enquiries.data.map((e) => (
         <div key={e.id} className="rounded-2xl border border-border bg-card p-5">
           <div className="flex flex-wrap items-start justify-between gap-4">
