@@ -6,7 +6,7 @@ import { FacultyBar, FacultyPhoto } from '@/components/brochure-visuals';
 import { Button } from '@/components/ui/button';
 import { CatalogueError, CatalogueNotFound } from "@/components/route-fallbacks";
 import { catalogueQueryOptions } from "@/lib/catalogue-queries";
-import { dualsForCourse, separateMonths } from "@/data/courses";
+import { dualsForCourse } from "@/data/courses";
 
 export const Route = createFileRoute("/dual-courses")({
   head: () => ({
