@@ -314,7 +314,7 @@ function ApplyPage() {
                           <input type="radio" name="planChoice" checked={chosenPlan?.id === p.id} onChange={() => setPlanId(p.id)} className="mt-1 accent-primary" />
                           <span className="text-sm">
                             <span className="block font-bold">{publicPlanName(p.name)}</span>
-                            {p.instalments > 0 ? (
+                            {p.instalments > 1 ? (
                               <span className="text-muted-foreground">After placement confirmation: {p.instalments} × {formatZar(p.instalmentAmount)}</span>
                             ) : (
                               <span className="text-muted-foreground">Due now: {formatZar(p.instalmentAmount)}</span>

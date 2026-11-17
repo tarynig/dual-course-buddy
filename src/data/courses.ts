@@ -64,9 +64,9 @@ export const planTotal = (p: PaymentPlan) => p.deposit + p.instalments * p.insta
 export const fromPrice = (plans: PaymentPlan[]): number | null =>
   plans.length ? Math.min(...plans.map((p) => p.instalmentAmount)) : null;
 
-/** True when the from price is a monthly instalment (vs a once-off amount). */
+/** True when the from price is a monthly instalment (vs a once-off amount). Once-off plans store instalments as 0 or 1. */
 export const fromIsMonthly = (plans: PaymentPlan[]): boolean =>
-  plans.some((p) => p.instalments > 0);
+  plans.some((p) => p.instalments > 1);
 
 export type FacultyId =
   | "audio"
