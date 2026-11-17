@@ -322,7 +322,6 @@ function ApplyPage() {
                             {p.deposit > 0 && (
                               <span className="mt-1 block text-xs text-muted-foreground">Deposit arranged with admin: {formatZar(p.deposit)}</span>
                             )}
-                            <span className="mt-1 block text-xs text-muted-foreground">Total course fee: {formatZar(planTotal(p))}</span>
                           </span>
                         </label>
                       </li>
