@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { formatZar, planTotal, publicPlanName, type PaymentPlan } from "@/data/courses";
+import { formatZar, publicPlanName, type PaymentPlan } from "@/data/courses";
 import { startBookingPayment } from "@/lib/payments.functions";
 import { Button } from "@/components/ui/button";
 import { LockKeyhole } from "lucide-react";
