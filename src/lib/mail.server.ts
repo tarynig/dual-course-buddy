@@ -92,7 +92,7 @@ export async function sendMail(mail: OutgoingMail): Promise<SendResult> {
           socketTimeoutMs: 20000,
           responseTimeoutMs: 20000,
         },
-        { from: config.from, to: mail.to, subject: mail.subject, text: mail.text, html: mail.html },
+        { from: parseAddress(config.from), to: mail.to, subject: mail.subject, text: mail.text, html: mail.html },
       );
       return { sent: true };
     } catch (error) {
@@ -121,4 +121,10 @@ export async function sendMail(mail: OutgoingMail): Promise<SendResult> {
   } finally {
     transport.close();
   }
+}
+
+/** Splits `"Name" <a@b.c>` into its parts for senders that want them separately. */
+function parseAddress(value: string): { name?: string; email: string } {
+  const match = value.match(/^\s*"?([^"<]*?)"?\s*<([^>]+)>\s*$/);
+  return match ? { name: match[1].trim() || undefined, email: match[2].trim() } : { email: value.trim() };
 }
