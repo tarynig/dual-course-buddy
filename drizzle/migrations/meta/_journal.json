@@ -85,6 +85,13 @@
       "when": 1794898220460,
       "tag": "0011_booking_payment_due_now_mode",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1794899009657,
+      "tag": "0012_editable_booking_fee",
+      "breakpoints": true
     }
   ]
 }
