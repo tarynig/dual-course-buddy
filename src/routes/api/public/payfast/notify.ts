@@ -40,23 +40,29 @@ export const Route = createFileRoute("/api/public/payfast/notify")({
           paidAt: status === "paid" ? new Date().toISOString() : "",
         });
 
+        const { sendMail, teamRecipients } = await import("@/lib/mail.server");
+        const { depositEmails, depositFailedEmail } = await import("@/lib/emails/deposit-emails");
+        const details = {
+          reference: id.slice(0, 8).toUpperCase(),
+          item_name: payment.itemName,
+          plan_name: payment.planName,
+          amount: Number(payment.amount),
+          full_name: payment.fullName,
+          email: payment.email,
+          phone: payment.phone,
+          payment_kind: payment.paymentKind,
+        };
         if (status === "paid") {
-          const { sendMail, teamRecipients } = await import("@/lib/mail.server");
-          const { depositEmails } = await import("@/lib/emails/deposit-emails");
-          const mails = depositEmails({
-            reference: id.slice(0, 8).toUpperCase(),
-            item_name: payment.itemName,
-            plan_name: payment.planName,
-            amount: Number(payment.amount),
-            full_name: payment.fullName,
-            email: payment.email,
-            phone: payment.phone,
-            payment_kind: payment.paymentKind,
-          });
+          const mails = depositEmails(details);
           await Promise.allSettled([
             ...(await teamRecipients()).map((to) => sendMail({ to, ...mails.team })),
             sendMail({ to: payment.email, ...mails.student }),
           ]);
+        } else {
+          const mail = depositFailedEmail({ ...details, outcome: status });
+          await Promise.allSettled(
+            (await teamRecipients()).map((to) => sendMail({ to, ...mail })),
+          );
         }
         return new Response("ok");
       },

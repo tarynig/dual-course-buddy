@@ -23,6 +23,26 @@ ${lines.map((l) => `<p style="margin:0 0 10px">${esc(l)}</p>`).join("")}
 </div></div>`;
 }
 
+export function depositFailedEmail(p: Paid & { outcome: string }) {
+  const label = p.payment_kind === "booking" ? "Booking fee" : "Deposit";
+  const lines = [
+    `Student: ${p.full_name}`,
+    `Email: ${p.email}`,
+    `Phone: ${p.phone}`,
+    `Course: ${p.item_name}`,
+    `Payment plan: ${p.plan_name ?? "—"}`,
+    `Amount attempted: ${zar(p.amount)}`,
+    `Reference: ${p.reference}`,
+    `Outcome: ${p.outcome}`,
+    "No money was taken. You may want to follow up with the student.",
+  ];
+  return {
+    subject: `${label} ${p.outcome}: ${p.item_name} — ${p.full_name}`,
+    text: lines.join("\n"),
+    html: wrap(`${label} ${p.outcome}`, lines),
+  };
+}
+
 export function depositEmails(p: Paid) {
   const label = p.payment_kind === "booking" ? "Booking fee" : "Deposit";
   const details = [
