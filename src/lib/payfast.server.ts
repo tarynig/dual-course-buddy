@@ -5,7 +5,6 @@
 //   PAYFAST_MERCHANT_ID  PAYFAST_MERCHANT_KEY  PAYFAST_PASSPHRASE
 // In test mode with no settings, PayFast's public sandbox account is used.
 import { createHash } from "node:crypto";
-import { BOOKING_FEE } from "./booking-fee";
 
 const SANDBOX = { merchantId: "10000100", merchantKey: "46f0cd694581a", passphrase: "jt7NOE43FZPn" };
 
@@ -46,6 +45,8 @@ export function sign(fields: Array<[string, string]>, passphrase: string): strin
 export type CheckoutInput = {
   paymentId: string;
   itemName: string;
+  /** Amount in rand, always derived server-side — never taken from the browser. */
+  amount: number;
   fullName: string;
   email: string;
   siteUrl: string;
@@ -66,8 +67,8 @@ export function buildCheckout(input: CheckoutInput) {
     ["name_last", rest.join(" ").slice(0, 100)],
     ["email_address", input.email],
     ["m_payment_id", input.paymentId],
-    ["amount", BOOKING_FEE.toFixed(2)],
-    ["item_name", `Booking fee: ${input.itemName}`.slice(0, 100)],
+    ["amount", input.amount.toFixed(2)],
+    ["item_name", input.itemName.slice(0, 100)],
   ];
   const signature = sign(fields, config.passphrase);
   return {
