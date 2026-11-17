@@ -159,7 +159,7 @@ function CoursePage() {
             <Link to="/contact" className="mt-5 inline-block rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-foreground">
               Enquire about this course
             </Link>
-            <Link to="/apply" search={{ course: `course:${course.id}` }} className="mt-5 ml-3 inline-block rounded-full bg-secondary px-6 py-3 text-sm font-bold text-secondary-foreground">
+            <Link to="/apply" search={{ course: `course:${course.id}`, plan: undefined }} className="mt-5 ml-3 inline-block rounded-full bg-secondary px-6 py-3 text-sm font-bold text-secondary-foreground">
               Apply now
             </Link>
           </div>
