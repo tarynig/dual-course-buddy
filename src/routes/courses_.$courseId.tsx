@@ -193,7 +193,7 @@ function QualificationFacts({ course }: { course: Course }) {
   if (course.saqa) facts.push(["SAQA ID", course.saqa]);
   if (course.nqfLevel) facts.push(["NQF level", course.nqfLevel]);
   if (course.credits) facts.push(["Credits", String(course.credits)]);
-  if (course.accreditation) facts.push(["Accredited by", course.accreditation]);
+  if (course.accreditation) facts.push(["Provided by", course.accreditation]);
   if (course.courseCode) facts.push(["Course code", course.courseCode]);
   if (!facts.length) return null;
   return (

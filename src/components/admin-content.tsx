@@ -230,7 +230,7 @@ function CourseForm({
           <input type="number" min={0} value={form.credits} onChange={(e) => set("credits", e.target.value)} className={field} />
         </label>
         <label className={label}>
-          Accredited by (optional)
+          Provided by (optional)
           <input value={form.accreditation} placeholder="MICT SETA" onChange={(e) => set("accreditation", e.target.value)} className={field} />
         </label>
         <label className={label}>
