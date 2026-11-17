@@ -9,7 +9,7 @@ import { catalogueQueryOptions } from "@/lib/catalogue-queries";
 import { submitApplication } from "@/lib/applications.functions";
 import { startBookingPayment } from "@/lib/payments.functions";
 import { postToPayFast } from "@/components/deposit-panel";
-import { formatZar, publicPlanName } from "@/data/courses";
+import { dueNowAmount, formatZar, publicPlanName } from "@/data/courses";
 import { BOOKING_FEE, BOOKING_TERMS, DIRECT_PAYMENT_TERMS } from "@/lib/booking-fee";
 import { Button } from "@/components/ui/button";
 
@@ -71,7 +71,7 @@ function ApplyPage() {
   const [elsewhere, setElsewhere] = useState(false);
   const [step, setStep] = useState(0);
   const [interest, setInterest] = useState(course ?? "");
-  const [payNow, setPayNow] = useState(true);
+  const [payChoice, setPayChoice] = useState<"plan" | "booking" | "later">("plan");
   const [planId, setPlanId] = useState(plan ?? "");
   const formRef = useRef<HTMLFormElement>(null);
   const [kind, itemId] = interest.split(":");
@@ -79,6 +79,7 @@ function ApplyPage() {
   const payable = item?.plans ?? [];
   const chosenPlan = payable.find((p) => p.id === planId) ?? payable[0];
   const canPay = !!item;
+  const effectivePayChoice = payChoice === "plan" && payable.length === 0 ? "booking" : payChoice;
 
   function stepValid(i: number) {
     const box = formRef.current?.querySelector<HTMLElement>(`[data-step="${i}"]`);
@@ -132,13 +133,14 @@ function ApplyPage() {
           payerAddress: g("payerAddress"), payerEmployment: g("payerEmployment") as "Employed",
         },
       });
-      if (result.ok && canPay && payNow) {
+      if (result.ok && canPay && effectivePayChoice !== "later") {
         try {
           const checkout = await pay({
             data: {
               courseId: kind === "course" ? itemId : null,
               dualCourseId: kind === "dual" ? itemId : null,
               planId: chosenPlan?.id ?? null,
+              mode: effectivePayChoice === "plan" ? "due_now" : "booking",
               fullName: `${g("firstName")} ${g("lastName")}`,
               email: g("email"),
               phone: g("cell"),
@@ -293,19 +295,27 @@ function ApplyPage() {
                 {BOOKING_TERMS}
               </p>
               <p className="mt-3 text-sm text-muted-foreground">{DIRECT_PAYMENT_TERMS}</p>
-              <div className="mt-4 grid gap-2 sm:grid-cols-2">
-                {[true, false].map((v) => (
-                  <label key={String(v)} className="flex cursor-pointer items-center gap-2 rounded-xl border border-input p-3 text-sm font-bold has-[:checked]:border-primary has-[:checked]:bg-primary/10">
-                    <input type="radio" name="payNow" checked={payNow === v} onChange={() => setPayNow(v)} className="accent-primary" />
-                    {v ? `Apply and pay ${formatZar(BOOKING_FEE)} booking fee now` : "Apply only — I'll pay later"}
+              <div className="mt-4 grid gap-2">
+                {payable.length > 0 && (
+                  <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-input p-3 text-sm font-bold has-[:checked]:border-primary has-[:checked]:bg-primary/10">
+                    <input type="radio" name="payChoice" checked={effectivePayChoice === "plan"} onChange={() => setPayChoice("plan")} className="accent-primary" />
+                    Pay my plan's Due now amount{chosenPlan ? ` — ${formatZar(dueNowAmount(chosenPlan))}` : ""}
                   </label>
-                ))}
+                )}
+                <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-input p-3 text-sm font-bold has-[:checked]:border-primary has-[:checked]:bg-primary/10">
+                  <input type="radio" name="payChoice" checked={effectivePayChoice === "booking"} onChange={() => setPayChoice("booking")} className="accent-primary" />
+                  Pay the {formatZar(BOOKING_FEE)} booking fee to secure my spot
+                </label>
+                <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-input p-3 text-sm font-bold has-[:checked]:border-primary has-[:checked]:bg-primary/10">
+                  <input type="radio" name="payChoice" checked={effectivePayChoice === "later"} onChange={() => setPayChoice("later")} className="accent-primary" />
+                  Apply only — I'll pay later
+                </label>
               </div>
-              {payNow && payable.length > 0 && (
+              {effectivePayChoice === "plan" && payable.length > 0 && (
                 <fieldset className="mt-6">
-                  <legend className="font-display text-lg font-black">Choose your preferred payment plan</legend>
+                  <legend className="font-display text-lg font-black">Choose your payment plan</legend>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    This is a selection only — you are not paying the plan amount now. The college admin will arrange all deposit and course payments directly with you.
+                    You pay the Due now amount now. The college admin will arrange all remaining payments directly with you.
                   </p>
                   <ul className="mt-3 space-y-3">
                     {payable.map((p) => (
@@ -346,8 +356,14 @@ function ApplyPage() {
             <Button key="next" type="button" onClick={next} className="flex-1 rounded-full bg-primary px-6 py-4 text-sm font-bold text-primary-foreground">Continue →</Button>
           ) : (
             <Button key="submit" type="button" onClick={() => formRef.current?.requestSubmit()} disabled={state.status === "sending"} className="flex flex-1 items-center justify-center gap-2 rounded-full bg-primary px-6 py-4 text-sm font-bold text-primary-foreground disabled:opacity-60">
-              {canPay && payNow && <LockKeyhole aria-hidden="true" className="size-4" />}
-              {state.status === "sending" ? "Submitting…" : canPay && payNow ? `Submit & pay ${formatZar(BOOKING_FEE)} booking fee` : "Submit application"}
+              {canPay && effectivePayChoice !== "later" && <LockKeyhole aria-hidden="true" className="size-4" />}
+              {state.status === "sending"
+                ? "Submitting…"
+                : canPay && effectivePayChoice === "plan" && chosenPlan
+                  ? `Submit & pay ${formatZar(dueNowAmount(chosenPlan))}`
+                  : canPay && effectivePayChoice === "booking"
+                    ? `Submit & pay ${formatZar(BOOKING_FEE)} booking fee`
+                    : "Submit application"}
             </Button>
           )}
         </div>
