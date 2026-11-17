@@ -110,16 +110,16 @@ function DualPage() {
           {results.length > 0 && (
             <dl className="mt-6 grid gap-4 sm:grid-cols-3">
               <Stat
-                label="Competitive advantage"
-                value="Two qualifications set you apart"
+                label="Tactical selection"
+                value="Competitive advantage"
               />
               <Stat
-                label="Expanded scope"
-                value="Skills across two disciplines"
+                label="Two certificates"
+                value="Expanded scope"
               />
               <Stat
-                label="More opportunity"
-                value="Twice the doors open to you"
+                label="Superior portfolio"
+                value="More opportunity"
               />
             </dl>
           )}
