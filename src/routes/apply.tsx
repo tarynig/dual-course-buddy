@@ -314,8 +314,14 @@ function ApplyPage() {
                           <input type="radio" name="planChoice" checked={chosenPlan?.id === p.id} onChange={() => setPlanId(p.id)} className="mt-1 accent-primary" />
                           <span className="text-sm">
                             <span className="block font-bold">{publicPlanName(p.name)}</span>
-                            <span className="text-muted-foreground">After placement confirmation: {p.instalments} × {formatZar(p.instalmentAmount)}</span>
-                            <span className="mt-1 block text-xs text-muted-foreground">Deposit arranged with admin: {formatZar(p.deposit)}</span>
+                            {p.instalments > 1 ? (
+                              <span className="text-muted-foreground">After placement confirmation: {p.instalments} × {formatZar(p.instalmentAmount)}</span>
+                            ) : (
+                              <span className="text-muted-foreground">Due now: {formatZar(p.instalmentAmount)}</span>
+                            )}
+                            {p.deposit > 0 && (
+                              <span className="mt-1 block text-xs text-muted-foreground">Deposit arranged with admin: {formatZar(p.deposit)}</span>
+                            )}
                             <span className="mt-1 block font-bold text-primary">Total course fee: {formatZar(planTotal(p))}</span>
                           </span>
                         </label>
