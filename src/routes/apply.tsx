@@ -175,8 +175,8 @@ function ApplyPage() {
         </p>
         {state.paymentIssue && (
           <p className="mt-4 rounded-xl border border-border bg-muted p-4 text-sm">
-            Your application is saved, but the booking fee payment couldn't open just now. No money was taken — please{" "}
-            <Link to="/contact" className="font-bold underline">speak to the college admin</Link> or call 081 589 1088 about your booking fee.
+            Your application is saved, but the payment couldn't open just now. No money was taken — please{" "}
+            <Link to="/contact" className="font-bold underline">speak to the college admin</Link> or call 081 589 1088 about paying.
           </p>
         )}
         <Link to="/courses" className="mt-8 inline-block rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-foreground">Back to courses</Link>
