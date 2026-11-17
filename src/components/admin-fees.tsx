@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { catalogueQueryOptions } from "@/lib/catalogue-queries";
 import { deletePlan, savePlan, setItemPlans } from "@/lib/admin.functions";
-import { formatZar, fromPrice, planTotal, type PaymentPlan } from "@/data/courses";
+import { formatZar, fromIsMonthly, fromPrice, planTotal, type PaymentPlan } from "@/data/courses";
 
 const field =
   "mt-1 block w-full rounded-lg border border-border bg-background px-3 py-2 text-sm font-normal normal-case tracking-normal text-foreground";
@@ -135,7 +135,9 @@ function AssignRow({
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="font-semibold">{title}</p>
         <p className="text-xs text-muted-foreground">
-          {from === null ? "Shows “Fees on request”" : `Shows “From ${formatZar(from)}”`}
+          {from === null
+            ? "Shows “Fees on request”"
+            : `Shows “From ${formatZar(from)}${fromIsMonthly(plans.filter((p) => selected.includes(p.id))) ? "/month" : ""}”`}
         </p>
       </div>
       <div className="mt-3 flex flex-wrap gap-2">

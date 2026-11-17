@@ -60,9 +60,13 @@ export interface PaymentPlan {
 
 export const planTotal = (p: PaymentPlan) => p.deposit + p.instalments * p.instalmentAmount;
 
-/** Lowest total across the given plans — the "from" price. */
+/** Lowest instalment across the given plans — the "from" price. Once-off plans store their full amount as the instalment amount. */
 export const fromPrice = (plans: PaymentPlan[]): number | null =>
-  plans.length ? Math.min(...plans.map(planTotal)) : null;
+  plans.length ? Math.min(...plans.map((p) => p.instalmentAmount)) : null;
+
+/** True when the from price is a monthly instalment (vs a once-off amount). */
+export const fromIsMonthly = (plans: PaymentPlan[]): boolean =>
+  plans.some((p) => p.instalments > 0);
 
 export type FacultyId =
   | "audio"
