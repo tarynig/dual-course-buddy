@@ -9,7 +9,7 @@ import { catalogueQueryOptions } from "@/lib/catalogue-queries";
 import { submitApplication } from "@/lib/applications.functions";
 import { startBookingPayment } from "@/lib/payments.functions";
 import { postToPayFast } from "@/components/deposit-panel";
-import { formatZar, planTotal } from "@/data/courses";
+import { formatZar, planTotal, publicPlanName } from "@/data/courses";
 import { BOOKING_FEE, BOOKING_TERMS, DIRECT_PAYMENT_TERMS } from "@/lib/booking-fee";
 import { Button } from "@/components/ui/button";
 
@@ -26,7 +26,10 @@ export const Route = createFileRoute("/apply")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  validateSearch: (s: Record<string, unknown>) => ({ course: typeof s["course"] === "string" ? s["course"] : undefined }),
+  validateSearch: (s: Record<string, unknown>) => ({
+    course: typeof s["course"] === "string" ? s["course"] : undefined,
+    plan: typeof s["plan"] === "string" ? s["plan"] : undefined,
+  }),
   loader: ({ context }) => context.queryClient.ensureQueryData(catalogueQueryOptions),
   errorComponent: ({ error }) => <CatalogueError error={error} />,
   notFoundComponent: () => <CatalogueNotFound />,
@@ -62,14 +65,14 @@ function Choice({ label, name, options, onChange, required = true }: { label: st
 
 function ApplyPage() {
   const { data: catalogue } = useSuspenseQuery(catalogueQueryOptions);
-  const { course } = Route.useSearch();
+  const { course, plan } = Route.useSearch();
   const submit = useServerFn(submitApplication);
   const pay = useServerFn(startBookingPayment);
   const [elsewhere, setElsewhere] = useState(false);
   const [step, setStep] = useState(0);
   const [interest, setInterest] = useState(course ?? "");
   const [payNow, setPayNow] = useState(true);
-  const [planId, setPlanId] = useState("");
+  const [planId, setPlanId] = useState(plan ?? "");
   const formRef = useRef<HTMLFormElement>(null);
   const [kind, itemId] = interest.split(":");
   const item = kind === "course" ? catalogue.courses.find((c) => c.id === itemId) : kind === "dual" ? catalogue.duals.find((d) => d.id === itemId) : undefined;
@@ -310,7 +313,7 @@ function ApplyPage() {
                         <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-border p-3 has-[:checked]:border-primary">
                           <input type="radio" name="planChoice" checked={chosenPlan?.id === p.id} onChange={() => setPlanId(p.id)} className="mt-1 accent-primary" />
                           <span className="text-sm">
-                            <span className="block font-bold">{p.name}</span>
+                            <span className="block font-bold">{publicPlanName(p.name)}</span>
                             <span className="text-muted-foreground">After placement confirmation: {p.instalments} × {formatZar(p.instalmentAmount)}</span>
                             <span className="mt-1 block text-xs text-muted-foreground">Deposit arranged with admin: {formatZar(p.deposit)}</span>
                             <span className="mt-1 block font-bold text-primary">Total course fee: {formatZar(planTotal(p))}</span>
