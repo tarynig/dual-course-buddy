@@ -70,7 +70,7 @@ export function DepositPanel({ plans, courseId, dualCourseId }: Props) {
         <fieldset className="mt-4">
           <legend className="font-display text-lg font-black">Choose your payment option</legend>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-            You're not paying the course fee now — the college admin will arrange your deposit and payments directly with you.
+            Pick the option that suits you best — you can pay the Due now amount online when you register, or arrange it with the college admin.
           </p>
           <ul className="mt-4 space-y-3">
             {plans.map((p) => (
