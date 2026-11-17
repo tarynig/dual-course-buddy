@@ -5,7 +5,7 @@ import { FeeLine } from "@/components/course-cards";
 import { DepositPanel } from "@/components/deposit-panel";
 import { CatalogueError, CatalogueNotFound } from "@/components/route-fallbacks";
 import { catalogueQueryOptions } from "@/lib/catalogue-queries";
-import { facultyById, formatZar, separateMonths, type Course } from "@/data/courses";
+import { facultyById, formatZar, type Course } from "@/data/courses";
 
 export const Route = createFileRoute("/dual-courses_/$dualId")({
   loader: async ({ context, params }) => {
@@ -42,7 +42,6 @@ function DualPage() {
   const parts = dual.courseIds
     .map((id) => catalogue.courses.find((c) => c.id === id))
     .filter(Boolean) as Course[];
-  const monthsSaved = Math.max(separateMonths(catalogue.courses, dual) - dual.months, 0);
 
   return (
     <div>
@@ -55,11 +54,9 @@ function DualPage() {
           <h1 className="mt-2 max-w-3xl font-display text-4xl font-black md:text-5xl">{dual.title}</h1>
           <div className="mt-5 flex flex-wrap gap-2 text-xs font-bold">
             <span className="rounded-full bg-accent px-3 py-1 text-accent-foreground">{dual.months} months</span>
-            {monthsSaved > 0 && (
-              <span className="rounded-full bg-accent px-3 py-1 text-accent-foreground">
-                {monthsSaved} months faster than one after the other
-              </span>
-            )}
+            <span className="rounded-full bg-accent px-3 py-1 text-accent-foreground">
+              15 months intensive programme
+            </span>
             {dual.saving !== null && dual.saving > 0 && (
               <span className="rounded-full bg-gold px-3 py-1 text-gold-foreground">Save {formatZar(dual.saving)}</span>
             )}
