@@ -36,10 +36,9 @@ export const Route = createFileRoute("/courses")({
 function CoursesPage() {
   const { data: catalogue } = useSuspenseQuery(catalogueQueryOptions);
   const [faculty, setFaculty] = useState<FacultyId | "all">("all");
-  const [maxMonths, setMaxMonths] = useState(15);
 
   const filtered = catalogue.courses.filter(
-    (c) => (faculty === "all" || c.faculty === faculty) && c.months <= maxMonths,
+    (c) => faculty === "all" || c.faculty === faculty,
   );
 
   return (
@@ -89,22 +88,6 @@ function CoursesPage() {
         </div>
 
         <div className="mt-6 flex flex-wrap items-center gap-4 border-y border-border py-5">
-          <label htmlFor="duration" className="text-sm font-bold">
-            Maximum duration
-          </label>
-          <input
-            id="duration"
-            type="range"
-            min={10}
-            max={15}
-            step={1}
-            value={maxMonths}
-            onChange={(e) => setMaxMonths(Number(e.target.value))}
-            className="h-2 w-56 cursor-pointer accent-[var(--color-secondary)]"
-          />
-          <span className="rounded-full bg-accent px-3 py-1 text-sm font-bold text-accent-foreground">
-            up to {maxMonths} months
-          </span>
           <span className="ml-auto text-sm text-muted-foreground">
             {filtered.length} course{filtered.length === 1 ? "" : "s"}
           </span>
