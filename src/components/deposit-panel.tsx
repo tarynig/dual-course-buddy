@@ -77,11 +77,13 @@ export function DepositPanel({ plans, courseId, dualCourseId }: Props) {
                   <span className="min-w-0 flex-1 text-sm">
                     <span className="block font-bold">{publicPlanName(p.name)}</span>
                     {p.instalments > 1 ? (
-                      <span className="font-bold text-primary">{p.instalments} × {formatZar(p.instalmentAmount)}</span>
+                      <>
+                        <span className="font-bold text-primary">Due now: {formatZar(p.deposit)}</span>
+                        <span className="mt-1 block text-muted-foreground">Then: {p.instalments} × {formatZar(p.instalmentAmount)}</span>
+                      </>
                     ) : (
                       <span className="font-bold text-primary">Due now: {formatZar(p.instalmentAmount)}</span>
                     )}
-                    {p.deposit > 0 && <span className="mt-1 block text-xs text-muted-foreground">Deposit: {formatZar(p.deposit)}</span>}
                     {p.notes && <span className="mt-1 block text-xs text-muted-foreground">{p.notes}</span>}
                   </span>
                 </label>
