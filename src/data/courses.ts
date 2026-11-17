@@ -114,3 +114,9 @@ export const contact = {
     { city: "Pietermaritzburg", phone: "033 342 2720", address: "157 Victoria Road, Victoria Shopping Centre" },
   ],
 };
+
+/** Public plan label: hides internal category/price prefixes, e.g. "CAT-1 · Split pay 1" → "Split pay 1". */
+export function publicPlanName(name: string): string {
+  const tail = name.split("·").pop()!.trim();
+  return tail.replace(/\s*\([^)]*deposit\)\s*$/i, "").trim() || name;
+}
