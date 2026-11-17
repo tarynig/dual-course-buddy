@@ -6,7 +6,7 @@ import { FacultyBar, FacultyPhoto } from '@/components/brochure-visuals';
 import { Button } from '@/components/ui/button';
 import { CatalogueError, CatalogueNotFound } from "@/components/route-fallbacks";
 import { catalogueQueryOptions } from "@/lib/catalogue-queries";
-import { dualsForCourse, separateMonths } from "@/data/courses";
+import { dualsForCourse } from "@/data/courses";
 
 export const Route = createFileRoute("/dual-courses")({
   head: () => ({
@@ -110,16 +110,17 @@ function DualPage() {
           {results.length > 0 && (
             <dl className="mt-6 grid gap-4 sm:grid-cols-3">
               <Stat
-                label="Shortest pairing"
-                value={`${Math.min(...results.map((d) => d.months))} months`}
+                label="Competitive advantage"
+                value="Two qualifications set you apart"
               />
               <Stat
-                label="Most time saved"
-                value={`${Math.max(
-                  ...results.map((d) => separateMonths(catalogue.courses, d) - d.months),
-                )} months`}
+                label="Expanded scope"
+                value="Skills across two disciplines"
               />
-              <Stat label="Qualifications earned" value="2 per pairing" />
+              <Stat
+                label="More opportunity"
+                value="Twice the doors open to you"
+              />
             </dl>
           )}
         </div>
