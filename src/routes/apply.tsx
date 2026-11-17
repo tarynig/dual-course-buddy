@@ -315,14 +315,14 @@ function ApplyPage() {
                           <span className="text-sm">
                             <span className="block font-bold">{publicPlanName(p.name)}</span>
                             {p.instalments > 1 ? (
-                              <span className="text-muted-foreground">After placement confirmation: {p.instalments} × {formatZar(p.instalmentAmount)}</span>
+                              <span className="font-bold text-primary">After placement confirmation: {p.instalments} × {formatZar(p.instalmentAmount)}</span>
                             ) : (
-                              <span className="text-muted-foreground">Due now: {formatZar(p.instalmentAmount)}</span>
+                              <span className="font-bold text-primary">Due now: {formatZar(p.instalmentAmount)}</span>
                             )}
                             {p.deposit > 0 && (
                               <span className="mt-1 block text-xs text-muted-foreground">Deposit arranged with admin: {formatZar(p.deposit)}</span>
                             )}
-                            <span className="mt-1 block font-bold text-primary">Total course fee: {formatZar(planTotal(p))}</span>
+                            <span className="mt-1 block text-xs text-muted-foreground">Total course fee: {formatZar(planTotal(p))}</span>
                           </span>
                         </label>
                       </li>
