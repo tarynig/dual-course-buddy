@@ -49,7 +49,7 @@ export const submitApplication = createServerFn({ method: "POST" })
           .replace(/\n/g, "<br>")}</div>`;
       await Promise.allSettled([
         sendMail({ to: data.email, subject: "We've received your application", text: studentText, html: html(studentText) }),
-        ...teamRecipients().map((to) =>
+        ...(await teamRecipients()).map((to) =>
           sendMail({ to, subject: `New application: ${name} — ${course}`, text: teamText, html: html(teamText) }),
         ),
       ]);

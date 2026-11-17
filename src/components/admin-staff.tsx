@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { createStaff, listStaff, resetStaffPassword, setStaffActive } from "@/lib/auth.functions";
+import { createStaff, listStaff, resetStaffPassword, setStaffActive, setStaffNotifications } from "@/lib/auth.functions";
 import type { StaffUser } from "@/lib/auth.functions";
 
 const field = "mt-2 block w-full rounded-lg border border-border bg-background px-3 py-2 text-sm font-normal";
@@ -72,6 +72,7 @@ export function StaffPanel() {
 function StaffRow({ user }: { user: StaffUser }) {
   const reset = useServerFn(resetStaffPassword);
   const toggle = useServerFn(setStaffActive);
+  const notify = useServerFn(setStaffNotifications);
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [password, setPassword] = useState("");
@@ -97,12 +98,25 @@ function StaffRow({ user }: { user: StaffUser }) {
     await queryClient.invalidateQueries({ queryKey: ["staff"] });
   }
 
+  async function handleNotify(enabled: boolean) {
+    await notify({ data: { id: user.id, enabled } });
+    await queryClient.invalidateQueries({ queryKey: ["staff"] });
+  }
+
   return (
     <div className="rounded-2xl border border-border p-4">
       <div className="flex flex-wrap items-center gap-3">
         <span className="font-semibold">{user.email}</span>
         <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-bold uppercase">{user.role}</span>
         {!user.isActive && <span className="text-xs font-bold text-destructive">Switched off</span>}
+        <label className="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            checked={user.receivesNotifications}
+            onChange={(e) => handleNotify(e.target.checked)}
+          />
+          Email notifications
+        </label>
         <div className="ml-auto flex gap-3 text-sm font-bold">
           <button type="button" onClick={() => setOpen((o) => !o)} className="text-primary underline">
             Reset password
