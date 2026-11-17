@@ -78,6 +78,13 @@
       "when": 1794238790923,
       "tag": "0010_course_qualification_fields",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1794898220460,
+      "tag": "0011_booking_payment_due_now_mode",
+      "breakpoints": true
     }
   ]
 }
