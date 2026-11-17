@@ -9,7 +9,7 @@ import { catalogueQueryOptions } from "@/lib/catalogue-queries";
 import { submitApplication } from "@/lib/applications.functions";
 import { startBookingPayment } from "@/lib/payments.functions";
 import { postToPayFast } from "@/components/deposit-panel";
-import { formatZar, planTotal, publicPlanName } from "@/data/courses";
+import { formatZar, publicPlanName } from "@/data/courses";
 import { BOOKING_FEE, BOOKING_TERMS, DIRECT_PAYMENT_TERMS } from "@/lib/booking-fee";
 import { Button } from "@/components/ui/button";
 
@@ -322,7 +322,6 @@ function ApplyPage() {
                             {p.deposit > 0 && (
                               <span className="mt-1 block text-xs text-muted-foreground">Deposit arranged with admin: {formatZar(p.deposit)}</span>
                             )}
-                            <span className="mt-1 block text-xs text-muted-foreground">Total course fee: {formatZar(planTotal(p))}</span>
                           </span>
                         </label>
                       </li>

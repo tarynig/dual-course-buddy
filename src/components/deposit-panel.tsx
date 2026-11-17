@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { formatZar, planTotal, publicPlanName, type PaymentPlan } from "@/data/courses";
+import { formatZar, publicPlanName, type PaymentPlan } from "@/data/courses";
 import { startBookingPayment } from "@/lib/payments.functions";
 import { Button } from "@/components/ui/button";
 import { LockKeyhole } from "lucide-react";
@@ -82,7 +82,6 @@ export function DepositPanel({ plans, courseId, dualCourseId }: Props) {
                       <span className="font-bold text-primary">Due now: {formatZar(p.instalmentAmount)}</span>
                     )}
                     {p.deposit > 0 && <span className="mt-1 block text-xs text-muted-foreground">Deposit: {formatZar(p.deposit)}</span>}
-                    <span className="mt-1 block text-xs text-muted-foreground">Total course fee: {formatZar(planTotal(p))}</span>
                     {p.notes && <span className="mt-1 block text-xs text-muted-foreground">{p.notes}</span>}
                   </span>
                 </label>
