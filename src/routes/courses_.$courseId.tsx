@@ -102,7 +102,7 @@ function CoursePage() {
           <div className="mt-5 flex flex-wrap gap-2 text-xs font-bold">
             <span className="rounded-full bg-accent px-3 py-1 text-accent-foreground">{course.months} months</span>
             {course.signature && (
-              <span className="rounded-full bg-gold px-3 py-1 text-gold-foreground uppercase tracking-widest">Signature course</span>
+              <span className="rounded-full bg-gold px-3 py-1 text-gold-foreground uppercase tracking-widest">Signature course - NQF 6</span>
             )}
           </div>
         </div>

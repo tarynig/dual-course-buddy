@@ -42,7 +42,7 @@ export function CourseCard({ course, number = 1 }: { course: Course; number?: nu
 
       {course.signature && (
         <span className="mt-2 w-fit rounded-full bg-gold px-3 py-1 text-[0.65rem] font-black tracking-widest text-gold-foreground uppercase">
-          Signature course
+          Signature course - NQF 6
         </span>
       )}
 
