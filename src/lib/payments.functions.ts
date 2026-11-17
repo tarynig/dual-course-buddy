@@ -3,7 +3,7 @@ import { z } from "zod";
 import { BOOKING_FEE } from "./booking-fee";
 import { callData } from "./data.server";
 
-/** Records the global booking fee; no course deposit can be charged online. */
+/** Records an online payment: the global booking fee, or a plan's "Due now" amount. */
 export const startBookingPayment = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) =>
     z
@@ -11,6 +11,7 @@ export const startBookingPayment = createServerFn({ method: "POST" })
         courseId: z.string().max(80).nullable(),
         dualCourseId: z.string().max(80).nullable(),
         planId: z.string().uuid().nullable(),
+        mode: z.enum(["booking", "due_now"]).default("booking"),
         fullName: z.string().trim().min(2).max(120),
         email: z.string().trim().email().max(200),
         phone: z.string().trim().max(40).refine((v) => v.replace(/\D/g, "").length >= 6),
@@ -22,23 +23,29 @@ export const startBookingPayment = createServerFn({ method: "POST" })
     const { buildCheckout } = await import("./payfast.server");
     const { getRequest } = await import("@tanstack/react-start/server");
 
-    // Names and plan association come from the database; the fee is global.
+    // Names, the plan association and the amount all come from the database.
     const booking = await callData<{
       ok: boolean;
       id?: string;
       item?: string;
       plan?: string | null;
+      amount?: number;
+      mode?: string;
       error?: string;
     }>("app_start_booking", { ...data, amount: BOOKING_FEE });
 
-    if (!booking?.ok || !booking.id || !booking.item) {
+    if (!booking?.ok || !booking.id || !booking.item || !booking.amount) {
       throw new Error(booking?.error ?? "That course or payment plan isn't available.");
     }
 
     const siteUrl = (process.env["SITE_URL"] ?? new URL(getRequest().url).origin).replace(/\/$/, "");
     return buildCheckout({
       paymentId: booking.id,
-      itemName: booking.item,
+      itemName:
+        booking.mode === "due_now"
+          ? `Due now payment: ${booking.item}${booking.plan ? ` — ${booking.plan}` : ""}`
+          : `Booking fee: ${booking.item}`,
+      amount: booking.amount,
       fullName: data.fullName,
       email: data.email,
       siteUrl,
