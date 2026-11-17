@@ -135,7 +135,9 @@ function AssignRow({
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="font-semibold">{title}</p>
         <p className="text-xs text-muted-foreground">
-          {from === null ? "Shows “Fees on request”" : `Shows “From ${formatZar(from)}”`}
+          {from === null
+            ? "Shows “Fees on request”"
+            : `Shows “From ${formatZar(from)}${fromIsMonthly(plans.filter((p) => selected.includes(p.id))) ? "/month" : ""}”`}
         </p>
       </div>
       <div className="mt-3 flex flex-wrap gap-2">
