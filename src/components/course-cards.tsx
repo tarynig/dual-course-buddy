@@ -4,7 +4,6 @@ import {
   formatZar,
   fromIsMonthly,
   fromPrice,
-  separateMonths,
   type PaymentPlan,
   type Course,
   type DualCourse,
@@ -74,8 +73,6 @@ export function DualCard({ dual, courses, number = 1 }: { dual: DualCourse; cour
   const parts = dual.courseIds
     .map((id) => courses.find((c) => c.id === id))
     .filter(Boolean) as Course[];
-  const apart = separateMonths(courses, dual);
-  const monthsSaved = Math.max(apart - dual.months, 0);
   const saving = dual.saving;
 
   return (
@@ -101,7 +98,7 @@ export function DualCard({ dual, courses, number = 1 }: { dual: DualCourse; cour
 
       <div className="mt-5 flex flex-wrap gap-2 text-xs font-bold">
         <span className="rounded-full bg-accent px-3 py-1 text-accent-foreground">
-          {monthsSaved > 0 ? `${monthsSaved} months faster than one after the other` : "Two qualifications, one timeline"}
+          15 months intensive programme
         </span>
         {saving !== null && saving > 0 && (
           <span className="rounded-full bg-gold px-3 py-1 text-gold-foreground">
