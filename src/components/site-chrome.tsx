@@ -22,7 +22,7 @@ export function Logo({ compact = false }: { compact?: boolean }) {
           <span className="text-primary">arts</span>
         </span>
         {!compact && (
-          <span className="block text-[0.6rem] font-semibold tracking-[0.42em] text-muted-foreground">
+          <span className="block text-[0.6rem] font-semibold tracking-[0.22em] text-muted-foreground">
             COLLEGE
           </span>
         )}
