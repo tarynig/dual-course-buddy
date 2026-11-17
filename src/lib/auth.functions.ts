@@ -63,7 +63,7 @@ export const changePassword = createServerFn({ method: "POST" })
     return { ok: true as const };
   });
 
-export type StaffUser = { id: string; email: string; role: "admin" | "staff"; isActive: boolean };
+export type StaffUser = { id: string; email: string; role: "admin" | "staff"; isActive: boolean; receivesNotifications: boolean };
 
 export const listStaff = createServerFn({ method: "GET" }).handler(async (): Promise<StaffUser[]> => {
   const { requireAdmin } = await import("./session.server");
@@ -113,5 +113,14 @@ export const setStaffActive = createServerFn({ method: "POST" })
       actorId: me.id,
     });
     if (!result?.ok) return { ok: false as const, error: result?.error ?? "Couldn't update the account." };
+    return { ok: true as const };
+  });
+
+export const setStaffNotifications = createServerFn({ method: "POST" })
+  .inputValidator((data: unknown) => z.object({ id: z.string().uuid(), enabled: z.boolean() }).parse(data))
+  .handler(async ({ data }) => {
+    const { requireAdmin } = await import("./session.server");
+    await requireAdmin();
+    await callData("app_set_staff_notifications", { ...data });
     return { ok: true as const };
   });

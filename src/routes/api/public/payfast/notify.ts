@@ -54,7 +54,7 @@ export const Route = createFileRoute("/api/public/payfast/notify")({
             payment_kind: payment.paymentKind,
           });
           await Promise.allSettled([
-            ...teamRecipients().map((to) => sendMail({ to, ...mails.team })),
+            ...(await teamRecipients()).map((to) => sendMail({ to, ...mails.team })),
             sendMail({ to: payment.email, ...mails.student }),
           ]);
         }

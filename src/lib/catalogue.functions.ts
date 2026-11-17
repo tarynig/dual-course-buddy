@@ -167,9 +167,9 @@ export const submitEnquiry = createServerFn({ method: "POST" })
 
       // The enquiry is already saved, so mail is a bonus on top of it: a failed
       // or unconfigured send must never turn a good submission into an error.
-      const team = teamRecipients();
+      const team = await teamRecipients();
       if (team.length === 0) {
-        console.warn("[mail] ADMISSIONS_EMAIL is not set — no admissions inbox to notify");
+        console.warn("[mail] no staff selected for notifications and ADMISSIONS_EMAIL is not set");
       }
 
       await Promise.all([

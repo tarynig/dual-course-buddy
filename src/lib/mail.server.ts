@@ -49,8 +49,18 @@ export function mailConfigured(): boolean {
   return settings() !== null;
 }
 
-/** Where enquiry notifications go (comma separated addresses). */
-export function teamRecipients(): Array<string> {
+/**
+ * Who gets team notifications: active staff ticked "Email notifications" on the
+ * Staff screen. ADMISSIONS_EMAIL is only a fallback when nobody is ticked.
+ */
+export async function teamRecipients(): Promise<Array<string>> {
+  try {
+    const { callData } = await import("./data.server");
+    const selected = (await callData<string[]>("app_list_notification_recipients")) ?? [];
+    if (selected.length > 0) return selected;
+  } catch (error) {
+    console.error("[mail] couldn't read notification recipients:", error);
+  }
   return (process.env["ADMISSIONS_EMAIL"] ?? "")
     .split(",")
     .map((address) => address.trim().toLowerCase())

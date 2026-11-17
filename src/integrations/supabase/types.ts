@@ -71,6 +71,7 @@ export type Database = {
           id: string
           is_active: boolean
           password_hash: string
+          receives_notifications: boolean
           role: string
           updated_at: string
         }
@@ -80,6 +81,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           password_hash: string
+          receives_notifications?: boolean
           role?: string
           updated_at?: string
         }
@@ -89,6 +91,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           password_hash?: string
+          receives_notifications?: boolean
           role?: string
           updated_at?: string
         }
@@ -641,6 +644,10 @@ export type Database = {
       app_iso: { Args: { ts: string }; Returns: string }
       app_list_applications: { Args: { payload?: Json }; Returns: Json }
       app_list_enquiries: { Args: { payload?: Json }; Returns: Json }
+      app_list_notification_recipients: {
+        Args: { payload?: Json }
+        Returns: Json
+      }
       app_list_payments: { Args: { payload?: Json }; Returns: Json }
       app_list_staff: { Args: { payload?: Json }; Returns: Json }
       app_payment_record: { Args: { payload: Json }; Returns: Json }
@@ -654,6 +661,7 @@ export type Database = {
       app_set_enquiry_status: { Args: { payload: Json }; Returns: Json }
       app_set_item_plans: { Args: { payload: Json }; Returns: Json }
       app_set_staff_active: { Args: { payload: Json }; Returns: Json }
+      app_set_staff_notifications: { Args: { payload: Json }; Returns: Json }
       app_sign_in: { Args: { payload: Json }; Returns: Json }
       app_slug: { Args: { txt: string }; Returns: string }
       app_start_booking: { Args: { payload: Json }; Returns: Json }
