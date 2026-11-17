@@ -60,6 +60,9 @@ export interface PaymentPlan {
 
 export const planTotal = (p: PaymentPlan) => p.deposit + p.instalments * p.instalmentAmount;
 
+/** The amount payable upfront for a plan: the deposit for split plans, the full amount for once-off plans. */
+export const dueNowAmount = (p: PaymentPlan): number => (p.instalments > 1 ? p.deposit : p.instalmentAmount);
+
 /** Lowest instalment across the given plans — the "from" price. Once-off plans store their full amount as the instalment amount. */
 export const fromPrice = (plans: PaymentPlan[]): number | null =>
   plans.length ? Math.min(...plans.map((p) => p.instalmentAmount)) : null;
