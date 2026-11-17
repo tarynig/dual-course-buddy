@@ -87,7 +87,7 @@ export async function sendMail(mail: OutgoingMail): Promise<SendResult> {
           port: config.port,
           secure: config.secure,
           startTls: !config.secure,
-          credentials: config.auth ? { username: config.auth.user, password: config.auth.pass } : undefined,
+          ...(config.auth ? { credentials: { username: config.auth.user, password: config.auth.pass } } : {}),
           authType: ["plain", "login"],
           socketTimeoutMs: 20000,
           responseTimeoutMs: 20000,
@@ -126,5 +126,8 @@ export async function sendMail(mail: OutgoingMail): Promise<SendResult> {
 /** Splits `"Name" <a@b.c>` into its parts for senders that want them separately. */
 function parseAddress(value: string): { name?: string; email: string } {
   const match = value.match(/^\s*"?([^"<]*?)"?\s*<([^>]+)>\s*$/);
-  return match ? { name: match[1].trim() || undefined, email: match[2].trim() } : { email: value.trim() };
+  const name = match?.[1]?.trim();
+  const email = match?.[2]?.trim();
+  if (!email) return { email: value.trim() };
+  return name ? { name, email } : { email };
 }
