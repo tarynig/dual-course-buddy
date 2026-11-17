@@ -85,9 +85,6 @@ function CoursesPage() {
               {f.name}
             </Button>
           ))}
-        </div>
-
-        <div className="mt-6 flex flex-wrap items-center gap-4 border-y border-border py-5">
           <span className="ml-auto text-sm text-muted-foreground">
             {filtered.length} course{filtered.length === 1 ? "" : "s"}
           </span>
