@@ -80,7 +80,7 @@ export function DualCard({ dual, courses, number = 1 }: { dual: DualCourse; cour
       <NumberedBar number={number} title={dual.title} dual />
       <div className="flex items-start justify-between gap-3">
         <span className="shrink-0 rounded-full bg-primary px-3 py-1 text-xs font-bold text-primary-foreground">
-          {dual.months} months
+          {dual.months} months intensive programme
         </span>
       </div>
 
@@ -97,9 +97,6 @@ export function DualCard({ dual, courses, number = 1 }: { dual: DualCourse; cour
       </ul>
 
       <div className="mt-5 flex flex-wrap gap-2 text-xs font-bold">
-        <span className="rounded-full bg-accent px-3 py-1 text-accent-foreground">
-          15 months intensive programme
-        </span>
         {saving !== null && saving > 0 && (
           <span className="rounded-full bg-gold px-3 py-1 text-gold-foreground">
             Save {formatZar(saving)}

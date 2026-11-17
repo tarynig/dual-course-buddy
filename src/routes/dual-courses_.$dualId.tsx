@@ -53,10 +53,7 @@ function DualPage() {
           </p>
           <h1 className="mt-2 max-w-3xl font-display text-4xl font-black md:text-5xl">{dual.title}</h1>
           <div className="mt-5 flex flex-wrap gap-2 text-xs font-bold">
-            <span className="rounded-full bg-accent px-3 py-1 text-accent-foreground">{dual.months} months</span>
-            <span className="rounded-full bg-accent px-3 py-1 text-accent-foreground">
-              15 months intensive programme
-            </span>
+            <span className="rounded-full bg-accent px-3 py-1 text-accent-foreground">{dual.months} months intensive programme</span>
             {dual.saving !== null && dual.saving > 0 && (
               <span className="rounded-full bg-gold px-3 py-1 text-gold-foreground">Save {formatZar(dual.saving)}</span>
             )}
