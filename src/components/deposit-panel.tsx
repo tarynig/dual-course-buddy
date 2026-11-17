@@ -62,7 +62,7 @@ export function DepositPanel({ plans, courseId, dualCourseId }: Props) {
 
   return (
     <div className="brochure-frame rounded-3xl p-6">
-      <h2 className="font-display text-2xl font-black">Secure your booking</h2>
+      <h2 className="font-display text-2xl font-black">Register now</h2>
       {(
         <div className="mt-4">
           <p className="text-sm font-semibold text-muted-foreground">Refundable booking fee</p>
