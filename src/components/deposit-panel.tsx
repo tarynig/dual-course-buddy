@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
+import { catalogueQueryOptions } from "@/lib/catalogue-queries";
 import { formatZar, publicPlanName, type PaymentPlan } from "@/data/courses";
 import { startBookingPayment } from "@/lib/payments.functions";
 import { Button } from "@/components/ui/button";
 import { LockKeyhole } from "lucide-react";
-import { BOOKING_FEE, BOOKING_TERMS, DIRECT_PAYMENT_TERMS } from "@/lib/booking-fee";
+import { BOOKING_TERMS, DIRECT_PAYMENT_TERMS } from "@/lib/booking-fee";
 
 /** Sends the browser to PayFast's hosted payment page with the signed fields from the server. */
 export function postToPayFast(checkout: { action: string; fields: [string, string][] }) {
@@ -28,6 +30,7 @@ type Props = { plans: PaymentPlan[]; courseId?: string; dualCourseId?: string };
 /** Course-page panel: pick a payment option, then register (apply flow) or just book with basic details. */
 export function DepositPanel({ plans, courseId, dualCourseId }: Props) {
   const start = useServerFn(startBookingPayment);
+  const BOOKING_FEE = useQuery(catalogueQueryOptions).data?.bookingFee ?? 500;
   const [planId, setPlanId] = useState(plans[0]?.id ?? "");
   const [bookOnly, setBookOnly] = useState(false);
   const [busy, setBusy] = useState(false);

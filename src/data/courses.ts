@@ -92,9 +92,11 @@ export interface Catalogue {
   courses: Course[];
   duals: DualCourse[];
   plans: PaymentPlan[];
+  /** Online booking fee in rand, set by admins on the Fees screen. */
+  bookingFee: number;
 }
 
-export const emptyCatalogue: Catalogue = { faculties: [], courses: [], duals: [], plans: [] };
+export const emptyCatalogue: Catalogue = { faculties: [], courses: [], duals: [], plans: [], bookingFee: 500 };
 
 export const courseById = (catalogue: Catalogue, id: string) =>
   catalogue.courses.find((c) => c.id === id);

@@ -1,6 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { BOOKING_FEE } from "./booking-fee";
 import { callData } from "./data.server";
 
 /** Records an online payment: the global booking fee, or a plan's "Due now" amount. */
@@ -32,7 +31,7 @@ export const startBookingPayment = createServerFn({ method: "POST" })
       amount?: number;
       mode?: string;
       error?: string;
-    }>("app_start_booking", { ...data, amount: BOOKING_FEE });
+    }>("app_start_booking", { ...data });
 
     if (!booking?.ok || !booking.id || !booking.item || !booking.amount) {
       throw new Error(booking?.error ?? "That course or payment plan isn't available.");
