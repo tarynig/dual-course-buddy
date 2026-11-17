@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { NumberedBar } from '@/components/brochure-visuals';
 import {
   formatZar,
+  fromIsMonthly,
   fromPrice,
   separateMonths,
   type PaymentPlan,
@@ -22,6 +23,7 @@ export function FeeLine({ plans }: { plans: PaymentPlan[] }) {
     <p className="text-sm font-semibold">
       <span className="text-muted-foreground">From </span>
       <span className="font-display text-xl font-black text-primary">{formatZar(from)}</span>
+      {fromIsMonthly(plans) && <span className="text-muted-foreground">/month</span>}
       {plans.length > 1 && (
         <span className="ml-2 text-muted-foreground">· {plans.length} payment plans</span>
       )}
