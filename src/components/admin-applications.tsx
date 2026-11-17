@@ -26,8 +26,37 @@ export function ApplicationsPanel() {
   if (q.error) return <p className="text-sm text-destructive">Couldn't load applications.</p>;
   if (!q.data?.length) return <p className="text-sm text-muted-foreground">No applications yet.</p>;
 
+  const handleDownload = () => {
+    const data = q.data ?? [];
+    downloadCsv(
+      `applications-${new Date().toISOString().slice(0, 10)}.csv`,
+      [
+        "Date", "First name", "Last name", "Course", "Location", "Status",
+        "ID number", "Date of birth", "Gender", "Home language", "Email", "Cell",
+        "Last school", "Highest grade", "Grade year", "Current grade",
+        "Studied elsewhere", "Institution", "Qualification", "Completed",
+        "Payer name", "Payer phone", "Payer email", "Payer ID", "Relationship",
+        "Payer address", "Payer employment",
+      ],
+      data.map((a: AdminApplication) => [
+        new Date(a.created_at).toLocaleString("en-ZA"),
+        a["first_name"], a["last_name"], a["item_name"] ?? "Course not chosen", a["location"], a.status,
+        a["id_number"], a["date_of_birth"], a["gender"], a["home_language"], a["email"], a["cell"],
+        a["last_school"], a["highest_grade"], a["grade_year"], a["current_grade"],
+        yn(a["studied_elsewhere"]), a["institution_name"], a["institution_qualification"], yn(a["institution_completed"]),
+        `${v(a["payer_first_name"])} ${v(a["payer_last_name"])}`, a["payer_phone"], a["payer_email"],
+        a["payer_id_number"], a["payer_relationship"], a["payer_address"], a["payer_employment"],
+      ]),
+    );
+  };
+
   return (
     <div className="space-y-4">
+      <div className="flex justify-end">
+        <button type="button" onClick={handleDownload} className={downloadButtonClass()}>
+          Download spreadsheet
+        </button>
+      </div>
       {q.data.map((a: AdminApplication) => (
         <details key={a.id} className="rounded-2xl border border-border p-5">
           <summary className="flex cursor-pointer flex-wrap items-center justify-between gap-3">
