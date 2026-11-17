@@ -178,7 +178,7 @@ function ContactPage() {
               {status === "sending" ? "Sending…" : "Send enquiry"}
             </button>
             <p className="mt-3 text-xs text-muted-foreground">
-              Only the refundable R500 booking fee is payable online; the college admin arranges all other payments directly with you.
+              Only the refundable booking fee or your plan's Due now amount is payable online; the college admin arranges all other payments directly with you.
             </p>
           </form>
         )}

@@ -729,14 +729,15 @@ begin
 
   -- The amount is decided here, never by the browser: the plan's "Due now"
   -- amount (deposit for split plans, full amount for once-off plans) or the
-  -- fixed booking fee passed by the server.
+  -- booking fee the admin set on the Fees screen.
   if v_mode = 'due_now' then
     if v_plan is null then
       return jsonb_build_object('ok', false, 'error', 'Choose a payment plan first.');
     end if;
     v_amount := case when v_instalments > 1 then v_deposit else v_instalment_amount end;
   else
-    v_amount := (payload->>'amount')::numeric;
+    select coalesce((select value::numeric from public.app_settings where key = 'booking_fee'), 500)
+      into v_amount;
   end if;
 
   insert into public.deposit_payments
@@ -859,3 +860,48 @@ to service_role;
 
 -- Public catalogue browsing is the one thing the site reads without a login.
 grant execute on function public.app_get_catalogue(jsonb) to anon;
+
+-- ------------------------------------------------------------- settings --
+
+create table if not exists public.app_settings (
+  key text primary key,
+  value text not null,
+  updated_at timestamptz not null default now()
+);
+grant all on public.app_settings to service_role;
+alter table public.app_settings enable row level security;
+insert into public.app_settings (key, value) values ('booking_fee', '500')
+  on conflict (key) do nothing;
+
+create or replace function public.app_get_booking_fee(payload jsonb default '{}'::jsonb)
+returns jsonb
+language sql stable security definer
+set search_path = public
+as $$
+  select jsonb_build_object('amount',
+    coalesce((select value::numeric from public.app_settings where key = 'booking_fee'), 500));
+$$;
+
+create or replace function public.app_set_booking_fee(payload jsonb)
+returns jsonb
+language plpgsql volatile security definer
+set search_path = public
+as $$
+declare
+  v_amount numeric := (payload->>'amount')::numeric;
+begin
+  if v_amount is null or v_amount < 1 or v_amount > 100000 then
+    return jsonb_build_object('ok', false, 'error', 'Enter an amount between R1 and R100 000.');
+  end if;
+  insert into public.app_settings (key, value, updated_at)
+    values ('booking_fee', v_amount::text, now())
+    on conflict (key) do update set value = excluded.value, updated_at = now();
+  return jsonb_build_object('ok', true, 'amount', v_amount);
+end;
+$$;
+
+revoke all on function public.app_get_booking_fee(jsonb), public.app_set_booking_fee(jsonb)
+  from public, anon, authenticated;
+grant execute on function public.app_get_booking_fee(jsonb), public.app_set_booking_fee(jsonb)
+  to service_role;
+grant execute on function public.app_get_booking_fee(jsonb) to anon;

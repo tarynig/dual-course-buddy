@@ -10,7 +10,7 @@ import { submitApplication } from "@/lib/applications.functions";
 import { startBookingPayment } from "@/lib/payments.functions";
 import { postToPayFast } from "@/components/deposit-panel";
 import { dueNowAmount, formatZar, publicPlanName } from "@/data/courses";
-import { BOOKING_FEE, BOOKING_TERMS, DIRECT_PAYMENT_TERMS } from "@/lib/booking-fee";
+import { BOOKING_TERMS, DIRECT_PAYMENT_TERMS } from "@/lib/booking-fee";
 import { Button } from "@/components/ui/button";
 
 const STEPS = ["Course", "The applicant", "Education", "Payment contact", "Review & submit"];
@@ -314,7 +314,7 @@ function ApplyPage() {
                 ))}
                 <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-input p-3 text-sm font-bold has-[:checked]:border-primary has-[:checked]:bg-primary/10">
                   <input type="radio" name="payChoice" checked={effectivePayChoice === "booking"} onChange={() => setPayChoice("booking")} className="accent-primary" />
-                  Pay the {formatZar(BOOKING_FEE)} booking fee to secure my spot
+                  Pay the {formatZar(catalogue.bookingFee)} booking fee to secure my spot
                 </label>
                 <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-input p-3 text-sm font-bold has-[:checked]:border-primary has-[:checked]:bg-primary/10">
                   <input type="radio" name="payChoice" checked={effectivePayChoice === "later"} onChange={() => setPayChoice("later")} className="accent-primary" />
@@ -344,7 +344,7 @@ function ApplyPage() {
                 : canPay && effectivePayChoice === "plan" && chosenPlan
                   ? `Submit & pay ${formatZar(dueNowAmount(chosenPlan))}`
                   : canPay && effectivePayChoice === "booking"
-                    ? `Submit & pay ${formatZar(BOOKING_FEE)} booking fee`
+                    ? `Submit & pay ${formatZar(catalogue.bookingFee)} booking fee`
                     : "Submit application"}
             </Button>
           )}

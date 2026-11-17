@@ -145,3 +145,13 @@ export const sendTestEmail = createServerFn({ method: "POST" }).handler(
     return { ok: true as const };
   },
 );
+
+export const saveBookingFee = createServerFn({ method: "POST" })
+  .inputValidator((data: unknown) => z.object({ amount: z.number().min(1).max(100000) }).parse(data))
+  .handler(async ({ data }) => {
+    const { requireAdmin } = await import("./session.server");
+    await requireAdmin();
+    const result = await callData<{ ok: boolean; error?: string }>("app_set_booking_fee", { ...data });
+    if (!result?.ok) throw new Error(result?.error ?? "Couldn't save the booking fee.");
+    return { ok: true as const };
+  });

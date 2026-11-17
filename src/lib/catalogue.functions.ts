@@ -65,7 +65,11 @@ const toNumber = (value: string | number | null): number | null =>
 export const getCatalogue = createServerFn({ method: "GET" }).handler(
   async (): Promise<Catalogue> => {
     try {
-      const raw = await callData<CataloguePayload>("app_get_catalogue");
+      const [raw, fee] = await Promise.all([
+        callData<CataloguePayload>("app_get_catalogue"),
+        callData<{ amount: number }>("app_get_booking_fee").catch(() => null),
+      ]);
+      const bookingFee = Number(fee?.amount ?? 500);
 
       const plans: Array<PaymentPlan> = (raw?.plans ?? []).map((p) => ({
         id: p.id,
@@ -116,10 +120,10 @@ export const getCatalogue = createServerFn({ method: "GET" }).handler(
         saving: toNumber(d.saving),
       }));
 
-      return { faculties, courses, duals, plans };
+      return { faculties, courses, duals, plans, bookingFee };
     } catch (error) {
       console.error("Catalogue read failed:", error);
-      return { faculties: [], courses: [], duals: [], plans: [] };
+      return { faculties: [], courses: [], duals: [], plans: [], bookingFee: 500 };
     }
   },
 );

@@ -46,6 +46,24 @@ export type Database = {
           },
         ]
       }
+      app_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value: string
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: string
+        }
+        Relationships: []
+      }
       app_users: {
         Row: {
           created_at: string
@@ -618,6 +636,7 @@ export type Database = {
       app_delete_dual: { Args: { payload: Json }; Returns: Json }
       app_delete_plan: { Args: { payload: Json }; Returns: Json }
       app_delete_session: { Args: { payload: Json }; Returns: Json }
+      app_get_booking_fee: { Args: { payload?: Json }; Returns: Json }
       app_get_catalogue: { Args: { payload?: Json }; Returns: Json }
       app_iso: { Args: { ts: string }; Returns: string }
       app_list_applications: { Args: { payload?: Json }; Returns: Json }
@@ -631,6 +650,7 @@ export type Database = {
       app_save_dual: { Args: { payload: Json }; Returns: Json }
       app_save_plan: { Args: { payload: Json }; Returns: Json }
       app_set_application_status: { Args: { payload: Json }; Returns: Json }
+      app_set_booking_fee: { Args: { payload: Json }; Returns: Json }
       app_set_enquiry_status: { Args: { payload: Json }; Returns: Json }
       app_set_item_plans: { Args: { payload: Json }; Returns: Json }
       app_set_staff_active: { Args: { payload: Json }; Returns: Json }

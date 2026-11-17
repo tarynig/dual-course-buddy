@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { catalogueQueryOptions } from "@/lib/catalogue-queries";
-import { deletePlan, savePlan, setItemPlans } from "@/lib/admin.functions";
+import { deletePlan, saveBookingFee, savePlan, setItemPlans } from "@/lib/admin.functions";
 import { formatZar, fromIsMonthly, fromPrice, planTotal, type PaymentPlan } from "@/data/courses";
 
 const field =
@@ -21,6 +21,7 @@ export function FeesPanel() {
 
   return (
     <div className="space-y-12">
+      <BookingFeeCard current={catalogue.data.bookingFee} />
       <section>
         <div className="flex items-center justify-between gap-4">
           <div>
@@ -282,5 +283,57 @@ function PlanForm({ plan, onDone }: { plan: PaymentPlan | null; onDone: () => vo
         )}
       </div>
     </form>
+  );
+}
+
+function BookingFeeCard({ current }: { current: number }) {
+  const save = useServerFn(saveBookingFee);
+  const queryClient = useQueryClient();
+  const [value, setValue] = useState(String(current));
+  const [state, setState] = useState<"idle" | "busy" | "saved" | "error">("idle");
+
+  async function handleSave() {
+    const amount = Number(value);
+    if (!Number.isFinite(amount) || amount < 1) return setState("error");
+    setState("busy");
+    try {
+      await save({ data: { amount } });
+      await queryClient.invalidateQueries({ queryKey: ["catalogue"] });
+      setState("saved");
+    } catch {
+      setState("error");
+    }
+  }
+
+  return (
+    <section className="rounded-2xl border border-border bg-card p-6">
+      <h2 className="font-display text-xl font-black">Online booking fee</h2>
+      <p className="text-sm text-muted-foreground">
+        The amount students pay online to book their spot. Currently {formatZar(current)}.
+      </p>
+      <div className="mt-4 flex flex-wrap items-end gap-3">
+        <label className="block">
+          <span className={label}>Amount (R)</span>
+          <input
+            type="number"
+            min={1}
+            step={1}
+            value={value}
+            onChange={(e) => { setValue(e.target.value); setState("idle"); }}
+            className="mt-1 w-40 rounded-md border border-input bg-background px-3 py-2 text-sm"
+          />
+        </label>
+        <button
+          type="button"
+          onClick={handleSave}
+          disabled={state === "busy"}
+          className="rounded-md bg-primary px-4 py-2 text-sm font-bold text-primary-foreground disabled:opacity-60"
+        >
+          {state === "busy" ? "Saving…" : "Save booking fee"}
+        </button>
+        {state === "saved" && <span className="text-sm text-secondary-foreground">Saved.</span>}
+        {state === "error" && <span className="text-sm text-destructive">Couldn't save — enter at least R1.</span>}
+      </div>
+    </section>
   );
 }
