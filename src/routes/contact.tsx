@@ -205,6 +205,14 @@ function ContactPage() {
               >
                 {c.phone}
               </a>
+              {"cell" in c && c.cell && (
+                <a
+                  href={`tel:${String(c.cell).replace(/\s/g, "")}`}
+                  className="mt-2 ml-4 inline-block text-sm font-bold text-secondary"
+                >
+                  Cell: {String(c.cell)}
+                </a>
+              )}
             </div>
           ))}
         </div>
