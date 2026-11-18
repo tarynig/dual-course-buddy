@@ -120,7 +120,7 @@ export const contact = {
   website: "www.creativearts.co.za",
   campuses: [
     { city: "Durban", phone: "031 301 3313", address: "86 Stephen Dlamini Road, Musgrave" },
-    { city: "Pietermaritzburg", phone: "033 342 2720", cell: "081 589 1088", address: "157 Victoria Road, Victoria Shopping Centre" },
+    { city: "Pietermaritzburg", phone: "033 342 2720", cell: "061 108 7733", address: "157 Victoria Road, Victoria Shopping Centre" },
   ],
 };
 
