@@ -119,7 +119,7 @@ export const contact = {
   whatsapp: "https://api.whatsapp.com/send?phone=27815891088",
   website: "www.creativearts.co.za",
   campuses: [
-    { city: "Durban", phone: "031 301 3313", address: "86 Stephen Dlamini Road, Musgrave" },
+    { city: "Durban", phone: "031 301 3313", cell: "081 589 1088", address: "86 Stephen Dlamini Road, Musgrave" },
     { city: "Pietermaritzburg", phone: "033 342 2720", cell: "061 108 7733", address: "157 Victoria Road, Victoria Shopping Centre" },
   ],
 };
