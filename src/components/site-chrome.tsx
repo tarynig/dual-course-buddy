@@ -118,6 +118,17 @@ export function SiteFooter() {
                 <a href={`tel:${c.phone.replace(/\s/g, "")}`} className="opacity-80 underline">
                   {c.phone}
                 </a>
+                {c.cell && (
+                  <>
+                    {" · "}
+                    <a
+                      href={`tel:${c.cell.replace(/\s/g, "")}`}
+                      className="opacity-80 underline"
+                    >
+                      Cell: {c.cell}
+                    </a>
+                  </>
+                )}
               </li>
             ))}
           </ul>
