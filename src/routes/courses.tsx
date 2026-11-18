@@ -27,6 +27,11 @@ export const Route = createFileRoute("/courses")({
       },
     ],
   }),
+  validateSearch: (search: Record<string, unknown>): { faculty?: FacultyId } => {
+    const out: { faculty?: FacultyId } = {};
+    if (typeof search["faculty"] === "string") out.faculty = search["faculty"] as FacultyId;
+    return out;
+  },
   loader: ({ context }) => context.queryClient.ensureQueryData(catalogueQueryOptions),
   errorComponent: ({ error }) => <CatalogueError error={error} />,
   notFoundComponent: () => <CatalogueNotFound />,
@@ -35,7 +40,8 @@ export const Route = createFileRoute("/courses")({
 
 function CoursesPage() {
   const { data: catalogue } = useSuspenseQuery(catalogueQueryOptions);
-  const [faculty, setFaculty] = useState<FacultyId | "all">("all");
+  const { faculty: facultyParam } = Route.useSearch();
+  const [faculty, setFaculty] = useState<FacultyId | "all">(facultyParam ?? "all");
 
   const filtered = catalogue.courses.filter(
     (c) => faculty === "all" || c.faculty === faculty,

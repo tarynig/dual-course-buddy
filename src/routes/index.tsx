@@ -104,6 +104,7 @@ function Home() {
             <Link
               key={f.id}
               to="/courses"
+              search={{ faculty: f.id }}
               className="brochure-faculty-link group"
             >
               <FacultyPhoto faculty={f.id} />
