@@ -148,7 +148,7 @@ export function SiteFooter() {
             ))}
           </ul>
           <p className="mt-6 text-xs opacity-60">
-            Accredited by QCTO (SDP: 011907030-1765), MICT-SETA (ACC/2011/05/676), CATHSSETA and ICITP (PR20250064GP)
+            Accredited by QCTO (SDP: 011907030-1765), MICT-SETA (ACC/2011/05/676), CATHSSETA (613/P/00516/2023) and ICITP (PR20250064GP)
           </p>
         </div>
       </div>
