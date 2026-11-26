@@ -86,7 +86,7 @@ function Home() {
 
           <dl className="grid gap-4 sm:grid-cols-2 lg:col-span-2 lg:grid-cols-4">
             <HeroStat value="30+" label="SAQA qualifications" />
-            <HeroStat value="10–15" label="Months to qualify = Industry Ready & Earning" />
+            <HeroStat value="10–15" label="Months to Industry ready" />
             <HeroStat value={`${catalogue.duals.length}`} label="Dual pairings = Tactical Dual Combos" />
             <HeroStat value="99%" label="Pass rate" />
           </dl>
