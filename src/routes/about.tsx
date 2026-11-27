@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Building2 } from "lucide-react";
 import { brochureCampus } from '@/lib/brochure-images';
+import { contact } from "@/data/courses";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -97,16 +98,26 @@ function AboutPage() {
               Creative Arts College runs from two campuses: Durban and Pietermaritzburg.
             </p>
             <ul className="mt-4 space-y-3 text-sm">
-              <li className="rounded-xl bg-muted p-4">
-                <span className="font-black text-primary">Durban</span>
-                <span className="block text-muted-foreground">84/86 Essenwood Road</span>
-              </li>
-              <li className="rounded-xl bg-muted p-4">
-                <span className="font-black text-primary">Pietermaritzburg</span>
-                <span className="block text-muted-foreground">
-                  Enquire for the campus address
-                </span>
-              </li>
+              {contact.campuses.map((c) => (
+                <li key={c.city} className="rounded-xl bg-muted p-4">
+                  <span className="font-black text-primary">{c.city}</span>
+                  <span className="block text-muted-foreground">{c.address}</span>
+                  <a
+                    href={`tel:${c.phone.replace(/\s/g, "")}`}
+                    className="mt-1 inline-block text-sm font-bold text-secondary"
+                  >
+                    {c.phone}
+                  </a>
+                  {"cell" in c && c.cell && (
+                    <a
+                      href={`tel:${String(c.cell).replace(/\s/g, "")}`}
+                      className="mt-1 ml-3 inline-block text-sm font-bold text-secondary"
+                    >
+                      Cell: {String(c.cell)}
+                    </a>
+                  )}
+                </li>
+              ))}
             </ul>
             <Link
               to="/contact"
