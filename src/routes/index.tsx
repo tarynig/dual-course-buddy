@@ -158,7 +158,7 @@ function Home() {
               to="/dual-courses"
               className="rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-foreground"
             >
-              See all {catalogue.duals.length} pairings
+              See all {catalogue.duals.length} combos
             </Link>
           </div>
           <div className="mt-8 grid gap-5 md:grid-cols-2">

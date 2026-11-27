@@ -103,7 +103,7 @@ function DualPage() {
             )}
 
             <span className="ml-auto text-sm font-semibold text-muted-foreground">
-              {results.length} pairing{results.length === 1 ? "" : "s"}
+              {results.length} combo{results.length === 1 ? "" : "s"}
             </span>
           </div>
 
